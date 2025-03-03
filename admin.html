@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - Plan Management</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="./css/admin.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" rel="stylesheet" />
+  <style>
+
+  </style>
+</head>
+
+<body>
+  <!-- Container for Sidebar & Main Content -->
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Permanent Sidebar for medium and larger screens -->
+      <nav class="col-md-3 sidebar d-md-block d-sm-none">
+        <h3 class="my-4 display-4">Admin Panel</h3>
+        <ul class="nav flex-column mt-4">
+          <li class="nav-item">
+            <a href="#" class="nav-link active-sts active text-white" data-target="dashboardSection">
+              <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link active-sts text-white" data-target="planManagementSection">
+              <i class="fas fa-list me-2"></i> Plan Management
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link active-sts text-white" data-target="categoryManagementSection">
+              <i class="fa-solid fa-layer-group"></i> Category
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link active-sts text-white" data-target="userManagementSection">
+              <i class="fas fa-users me-2"></i> Users
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link active-sts text-white" data-target="newUserSection">
+              <i class="fa-solid fa-bell"></i> New User Request
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Mobile Navigation (Bottom) -->
+      <nav class="mobile-nav">
+        <ul class="nav">
+          <li class="nav-item">
+            <a href="#" class="nav-link active-sts active text-white" data-bs-target="#dashboardSection">
+              <i class="fas fa-tachometer-alt me-2"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link active-sts text-white" data-bs-target="#planManagementSection">
+              <i class="fas fa-list me-2"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link active-sts text-white" data-bs-target="#categoryManagementSection">
+              <i class="fa-solid fa-layer-group"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link active-sts text-white" data-bs-target="#userManagementSection">
+              <i class="fas fa-users me-2"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link active-sts text-white" data-target="newUserSection">
+              <i class="fa-solid fa-bell"></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Main Content -->
+      <main class="col-md-9 content">
+        <nav class="navbar navbar-expand-lg navbar-light shadow-sm rounded-5 mt-2 px-2"
+          style="background-color: #2c3e50;">
+          <div class="container-fluid ">
+            <div class="row w-100">
+              <div class="col-6">
+                <h1 class="display-6 fw-semibold text-white text-body-emphasis">MobiComm</h1>
+              </div>
+              <!-- Profile Dropdown -->
+              <div class="col-6 d-flex justify-content-end">
+                <div class=" dropdown">
+                  <a class=" dropdown-toggle d-flex align-items-center mt-2 text-decoration-none text-white" href="#"
+                    role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="./assets/images/user.png" alt="Profile" class="rounded-circle mx-2" width="40"
+                      height="40">
+                    <span>Admin</span>
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item" href="#">Settings</a></li>
+                    <li>
+                      <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="section features">
+          <h2>Dashboard</h2>
+          <div id="dashboardStats" class="mb-3"></div>
+          <!-- Expiring and Expired Users Sections -->
+          <!-- Expiring Users Table -->
+          <div id="expiringUsersContainer userTable" class="mt-4">
+            <h3>Users with Plans Expiring in 3 Days</h3>
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover">
+                <thead class="thead">
+                  <tr>
+                    <th>Name</th>
+                    <th>Plan</th>
+                    <th>Expires</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="expiringUsersList">
+                  <!-- Table rows will be injected dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Expired Users Table -->
+          <div id="expiredUsersContainer userTable" class="mt-4">
+            <h3>Users with Expired Plans</h3>
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover">
+                <thead class="thead">
+                  <tr>
+                    <th>Name</th>
+                    <th>Plan</th>
+                    <th>Expired On</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="expiredUsersList">
+                  <!-- Table rows will be injected dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Management Section -->
+        <div id="categoryManagementSection" class="section d-none features">
+          <h2>Category Management</h2><br>
+          <button class="btn-svg mb-3" id="addCategoryBtn">
+            <i class="fa fa-plus me-2"></i>Add New Category
+          </button>
+
+          <!-- Nav tabs for Active vs Deactivated Categories -->
+          <ul class="nav nav-tabs" id="categoriesTab" role="tablist">
+            <li class="nav-item">
+              <button class="nav-link active" id="active-categories-tab" data-bs-toggle="tab"
+                data-bs-target="#activeCategoriesPane" type="button" role="tab">
+                Active Categories
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" id="deactivated-categories-tab" data-bs-toggle="tab"
+                data-bs-target="#deactivatedCategoriesPane" type="button" role="tab">
+                Deactivated Categories
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content" id="categoriesTabContent">
+            <!-- Active Categories Tab -->
+            <div class="tab-pane fade show active" id="activeCategoriesPane" role="tabpanel"
+              aria-labelledby="active-categories-tab">
+              <div class="table-responsive">
+                <table class="table table-striped" id="activeCategoriesTable">
+                  <thead class="thead">
+                    <tr>
+                      <th>ID</th>
+                      <th>Category Name</th>
+                      <th>Associated Plans</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Deactivated Categories Tab -->
+            <div class="tab-pane fade" id="deactivatedCategoriesPane" role="tabpanel"
+              aria-labelledby="deactivated-categories-tab">
+              <div class="table-responsive">
+                <table class="table table-striped" id="deactivatedCategoriesTable">
+                  <thead class="thead">
+                    <tr>
+                      <th>ID</th>
+                      <th>Category Name</th>
+                      <th>Associated Plans</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plan Management Section -->
+        <div id="planManagementSection" class="section d-none features">
+          <h2>Plan Management</h2><br>
+          <button class="btn-svg mb-3" id="addPlanBtn"><i class="fa fa-plus me-2"></i>Add New Plan</button>
+
+          <!-- Nav tabs for Active vs Deactivated Plans -->
+          <ul class="nav nav-tabs" id="plansTab" role="tablist">
+            <li class="nav-item">
+              <button class="nav-link active" id="active-plans-tab" data-bs-toggle="tab"
+                data-bs-target="#activePlansPane" type="button" role="tab">
+                Active Plans
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" id="deactivated-plans-tab" data-bs-toggle="tab"
+                data-bs-target="#deactivatedPlansPane" type="button" role="tab">
+                Deactivated Plans
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content" id="plansTabContent">
+            <!-- Active Plans Tab Pane -->
+            <div class="tab-pane fade show active" id="activePlansPane" role="tabpanel"
+              aria-labelledby="active-plans-tab">
+              <div class="table-responsive">
+                <table class="table table-striped" id="activePlansTable">
+                  <thead class="thead">
+                    <tr>
+                      <th>ID</th>
+                      <th>Plan Name</th>
+                      <th>Category</th>
+                      <th>Price</th>
+                      <th>Validity</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Deactivated Plans Tab Pane -->
+            <div class="tab-pane fade" id="deactivatedPlansPane" role="tabpanel"
+              aria-labelledby="deactivated-plans-tab">
+              <div class="table-responsive">
+                <table class="table table-striped" id="deactivatedPlansTable">
+                  <thead class="thead">
+                    <tr>
+                      <th>ID</th>
+                      <th>Plan Name</th>
+                      <th>Category</th>
+                      <th>Price</th>
+                      <th>Validity</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- User Management Section -->
+        <div id="userManagementSection" class="section d-none features">
+          <h2>User Management</h2>
+
+          <!-- Nav tabs for User Details vs User Queries -->
+          <ul class="nav nav-tabs" id="userTabs" role="tablist">
+            <li class="nav-item">
+              <button class="nav-link active" id="user-details-tab" data-bs-toggle="tab"
+                data-bs-target="#user-details" type="button" role="tab">
+                User Details
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" id="user-queries-tab" data-bs-toggle="tab" data-bs-target="#user-queries"
+                type="button" role="tab">
+                User Queries
+              </button>
+            </li>
+          </ul>
+
+          <!-- User Details Table with Search -->
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="user-details" role="tabpanel" aria-labelledby="user-details-tab">
+              <div class="mb-3">
+                <input type="text" class="form-control" id="userSearch" placeholder="Search by Username or Email">
+              </div>
+              <div class="table-responsive">
+                <table class="table table-striped" id="usersDetailsTable">
+                  <thead>
+                    <tr>
+                      <th>Username</th>
+                      <th>Name</th>
+                      <th>Phone</th>
+                      <th>Email</th>
+                      <th>Active Plan</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- User details rows will be injected here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="user-queries" role="tabpanel" aria-labelledby="user-queries-tab">
+              <div class="table-responsive">
+                <table class="table table-striped" id="userQueriesTable">
+                  <thead>
+                    <tr>
+                      <th>Username</th>
+                      <th>Email</th>
+                      <th>Phone</th>
+                      <th>Query</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- User query rows will be injected here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="newUserSection" class="section d-none features">
+          <h2>New User Requests</h2>
+          <div class="table-responsive">
+            <table class="table table-striped" id="newUserRequestsTable">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Sim Plan</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- New user request rows will be injected here -->
+              </tbody>
+            </table>
+          </div>
+          </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="categoryForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="categoryModalLabel">Add New Category</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Hidden field for Category ID (used for editing) -->
+            <div class="mb-3">
+              <label for="categoryId" class="form-label">Category ID</label>
+              <input type="text" class="form-control" id="categoryId" required />
+            </div>
+            <div class="mb-3">
+              <label for="categoryName" class="form-label">Category Name</label>
+              <input type="text" class="form-control" id="categoryName" required />
+            </div>
+            <!-- You can add additional fields here if needed -->
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Plan Add/Edit -->
+  <div class="modal fade" id="planModal" tabindex="-1" aria-labelledby="planModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="planForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="planModalLabel">Add New Plan</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="planName" class="form-label">Plan Id</label>
+              <input type="text" class="form-control" id="planId" />
+            </div>
+            <div class="mb-3">
+              <label for="planName" class="form-label">Plan Name</label>
+              <input type="text" class="form-control" id="planName" required />
+            </div>
+            <div class="mb-3">
+              <label for="planCategory" class="form-label">Category</label>
+              <select id="planCategory" class="form-select" required></select>
+            </div>
+            <div class="mb-3">
+              <label for="planPrice" class="form-label">Price (₹)</label>
+              <input type="number" class="form-control" id="planPrice" required />
+            </div>
+            <div class="mb-3">
+              <label for="planValidity" class="form-label">Validity (Days)</label>
+              <input type="number" class="form-control" id="planValidity" required />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Category Add/Edit -->
+  <div class="modal fade" id="planModal" tabindex="-1" aria-labelledby="planModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="planForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="planModalLabel">Add New Plan</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Hidden ID field -->
+            <div class="mb-3">
+              <label for="planName" class="form-label">Plan ID</label>
+              <input type="text" class="form-control" id="planId" required />
+            </div>
+            <div class="mb-3">
+              <label for="planName" class="form-label">Plan Name</label>
+              <input type="text" class="form-control" id="planName" required />
+            </div>
+            <div class="mb-3">
+              <label for="planCategory" class="form-label">Category</label>
+              <select id="planCategory" class="form-select" required></select>
+            </div>
+            <div class="mb-3">
+              <label for="planPrice" class="form-label">Price (₹)</label>
+              <input type="number" class="form-control" id="planPrice" required />
+            </div>
+            <div class="mb-3">
+              <label for="planValidity" class="form-label">Validity (Days)</label>
+              <input type="number" class="form-control" id="planValidity" required />
+            </div>
+            <div class="mb-3">
+              <label for="planDescription" class="form-label">Description</label>
+              <textarea id="planDescription" class="form-control" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">OTT Details</label>
+              <div id="ottDetailsContainer"></div>
+              <button type="button" id="addOttDetailBtn" class="btn btn-sm btn-secondary mt-2">Add OTT Detail</button>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- User Details Modal -->
+  <div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="userDetailsModalLabel">User Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Basic User Information -->
+          <div class="mb-3">
+            <p><strong>Username:</strong> <span id="detailUsername"></span></p>
+            <p><strong>Name:</strong> <span id="detailName"></span></p>
+            <p><strong>Phone:</strong> <span id="detailPhone"></span></p>
+            <p><strong>Email:</strong> <span id="detailEmail"></span></p>
+            <p><strong>Active Plan:</strong> <span id="detailActivePlan"></span></p>
+          </div>
+          <!-- Recharge History Table -->
+          <div class="mb-3">
+            <h6>Recharge History</h6>
+            <table class="table table-bordered" id="detailRechargeHistoryTable">
+              <thead>
+                <tr>
+                  <th>Plan ID</th>
+                  <th>Recharge Date</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Recharge records will be injected here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- jQuery and Bootstrap Bundle -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Admin JS -->
+  <script src="./js/admin.js"></script>
+  <script>
+    document.querySelectorAll('.nav-link.active-sts').forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        // Get the target attribute from data-target or data-bs-target
+        const targetAttr = this.getAttribute('data-target') || this.getAttribute('data-bs-target');
+        if (!targetAttr) return;
+
+        // Remove the '#' if it exists in the attribute value
+        const targetId = targetAttr.startsWith('#') ? targetAttr.substring(1) : targetAttr;
+
+        // Hide all content sections (assuming sections have the class "section" and "features")
+        document.querySelectorAll('.section.features').forEach(section => {
+          section.classList.add('d-none');
+        });
+
+        // Show the selected section
+        const targetSection = document.getElementById(targetId);
+        if (targetSection) {
+          targetSection.classList.remove('d-none');
+        }
+
+        // Update active class on nav links
+        document.querySelectorAll('.nav-link.active-sts').forEach(item => {
+          item.classList.remove('active');
+        });
+        this.classList.add('active');
+      });
+    });
+
+    // Fetch new user requests on page load
+    fetch('http://localhost:3000/newUserRequest')
+      .then(res => res.json())
+      .then(data => {
+        const $tbody = $('#newUserRequestsTable tbody');
+        $tbody.empty();
+        data.forEach(user => {
+          $tbody.append(`
+            <tr>
+              <td>${user.id}</td>
+              <td>${user.name}</td>
+              <td>${user.email}</td>
+              <td>${user.contactNumber}</td>
+              <td>${user.simPlan}</td>
+              <td><button class="btn btn-sm btn-success approve-user mx-2 my-2"><i class="fa-solid fa-square-check"></i></button>
+                  <button class="btn btn-sm btn-danger reject-user mx-2 my-2"><i class="fa-solid fa-trash-can"></i></button></td>
+            </tr>
+          `);
+        });
+      })
+      .catch(err => console.error('Error fetching new user requests:', err));
+
+  </script>
+</body>
+
+</html>

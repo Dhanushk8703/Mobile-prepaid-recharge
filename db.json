@@ -1,0 +1,1155 @@
+{
+  "dashboard": {
+    "users": {
+      "details": [
+        {
+          "username": "dhanush",
+          "name": "Dhanush",
+          "phone": "6369216867",
+          "email": "dhanush@gmail.com",
+          "activePlan": {
+            "planId": "recommended1",
+            "title": "Smart Choice Plan",
+            "expiryDate": "2025-02-15"
+          },
+          "rechargeHistory": [
+            {
+              "planId": "recommended1",
+              "rechargeDate": "2025-02-15",
+              "amount": 249,
+              "status": "active"
+            },
+            {
+              "planId": "talktime1",
+              "rechargeDate": "2025-01-10",
+              "amount": 199,
+              "status": "expired"
+            }
+          ],
+          "query": "",
+          "feedback": "",
+          "favoritePlans": [
+            {
+              "id": "recommended1",
+              "categoryId": 1,
+              "name": "Smart Choice Plan",
+              "price": 249,
+              "validity": "28 days",
+              "description": "Recommended for balanced usage with excellent OTT offers.",
+              "status": "active"
+            },
+            {
+              "id": "data1",
+              "categoryId": 4,
+              "name": "Ultra Data Plan",
+              "price": 299,
+              "validity": "28 days",
+              "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "username": "kaasi",
+          "name": "Kaasi",
+          "phone": "7845129360",
+          "email": "kaasi@gmail.com",
+          "activePlan": {
+            "planId": "recommended2",
+            "title": "Premium Data Boost",
+            "expiryDate": "2025-04-01"
+          },
+          "rechargeHistory": [
+            {
+              "planId": "recommended2",
+              "rechargeDate": "2025-03-01",
+              "amount": 549,
+              "status": "active"
+            },
+            {
+              "planId": "data1",
+              "rechargeDate": "2025-01-20",
+              "amount": 299,
+              "status": "expired"
+            }
+          ],
+          "query": "",
+          "feedback": "",
+          "favoritePlans": [
+            {
+              "id": "recommended1",
+              "categoryId": 1,
+              "name": "Smart Choice Plan",
+              "price": 249,
+              "validity": "28 days",
+              "description": "Recommended for balanced usage with excellent OTT offers.",
+              "status": "active"
+            },
+            {
+              "id": "data1",
+              "categoryId": 4,
+              "name": "Ultra Data Plan",
+              "price": 299,
+              "validity": "28 days",
+              "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "username": "gokulakannan",
+          "name": "Gokulakannan",
+          "phone": "9360425967",
+          "email": "gokulakannan@gmail.com",
+          "activePlan": {
+            "planId": "data3",
+            "title": "Data Booster",
+            "expiryDate": "2025-03-30"
+          },
+          "rechargeHistory": [
+            {
+              "planId": "data3",
+              "rechargeDate": "2025-02-20",
+              "amount": 399,
+              "status": "active"
+            }
+          ],
+          "query": "",
+          "feedback": "",
+          "favoritePlans": [
+            {
+              "id": "recommended1",
+              "categoryId": 1,
+              "name": "Smart Choice Plan",
+              "price": 249,
+              "validity": "28 days",
+              "description": "Recommended for balanced usage with excellent OTT offers.",
+              "status": "active"
+            },
+            {
+              "id": "data1",
+              "categoryId": 4,
+              "name": "Ultra Data Plan",
+              "price": 299,
+              "validity": "28 days",
+              "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "username": "varun",
+          "name": "Varun",
+          "phone": "8667288126",
+          "email": "varun@gmail.com",
+          "activePlan": null,
+          "rechargeHistory": [
+            {
+              "planId": "talktime4",
+              "rechargeDate": "2025-01-15",
+              "amount": 149,
+              "status": "expired"
+            }
+          ],
+          "query": "",
+          "feedback": "",
+          "favoritePlans": [
+            {
+              "id": "recommended1",
+              "categoryId": 1,
+              "name": "Smart Choice Plan",
+              "price": 249,
+              "validity": "28 days",
+              "description": "Recommended for balanced usage with excellent OTT offers.",
+              "status": "active"
+            },
+            {
+              "id": "data1",
+              "categoryId": 4,
+              "name": "Ultra Data Plan",
+              "price": 299,
+              "validity": "28 days",
+              "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "username": "gobi_krishna",
+          "name": "Gobi Krishna",
+          "phone": "7639798140",
+          "email": "gobi.krishna@gmail.com",
+          "activePlan": {
+            "planId": "talktime1",
+            "title": "Unlimited Talktime",
+            "expiryDate": "2025-03-25"
+          },
+          "rechargeHistory": [
+            {
+              "planId": "talktime1",
+              "rechargeDate": "2025-02-05",
+              "amount": 199,
+              "status": "active"
+            }
+          ],
+          "query": "",
+          "feedback": "",
+          "favoritePlans": [
+            {
+              "id": "recommended1",
+              "categoryId": 1,
+              "name": "Smart Choice Plan",
+              "price": 249,
+              "validity": "28 days",
+              "description": "Recommended for balanced usage with excellent OTT offers.",
+              "status": "active"
+            },
+            {
+              "id": "data1",
+              "categoryId": 4,
+              "name": "Ultra Data Plan",
+              "price": 299,
+              "validity": "28 days",
+              "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "username": "kamal_raj",
+          "name": "Kamal Raj",
+          "phone": "8148074706",
+          "email": "kamal.raj@gmail.com",
+          "activePlan": {
+            "planId": "data1",
+            "title": "Ultra Data Plan",
+            "expiryDate": "2025-03-10"
+          },
+          "rechargeHistory": [
+            {
+              "planId": "data1",
+              "rechargeDate": "2025-02-01",
+              "amount": 299,
+              "status": "active"
+            }
+          ],
+          "query": "",
+          "feedback": "",
+          "favoritePlans": [
+            {
+              "id": "recommended1",
+              "categoryId": 1,
+              "name": "Smart Choice Plan",
+              "price": 249,
+              "validity": "28 days",
+              "description": "Recommended for balanced usage with excellent OTT offers.",
+              "status": "active"
+            },
+            {
+              "id": "data1",
+              "categoryId": 4,
+              "name": "Ultra Data Plan",
+              "price": 299,
+              "validity": "28 days",
+              "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "username": "arjun",
+          "name": "Arjun",
+          "phone": "6543210987",
+          "email": "arjun@gmail.com",
+          "activePlan": {
+            "planId": "popular1",
+            "title": "Hot Deal Talktime",
+            "expiryDate": "2025-03-20"
+          },
+          "rechargeHistory": [
+            {
+              "planId": "popular1",
+              "rechargeDate": "2025-03-20",
+              "amount": 129,
+              "status": "active"
+            }
+          ],
+          "query": "",
+          "feedback": "",
+          "favoritePlans": [
+            {
+              "id": "recommended1",
+              "categoryId": 1,
+              "name": "Smart Choice Plan",
+              "price": 249,
+              "validity": "28 days",
+              "description": "Recommended for balanced usage with excellent OTT offers.",
+              "status": "active"
+            },
+            {
+              "id": "data1",
+              "categoryId": 4,
+              "name": "Ultra Data Plan",
+              "price": 299,
+              "validity": "28 days",
+              "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "username": "bhargava",
+          "name": "Bhargava",
+          "phone": "9494876521",
+          "email": "bhargava@gmail.com",
+          "activePlan": {
+            "planId": "popular2",
+            "title": "Best Data Plan",
+            "expiryDate": "2025-03-28"
+          },
+          "rechargeHistory": [
+            {
+              "planId": "popular2",
+              "rechargeDate": "2025-03-05",
+              "amount": 279,
+              "status": "active"
+            }
+          ],
+          "query": "",
+          "feedback": "",
+          "favoritePlans": [
+            {
+              "id": "recommended1",
+              "categoryId": 1,
+              "name": "Smart Choice Plan",
+              "price": 249,
+              "validity": "28 days",
+              "description": "Recommended for balanced usage with excellent OTT offers.",
+              "status": "active"
+            },
+            {
+              "id": "data1",
+              "categoryId": 4,
+              "name": "Ultra Data Plan",
+              "price": 299,
+              "validity": "28 days",
+              "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "username": "chandra",
+          "name": "Chandra",
+          "phone": "7094640999",
+          "email": "chandra@gmail.com",
+          "activePlan": null,
+          "rechargeHistory": [
+            {
+              "planId": "talktime3",
+              "rechargeDate": "2025-02-10",
+              "amount": 499,
+              "status": "expired"
+            }
+          ],
+          "query": "",
+          "feedback": "",
+          "favoritePlans": [
+            {
+              "id": "recommended1",
+              "categoryId": 1,
+              "name": "Smart Choice Plan",
+              "price": 249,
+              "validity": "28 days",
+              "description": "Recommended for balanced usage with excellent OTT offers.",
+              "status": "active"
+            },
+            {
+              "id": "data1",
+              "categoryId": 4,
+              "name": "Ultra Data Plan",
+              "price": 299,
+              "validity": "28 days",
+              "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "username": "deepak",
+          "name": "Deepak",
+          "phone": "7845961230",
+          "email": "deepak@gmail.com",
+          "activePlan": {
+            "planId": "talktime2",
+            "title": "Talktime Combo",
+            "expiryDate": "2025-02-27"
+          },
+          "rechargeHistory": [
+            {
+              "planId": "talktime2",
+              "rechargeDate": "2025-03-10",
+              "amount": 399,
+              "status": "active"
+            }
+          ],
+          "query": "",
+          "feedback": "",
+          "favoritePlans": [
+            {
+              "id": "recommended1",
+              "categoryId": 1,
+              "name": "Smart Choice Plan",
+              "price": 249,
+              "validity": "28 days",
+              "description": "Recommended for balanced usage with excellent OTT offers.",
+              "status": "active"
+            },
+            {
+              "id": "data1",
+              "categoryId": 4,
+              "name": "Ultra Data Plan",
+              "price": 299,
+              "validity": "28 days",
+              "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "username": "eashan",
+          "name": "Eashan",
+          "phone": "8574961213",
+          "email": "eashan@gmail.com",
+          "activePlan": {
+            "planId": "data2",
+            "title": "Mega Data Pack",
+            "expiryDate": "2025-02-15"
+          },
+          "rechargeHistory": [
+            {
+              "planId": "data2",
+              "rechargeDate": "2025-02-24",
+              "amount": 499,
+              "status": "active"
+            }
+          ],
+          "query": "",
+          "feedback": "",
+          "favoritePlans": [
+            {
+              "id": "recommended1",
+              "categoryId": 1,
+              "name": "Smart Choice Plan",
+              "price": 249,
+              "validity": "28 days",
+              "description": "Recommended for balanced usage with excellent OTT offers.",
+              "status": "active"
+            },
+            {
+              "id": "data1",
+              "categoryId": 4,
+              "name": "Ultra Data Plan",
+              "price": 299,
+              "validity": "28 days",
+              "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "username": "farhan",
+          "name": "Farhan",
+          "phone": "9638527410",
+          "email": "farhan@gmail.com",
+          "activePlan": {
+            "planId": "combo1",
+            "title": "Unlimited Combo",
+            "expiryDate": "2025-04-20"
+          },
+          "rechargeHistory": [
+            {
+              "planId": "combo1",
+              "rechargeDate": "2025-03-15",
+              "amount": 699,
+              "status": "active"
+            }
+          ],
+          "query": "",
+          "feedback": "",
+          "favoritePlans": [
+            {
+              "id": "recommended1",
+              "categoryId": 1,
+              "name": "Smart Choice Plan",
+              "price": 249,
+              "validity": "28 days",
+              "description": "Recommended for balanced usage with excellent OTT offers.",
+              "status": "active"
+            },
+            {
+              "id": "data1",
+              "categoryId": 4,
+              "name": "Ultra Data Plan",
+              "price": 299,
+              "validity": "28 days",
+              "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "username": "ganesh",
+          "name": "Ganesh",
+          "phone": "8529637410",
+          "email": "ganesh@gmail.com",
+          "activePlan": null,
+          "rechargeHistory": [
+            {
+              "planId": "combo3",
+              "rechargeDate": "2025-02-20",
+              "amount": 299,
+              "status": "expired"
+            }
+          ],
+          "query": "",
+          "feedback": "",
+          "favoritePlans": [
+            {
+              "id": "recommended1",
+              "categoryId": 1,
+              "name": "Smart Choice Plan",
+              "price": 249,
+              "validity": "28 days",
+              "description": "Recommended for balanced usage with excellent OTT offers.",
+              "status": "active"
+            },
+            {
+              "id": "data1",
+              "categoryId": 4,
+              "name": "Ultra Data Plan",
+              "price": 299,
+              "validity": "28 days",
+              "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "username": "hari",
+          "name": "Hari",
+          "phone": "9063258741",
+          "email": "hari@gmail.com",
+          "activePlan": {
+            "planId": "ott1",
+            "title": "OTT Starter Pack",
+            "expiryDate": "2025-02-26"
+          },
+          "rechargeHistory": [
+            {
+              "planId": "ott1",
+              "rechargeDate": "2025-02-22",
+              "amount": 199,
+              "status": "active"
+            }
+          ],
+          "query": "",
+          "feedback": "",
+          "favoritePlans": [
+            {
+              "id": "recommended1",
+              "categoryId": 1,
+              "name": "Smart Choice Plan",
+              "price": 249,
+              "validity": "28 days",
+              "description": "Recommended for balanced usage with excellent OTT offers.",
+              "status": "active"
+            },
+            {
+              "id": "data1",
+              "categoryId": 4,
+              "name": "Ultra Data Plan",
+              "price": 299,
+              "validity": "28 days",
+              "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "username": "ishaan",
+          "name": "Ishaan",
+          "phone": "9856321470",
+          "email": "ishaan@gmail.com",
+          "activePlan": {
+            "planId": "ott2",
+            "title": "OTT Premium Pack",
+            "expiryDate": "2025-02-24"
+          },
+          "rechargeHistory": [
+            {
+              "planId": "ott2",
+              "rechargeDate": "2025-03-18",
+              "amount": 399,
+              "status": "active"
+            }
+          ],
+          "query": "",
+          "feedback": "",
+          "favoritePlans": [
+            {
+              "id": "recommended1",
+              "categoryId": 1,
+              "name": "Smart Choice Plan",
+              "price": 249,
+              "validity": "28 days",
+              "description": "Recommended for balanced usage with excellent OTT offers.",
+              "status": "active"
+            },
+            {
+              "id": "data1",
+              "categoryId": 4,
+              "name": "Ultra Data Plan",
+              "price": 299,
+              "validity": "28 days",
+              "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
+              "status": "active"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "categories": [
+    {
+      "id": "5",
+      "name": "Combo Packs",
+      "plans": []
+    },
+    {
+      "id": "6",
+      "name": "OTT Packs",
+      "plans": []
+    },
+    {
+      "id": "1",
+      "name": "Recommended",
+      "plans": []
+    },
+    {
+      "id": "3",
+      "name": "Talktime",
+      "plans": []
+    },
+    {
+      "id": "2",
+      "name": "Popular",
+      "plans": []
+    },
+    {
+      "id": "4",
+      "name": "Data Addon",
+      "plans": []
+    }
+  ],
+  "plans": [
+    {
+      "id": "popular2",
+      "categoryId": 2,
+      "name": "Best Data Plan",
+      "data": "2GB/day",
+      "price": 279,
+      "validity": "28 days",
+      "description": "Popular choice for high-speed data with OTT subscriptions.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Netflix",
+          "validity": "30 Days",
+          "icon": "./assets/images/netflix.png"
+        }
+      ]
+    },
+    {
+      "id": "popular3",
+      "categoryId": 2,
+      "name": "Combo Saver",
+      "data": "1GB/day",
+      "price": 399,
+      "validity": "56 days",
+      "description": "Popular combo plan balancing data and talktime with OTT benefits.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Amazon Prime",
+          "validity": "30 Days",
+          "icon": "./assets/images/amazon.png"
+        }
+      ]
+    },
+    {
+      "id": "popular4",
+      "categoryId": 2,
+      "name": "Value Combo",
+      "data": "0GB",
+      "price": 199,
+      "validity": "28 days",
+      "description": "Best value plan for calls and data with select OTT offers.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Hotstar",
+          "validity": "30 Days",
+          "icon": "./assets/images/hotstar.png"
+        }
+      ]
+    },
+    {
+      "id": "combo1",
+      "categoryId": 5,
+      "name": "Unlimited Combo",
+      "data": "Unlimited",
+      "price": 699,
+      "validity": "84 days",
+      "description": "Unlimited calls & data along with OTT offers including Amazon Prime.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Amazon Prime",
+          "validity": "30 Days",
+          "icon": "./assets/images/amazon.png"
+        }
+      ]
+    },
+    {
+      "id": "combo2",
+      "categoryId": 5,
+      "name": "Balanced Combo",
+      "data": "1.5GB/day",
+      "price": 449,
+      "validity": "56 days",
+      "description": "Balanced talktime and data benefits with OTT trials.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Hotstar",
+          "validity": "30 Days",
+          "icon": "./assets/images/hotstar.png"
+        }
+      ]
+    },
+    {
+      "id": "combo3",
+      "categoryId": 5,
+      "name": "Budget Combo",
+      "data": "1GB/day",
+      "price": 299,
+      "validity": "28 days",
+      "description": "Affordable combo plan with essential data and call benefits, plus OTT offers.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "YouTube Premium",
+          "validity": "30 Days",
+          "icon": "./assets/images/youtube.png"
+        }
+      ]
+    },
+    {
+      "id": "combo4",
+      "categoryId": 5,
+      "name": "Premium Combo",
+      "data": "3GB/day",
+      "price": 899,
+      "validity": "84 days",
+      "description": "Premium plan offering high-speed data, unlimited calls and multiple OTT subscriptions.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Netflix",
+          "validity": "30 Days",
+          "icon": "./assets/images/netflix.png"
+        },
+        {
+          "platform": "Disney+",
+          "validity": "30 Days",
+          "icon": "./assets/images/hotstar.png"
+        }
+      ]
+    },
+    {
+      "id": "ott1",
+      "categoryId": 6,
+      "name": "OTT Starter Pack",
+      "data": "500MB/day",
+      "price": 199,
+      "validity": "28 days",
+      "description": "Enjoy limited OTT access with this starter pack.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Netflix",
+          "validity": "15 Days",
+          "icon": "./assets/images/netflix.png"
+        }
+      ]
+    },
+    {
+      "id": "ott2",
+      "categoryId": 6,
+      "name": "OTT Premium Pack",
+      "data": "1GB/day",
+      "price": 399,
+      "validity": "56 days",
+      "description": "Unlimited OTT viewing with premium channels.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Disney+",
+          "validity": "30 Days",
+          "icon": "./assets/images/hotstar.png"
+        },
+        {
+          "platform": "Amazon Prime",
+          "validity": "30 Days",
+          "icon": "./assets/images/amazon.png"
+        }
+      ]
+    },
+    {
+      "id": "ott3",
+      "categoryId": 6,
+      "name": "OTT Ultimate Pack",
+      "data": "Unlimited",
+      "price": 699,
+      "validity": "84 days",
+      "description": "Unlimited access to all OTT platforms.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Netflix",
+          "validity": "30 Days",
+          "icon": "./assets/images/netflix.png"
+        },
+        {
+          "platform": "Disney+",
+          "validity": "30 Days",
+          "icon": "./assets/images/hotstar.png"
+        },
+        {
+          "platform": "Amazon Prime",
+          "validity": "30 Days",
+          "icon": "./assets/images/amazon.png"
+        }
+      ]
+    },
+    {
+      "id": "ott4",
+      "name": "OTT Pack",
+      "categoryId": 6,
+      "price": 99,
+      "validity": "28",
+      "active": true
+    },
+    {
+      "id": "recommended1",
+      "categoryId": 1,
+      "name": "Smart Choice Plan",
+      "data": "1.5GB/day",
+      "price": 249,
+      "validity": "28 days",
+      "description": "Recommended for balanced usage with excellent OTT offers.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Netflix",
+          "validity": "30 Days",
+          "icon": "./assets/images/netflix.png"
+        },
+        {
+          "platform": "Amazon Prime",
+          "validity": "30 Days",
+          "icon": "./assets/images/amazon.ico"
+        }
+      ]
+    },
+    {
+      "id": "recommended2",
+      "categoryId": 1,
+      "name": "Premium Data Boost",
+      "data": "2GB/day",
+      "price": 549,
+      "validity": "56 days",
+      "description": "Recommended for heavy data users with premium OTT trials.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Netflix",
+          "validity": "30 Days",
+          "icon": "./assets/images/netflix.png"
+        },
+        {
+          "platform": "Amazon Prime",
+          "validity": "30 Days",
+          "icon": "./assets/images/amazon.ico"
+        }
+      ]
+    },
+    {
+      "id": "recommended3",
+      "categoryId": 1,
+      "name": "Ultimate Combo",
+      "data": "Unlimited",
+      "price": 999,
+      "validity": "84 days",
+      "description": "Recommended for users who need everything – unlimited calls, data, and top OTT offers.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Netflix",
+          "validity": "30 Days",
+          "icon": "./assets/images/netflix.png"
+        },
+        {
+          "platform": "Amazon Prime",
+          "validity": "30 Days",
+          "icon": "./assets/images/amazon.ico"
+        }
+      ]
+    },
+    {
+      "id": "recommended4",
+      "categoryId": 1,
+      "name": "Economy Talktime",
+      "data": "0GB/day",
+      "price": 119,
+      "validity": "28 days",
+      "description": "Recommended for users on a budget with essential call benefits and select OTT offers.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Netflix",
+          "validity": "30 Days",
+          "icon": "./assets/images/netflix.png"
+        },
+        {
+          "platform": "Amazon Prime",
+          "validity": "30 Days",
+          "icon": "./assets/images/amazon.ico"
+        }
+      ]
+    },
+    {
+      "id": "talktime1",
+      "categoryId": 3,
+      "name": "Unlimited Talktime",
+      "data": "1GB/day",
+      "price": 199,
+      "validity": "28 days",
+      "description": "Enjoy unlimited calls with special OTT offers on ZEE5 and Hotstar.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "ZEE5",
+          "validity": "30 Days",
+          "icon": "./assets/images/zee5.png"
+        },
+        {
+          "platform": "Hotstar",
+          "validity": "30 Days",
+          "icon": "./assets/images/hotstar.png"
+        }
+      ]
+    },
+    {
+      "id": "talktime2",
+      "categoryId": 3,
+      "name": "Talktime Combo",
+      "data": "0.5GB/day",
+      "price": 399,
+      "validity": "56 days",
+      "description": "Unlimited local calls, daily data bonus, and exclusive OTT subscriptions.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Hotstar",
+          "validity": "30 Days",
+          "icon": "./assets/images/hotstar.png"
+        }
+      ]
+    },
+    {
+      "id": "talktime3",
+      "categoryId": 3,
+      "name": "Super Talktime",
+      "data": "0.5GB/day",
+      "price": 499,
+      "validity": "84 days",
+      "description": "Enhanced call benefits with moderate data allowance and OTT offers.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Netflix",
+          "validity": "30 Days",
+          "icon": "./assets/images/netflix.png"
+        }
+      ]
+    },
+    {
+      "id": "talktime4",
+      "categoryId": 3,
+      "name": "Value Talktime",
+      "data": "0GB",
+      "price": 149,
+      "validity": "28 days",
+      "description": "Affordable unlimited calls with occasional OTT offers.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Amazon Prime",
+          "validity": "30 Days",
+          "icon": "./assets/images/amazon.png"
+        }
+      ]
+    },
+    {
+      "id": "popular1",
+      "categoryId": 2,
+      "name": "Hot Deal Talktime",
+      "data": "0GB",
+      "price": 129,
+      "validity": "28 days",
+      "description": "Hot deal on unlimited calls with bonus OTT offers.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "ZEE5",
+          "validity": "30 Days",
+          "icon": "./assets/images/zee5.png"
+        }
+      ]
+    },
+    {
+      "id": "popular2",
+      "categoryId": 2,
+      "name": "Best Data Plan",
+      "data": "2GB/day",
+      "price": 279,
+      "validity": "28 days",
+      "description": "Popular choice for high-speed data with OTT subscriptions.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Netflix",
+          "validity": "30 Days",
+          "icon": "./assets/images/netflix.png"
+        }
+      ]
+    },
+    {
+      "id": "data1",
+      "categoryId": 4,
+      "name": "Ultra Data Plan",
+      "data": "2GB/day",
+      "price": 299,
+      "validity": "28 days",
+      "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Netflix",
+          "validity": "30 Days",
+          "icon": "./assets/images/netflix.png"
+        }
+      ]
+    },
+    {
+      "id": "data2",
+      "categoryId": 4,
+      "name": "Mega Data Pack",
+      "data": "3GB/day",
+      "price": 499,
+      "validity": "56 days",
+      "description": "Enjoy nonstop high-speed data and complimentary OTT offers.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Disney+",
+          "validity": "30 Days",
+          "icon": "./assets/images/hotstar.png"
+        }
+      ]
+    },
+    {
+      "id": "data3",
+      "categoryId": 4,
+      "name": "Data Booster",
+      "data": "4GB/day",
+      "price": 399,
+      "validity": "28 days",
+      "description": "Extra data boost with exclusive OTT trial subscriptions.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Hotstar",
+          "validity": "30 Days",
+          "icon": "./assets/images/hotstar.png"
+        }
+      ]
+    },
+    {
+      "id": "data4",
+      "categoryId": 4,
+      "name": "Super Data Pack",
+      "data": "5GB/day",
+      "price": 699,
+      "validity": "84 days",
+      "description": "Maximum data with premium OTT benefits and unlimited browsing.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Netflix",
+          "validity": "30 Days",
+          "icon": "./assets/images/netflix.png"
+        },
+        {
+          "platform": "Amazon Prime",
+          "validity": "30 Days",
+          "icon": "./assets/images/amazon.png"
+        }
+      ]
+    }
+  ],
+  "deactivatedPlans": [],
+  "deactivatedCategories": [],
+  "newUserRequest": [
+    {
+      "id": "054e",
+      "name": "Kishore",
+      "email": "kishore@gmail.com",
+      "contactNumber": "7094640999",
+      "simPlan": "plan2"
+    },
+    {
+      "id": "608c",
+      "name": "Kiran",
+      "email": "kiran@gmail.com",
+      "contactNumber": "9994601115",
+      "simPlan": "plan1"
+    },
+    {
+      "id": "1592",
+      "name": "Kumar",
+      "email": "kumar@gmail.com",
+      "contactNumber": "9976882115",
+      "simPlan": "plan2"
+    },
+    {
+      "id": "5131",
+      "name": "Venkat",
+      "email": "venkat@gmail.com",
+      "contactNumber": "8855226644",
+      "simPlan": "plan1"
+    }
+  ]
+}

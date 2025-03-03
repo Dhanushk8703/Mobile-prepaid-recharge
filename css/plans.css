@@ -1,0 +1,226 @@
+/* --- Filter Section Styling --- */
+.filter-section-container {
+  background: linear-gradient(135deg, #ffffff, #f8f9fa);
+  border-radius: 15px;
+  padding: 30px;
+  margin: 20px auto;
+  max-width: 1000px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+.filter-section-container:hover {
+  transform: translateY(-3px);
+}
+.filter-section-container .form-label {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+.filter-section-container .form-select {
+  border: none;
+  border-bottom: 2px solid #2fa31e;
+  border-radius: 0;
+  box-shadow: none;
+  transition: border-color 0.3s;
+}
+.filter-section-container .form-select:focus {
+  border-color: #ff6f61;
+  box-shadow: none;
+}
+.filter-section-container .form-range {
+  width: 100%;
+  height: 6px;
+  border-radius: 5px;
+  background: #ddd;
+  outline: none;
+  transition: background 0.3s ease;
+}
+.filter-section-container .form-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #2fa31e;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+.filter-section-container .form-range::-webkit-slider-thumb:hover {
+  background: #279221;
+  transform: scale(1.1);
+}
+.filter-section-container .form-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #2fa31e;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+.filter-section-container .form-range::-moz-range-thumb:hover {
+  background: #279221;
+  transform: scale(1.1);
+}
+#priceValue, #validityValue {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  font-weight: 500;
+}
+#clearFilters {
+  background: #2fa31e;
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-size: 1rem;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+#clearFilters:hover {
+  background: #279221;
+  transform: translateY(-3px);
+}
+
+/* --- Plan Card Styling --- */
+.plan-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.5s ease-out;
+  margin-bottom: 30px;
+}
+.plan-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media screen and (max-width: 768px) {
+  .plan-card {
+    margin-left: 20px;
+  }
+}
+
+/* Custom Modal Container */
+.custom-modal {
+  border-radius: 15px;
+  overflow: hidden;
+  border: none;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal Header Styling */
+.custom-modal .modal-header {
+  background: #2fa31e;
+  color: #fff;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+.custom-modal .modal-header .modal-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+.custom-modal .btn-close {
+  filter: invert(1);
+}
+
+/* Modal Body Styling */
+.custom-modal .modal-body {
+  padding: 2rem 1.5rem;
+  background: #fff;
+  color: #333;
+  font-size: 1rem;
+}
+
+/* Modal Footer Styling */
+.custom-modal .modal-footer {
+  background: #f8f9fa;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Modal Content Styling */
+.modal-plan-content p {
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+.modal-plan-content h6 {
+  margin-top: 1.5rem;
+  font-size: 1.2rem;
+  color: #2c3e50;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.5rem;
+}
+
+/* OTT Details Styling within the Modal */
+.modal-plan-content .ott-details {
+  margin-top: 1rem;
+}
+.modal-plan-content .ott-item {
+  font-size: 1rem;
+  color: #ff6f61;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+.modal-plan-content .ott-item i {
+  margin-right: 8px;
+  font-size: 1.2rem;
+}
+
+
+.plan-title { font-size: 1.5rem; font-weight: bold; color: #2c3e50; margin-bottom: 10px; }
+.plan-data, .plan-validity, .plan-price, .plan-description { font-size: 1rem; color: #555; margin-bottom: 10px; }
+.btn-group { display: flex; gap: 10px; }
+.btn-view, .btn-recharge {
+  flex: 1; padding: 10px 15px; border-radius: 5px; font-size: 1rem; text-align: center; cursor: pointer;
+  transition: background 0.3s, transform 0.3s; text-decoration: none; border: none;
+}
+
+
+.btn-view { background: #ff6f61; color: #fff; }
+.btn-view:hover { background: #ff4c3b; transform: translateY(-2px); }
+.btn-recharge { background: #2fa31e; color: #fff; }
+.btn-recharge:hover { background: #279221; transform: translateY(-2px); }
+
+
+
+/* From Uiverse.io by lenfear23 */ 
+.btn-svg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  cursor: pointer;
+  width: 150px;
+  height: 50px;
+  background-image: linear-gradient(to top, #D8D9DB 0%, #fff 80%, #FDFDFD 100%);
+  border-radius: 30px;
+  border: 1px solid #8F9092;
+  transition: all 0.2s ease;
+  font-family: "Source Sans Pro", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #606060;
+  text-shadow: 0 1px #fff;
+}
+
+.btn-svg:hover {
+  box-shadow: 0 4px 3px 1px #FCFCFC, 0 6px 8px #D6D7D9, 0 -4px 4px #CECFD1, 0 -6px 4px #FEFEFE, inset 0 0 3px 3px #CECFD1;
+}
+
+.btn-svg:active {
+  box-shadow: 0 4px 3px 1px #FCFCFC, 0 6px 8px #D6D7D9, 0 -4px 4px #CECFD1, 0 -6px 4px #FEFEFE, inset 0 0 5px 3px #999, inset 0 0 30px #aaa;
+}
+
+.btn-svg:focus {
+  box-shadow: 0 4px 3px 1px #FCFCFC, 0 6px 8px #D6D7D9, 0 -4px 4px #CECFD1, 0 -6px 4px #FEFEFE, inset 0 0 5px 3px #999, inset 0 0 30px #aaa;
+}
+
+

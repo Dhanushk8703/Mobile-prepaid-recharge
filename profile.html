@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile - MobiComm</title>
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/main.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="./node_modules/aos/dist/aos.css" />
+    <link
+        href="https://fonts.googleapis.com/css?family=Poppins:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="./css/profile.css">
+</head>
+
+<body>
+    <!-- Header Navigation -->
+    <header id="header">
+        <div class="nav-bar">
+            <div class="logo" data-aos="fade-down" data-aos-delay="100">
+                <a href="index.html" class="text-decoration-none text-white">MobiComm</a>
+            </div>
+            <nav class="navlinks">
+                <a class="navlink" data-aos="fade-down" data-aos-delay="100" href="index.html">Home</a>
+                <a class="navlink" data-aos="fade-down" data-aos-delay="200" href="prepaid.html">Prepaid Plans</a>
+                <!-- <a class="navlink" data-aos="fade-down" data-aos-delay="300" href="faq.html">FAQs</a> -->
+                <a class="navlink" data-aos="fade-down" data-aos-delay="400" href="contact.html">Contacts</a>
+                <a class="navlink" data-aos="fade-down" data-aos-delay="500" href="profile.html">Profile</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation (Bottom) -->
+    <nav class="mobile-nav">
+        <ul>
+            <li><a href="index.html"><i class="fa fa-home"></i><span>Home</span></a></li>
+            <li><a href="prepaid.html"><i class="fa fa-bolt"></i><span>Plans</span></a></li>
+            <li><a href="faq.html"><i class="fa fa-question-circle"></i><span>FAQs</span></a></li>
+            <li><a href="contact.html"><i class="fa fa-phone"></i><span>Contacts</span></a></li>
+            <li><a href="profile.html"><i class="fa fa-user"></i><span>Profile</span></a></li>
+        </ul>
+    </nav>
+
+    <!-- Profile Content -->
+    <div class="profile-container" data-aos="fade-up">
+        <!-- Sidebar: Personal Information Summary -->
+        <div class="row">
+            <div class="col-lg-3 col-sm-12 mb-5">
+                <div class="profile-sidebar" data-aos="fade-right">
+                    <i class="fa-solid fa-user display-2 mb-5 border-1"></i>
+                    <h2>Dhanush</h2>
+                    <p>dhanush@gmail.com</p>
+                    <p>+91 9876543210</p>
+                    <p>TN, India</p>
+                    <button id="logoutBtn" class="logout-btn">Logout</button>
+                </div>
+            </div>
+            <!-- Main Content: Active Plan, Recharge History, and Editable Personal Info -->
+            <div class="col-lg-9 col-sm-12">
+                <div class="profile-details " data-aos="fade-left">
+                    <!-- Personal Information Section with Edit Feature -->
+                    <div class="section personal-info">
+                        <h3 class="border-bottom border-warning">
+                            Personal Information
+                            <button id="editBtn" class="edit-btn">Edit</button>
+                        </h3><br>
+                        <div>
+                            <h4>Full Name</h4>
+                            <p class="info-text" data-key="fullname">Dhanush</p>
+                            <input type="text" class="info-input" data-key="fullname" value="Dhanush" />
+                        </div>
+                        <div>
+                            <h4>Email</h4>
+                            <p class="info-text" data-key="email">dhanush@gmail</p>
+                            <input type="email" class="info-input" data-key="email" value="dhanush@gmail" />
+                        </div>
+                        <div>
+                            <h4>Phone</h4>
+                            <p class="info-text" data-key="phone">+91 9876543210</p>
+                            <input type="text" class="info-input" data-key="phone" value="+91 9876543210" />
+                        </div>
+                        <div>
+                            <h4>Location</h4>
+                            <p class="info-text" data-key="location">TN, India</p>
+                            <input type="text" class="info-input" data-key="location" value="TN, India" />
+                        </div>
+                        <!-- Edit Actions (Save / Cancel) -->
+                        <div id="editActions" style="display: none; text-align: right; margin-top: 10px;">
+                            <button id="saveBtn" class="btn-save">Save</button>
+                            <button id="cancelBtn" class="btn-cancel">Cancel</button>
+                        </div>
+                    </div>
+                    <!-- Active Plan Section -->
+                    <div class="card shadow-sm my-5">
+                        <div class="card-body">
+                            <h5 class="card-title text-warning mb-4">Active Plan Details</h5>
+                            <div class="alert alert-info">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">₹499 Plan</h6>
+                                        <p class="mb-0 small">Valid till 15 Mar 2024</p>
+                                    </div>
+                                    <span class="badge bg-warning text-light">Active</span>
+                                </div>
+                                <hr>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Data Left</small>
+                                        <span>23.5 GB</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">SMS Balance</small>
+                                        <span>82</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Recent Recharge History Section -->
+                    <div class="section recharge-history">
+                        <h3>Recent Recharge History</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Plan</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2025-02-20</td>
+                                    <td>Unlimited Data Plan</td>
+                                    <td>₹499</td>
+                                    <td><span style="color:green;">Success</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2025-01-15</td>
+                                    <td>Combo Plan</td>
+                                    <td>₹399</td>
+                                    <td><span style="color:green;">Success</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2024-12-10</td>
+                                    <td>Talktime Plan</td>
+                                    <td>₹199</td>
+                                    <td><span style="color:green;">Success</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container py-5">
+            <div class="row">
+                <!-- About Section -->
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-dark" data-aos="fade-right" data-aos-duration="300">About MobiComm</h5>
+                    <p data-aos="fade-right" data-aos-duration="400">
+                        MobiComm provides seamless mobile connectivity and instant recharge solutions for a hassle-free
+                        experience.
+                    </p>
+                </div>
+                <!-- Quick Links -->
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-dark" data-aos="fade-down" data-aos-duration="500">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li data-aos="fade-up" data-aos-duration="600"><a href="index.html" class="footer-link">Home</a>
+                        </li>
+                        <li data-aos="fade-up" data-aos-duration="700"><a href="prepaid.html"
+                                class="footer-link">Prepaid Plans</a></li>
+                        <li data-aos="fade-up" data-aos-duration="800"><a href="faq.html" class="footer-link">FAQs</a>
+                        </li>
+                        <li data-aos="fade-up" data-aos-duration="900"><a href="contact.html"
+                                class="footer-link">Contact Us</a></li>
+                    </ul>
+                </div>
+                <!-- Social Media -->
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-dark" data-aos="fade-left" data-aos-duration="300">Connect With Us</h5>
+                    <ul class="list-inline social-icons">
+                        <li class="list-inline-item" data-aos="fade-left" data-aos-duration="400"><a href="#"><i
+                                    class="fab fa-facebook-f"></i></a></li>
+                        <li class="list-inline-item" data-aos="fade-left" data-aos-duration="500"><a href="#"><i
+                                    class="fab fa-twitter"></i></a></li>
+                        <li class="list-inline-item" data-aos="fade-left" data-aos-duration="600"><a href="#"><i
+                                    class="fab fa-instagram"></i></a></li>
+                        <li class="list-inline-item" data-aos="fade-left" data-aos-duration="700"><a href="#"><i
+                                    class="fab fa-linkedin-in"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Footer Bottom -->
+            <div class="row">
+                <div class="col-12 text-center mt-4">
+                    <p class="mb-0">&copy; 2025 MobiComm. All Rights
+                        Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="./node_modules/aos/dist/aos.js"></script>
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    <script>
+        AOS.init();
+        // Change header style on scroll
+        window.addEventListener('scroll', function () {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            sessionStorage.removeItem('loggedIn');
+            window.location.href = 'index.html';
+        });
+
+        document.addEventListener("DOMContentLoaded", async function () {
+            // Get the logged-in user's phone number (set during login)
+            if (!sessionStorage.getItem("loggedIn") || !sessionStorage.getItem("phone")) {
+                window.location.href = "login.html";
+                return;
+            }
+            const userPhone = sessionStorage.getItem("phone");
+
+            try {
+                // Fetch the user data from db.json
+                const response = await fetch("db.json");
+                if (!response.ok) {
+                    console.error("Failed to fetch db.json");
+                    return;
+                }
+                const data = await response.json();
+                const registeredUsers = data.dashboard.users.details;
+                // Find the user with the matching phone number
+                const currentUser = registeredUsers.find(u => u.phone === userPhone);
+
+                if (!currentUser) {
+                    alert("User not found. Please log in again.");
+                    window.location.href = "login.html";
+                    return;
+                }
+
+                // --- Update Sidebar Personal Information ---
+                const sidebar = document.querySelector(".profile-sidebar");
+                if (sidebar) {
+                    const nameEl = sidebar.querySelector("h2");
+                    const pEls = sidebar.querySelectorAll("p");
+                    if (nameEl) nameEl.textContent = currentUser.name;
+                    if (pEls[0]) pEls[0].textContent = currentUser.email;
+                    if (pEls[1]) pEls[1].textContent = currentUser.phone;
+                    if (pEls[2]) pEls[2].textContent = currentUser.location || "Not specified";
+                }
+
+                // --- Update Personal Information Section ---
+                function updateField(key, value, disable = false) {
+                    const textEl = document.querySelector(`.info-text[data-key="${key}"]`);
+                    const inputEl = document.querySelector(`.info-input[data-key="${key}"]`);
+                    if (textEl) textEl.textContent = value;
+                    if (inputEl) {
+                        inputEl.value = value;
+                        if (disable) {
+                            inputEl.setAttribute("disabled", "disabled");
+                        } else {
+                            inputEl.removeAttribute("disabled");
+                        }
+                    }
+                }
+                updateField("fullname", currentUser.name);
+                updateField("email", currentUser.email);
+                updateField("phone", currentUser.phone, true); // Disable editing phone
+                updateField("location", currentUser.location || "Not specified");
+
+                // --- Update Active Plan Section ---
+                const activePlanSection = document.querySelector(".profile-details .card-body");
+                if (activePlanSection) {
+                    if (currentUser.activePlan) {
+                        activePlanSection.innerHTML = `
+          <h5 class="card-title text-warning mb-4">Active Plan Details</h5>
+          <div class="alert alert-info">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="mb-1">${currentUser.activePlan.title}</h6>
+                <p class="mb-0 small">Valid till ${currentUser.activePlan.expiryDate}</p>
+              </div>
+              <span class="badge bg-warning text-light">Active</span>
+            </div>
+            <hr>
+            <div class="row g-2">
+              <div class="col-6">
+                <small class="text-muted d-block">Data Left</small>
+                <span>${currentUser.activePlan.dataLeft || "N/A"}</span>
+              </div>
+              <div class="col-6">
+                <small class="text-muted d-block">SMS Balance</small>
+                <span>${currentUser.activePlan.smsBalance || "N/A"}</span>
+              </div>
+            </div>
+          </div>
+        `;
+                    } else {
+                        activePlanSection.innerHTML = `<div class="alert alert-warning">No active plan available.</div>`;
+                    }
+                }
+
+                // --- Update Recharge History Section ---
+                const rechargeTbody = document.querySelector(".recharge-history tbody");
+                if (rechargeTbody) {
+                    rechargeTbody.innerHTML = "";
+                    if (currentUser.rechargeHistory && currentUser.rechargeHistory.length > 0) {
+                        currentUser.rechargeHistory.forEach(item => {
+                            const tr = document.createElement("tr");
+                            tr.innerHTML = `
+            <td>${item.rechargeDate}</td>
+            <td>${item.planId}</td>
+            <td>₹${item.amount}</td>
+            <td><span style="color:${item.status.toLowerCase() === "active" ? "green" : "red"};">${item.status}</span></td>
+          `;
+                            rechargeTbody.appendChild(tr);
+                        });
+                    } else {
+                        rechargeTbody.innerHTML = `<tr><td colspan="4" class="text-center">No recharge history available.</td></tr>`;
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+
+            // Initialize elements for edit functionality
+            const editBtn = document.getElementById('editBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            const infoTexts = document.querySelectorAll('.info-text');
+            const infoInputs = document.querySelectorAll('.info-input');
+            const editActions = document.getElementById('editActions');
+
+            // Edit button: Show input fields and hide static texts
+            editBtn.addEventListener('click', () => {
+                infoTexts.forEach(el => el.style.display = 'none');
+                infoInputs.forEach(el => {
+                    if (el.getAttribute('data-key') !== 'phone') {
+                        el.style.display = 'block';
+                    }
+                });
+                editActions.style.display = 'block';
+                editBtn.style.display = 'none';
+            });
+
+            // Cancel button: Hide input fields and revert changes
+            cancelBtn.addEventListener('click', () => {
+                infoInputs.forEach(el => {
+                    if (el.getAttribute('data-key') !== 'phone') {
+                        const key = el.getAttribute('data-key');
+                        const textEl = document.querySelector(`.info-text[data-key="${key}"]`);
+                        el.value = textEl.textContent;
+                        el.style.display = 'none';
+                    }
+                });
+                infoTexts.forEach(el => el.style.display = 'block');
+                editActions.style.display = 'none';
+                editBtn.style.display = 'inline-block';
+            });
+
+            // Save button: Update static texts with input values
+            saveBtn.addEventListener('click', () => {
+                infoInputs.forEach(el => {
+                    if (el.getAttribute('data-key') !== 'phone') {
+                        const key = el.getAttribute('data-key');
+                        const textEl = document.querySelector(`.info-text[data-key="${key}"]`);
+                        textEl.textContent = el.value;
+                        el.style.display = 'none';
+                    }
+                });
+                infoTexts.forEach(el => el.style.display = 'block');
+                editActions.style.display = 'none';
+                editBtn.style.display = 'inline-block';
+                // Optionally, send updated info to your server via AJAX here.
+            });
+        });
+    </script>
+</body>
+
+</html>

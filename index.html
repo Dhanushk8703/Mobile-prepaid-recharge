@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" href="./assets/images/user.png" type="image/x-icon">
+
+  <title>Home - MobiComm</title>
+
+  <link rel="stylesheet" href="./node_modules/aos/dist/aos.css">
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/main.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link
+    href="https://fonts.googleapis.com/css?family=Poppins:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic"
+    rel="stylesheet" />
+
+</head>
+
+<body>
+  <!-- Header with Sticky Navbar and Wave Background -->
+  <header id="header">
+    <div class="nav-bar">
+      <div class="logo" data-aos="fade-down" data-aos-delay="100">
+        <a href="index.html" class="text-decoration-none text-white">MobiComm</a>
+      </div>
+      <nav class="navlinks">
+        <a class="navlink" data-aos="fade-down" data-aos-delay="100" href="index.html">Home</a>
+        <a class="navlink" data-aos="fade-down" data-aos-delay="200" href="prepaid.html">Prepaid Plans</a>
+        <!-- <a class="navlink" data-aos="fade-down" data-aos-delay="300" href="faq.html">FAQs</a> -->
+        <a class="navlink" data-aos="fade-down" data-aos-delay="400" href="contact.html">Contacts</a>
+        <a class="navlink" data-aos="fade-down" data-aos-delay="500" href="profile.html">Profile</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation (Bottom) -->
+  <nav class="mobile-nav">
+    <ul>
+      <li><a href="index.html"><i class="fa fa-home"></i><span>Home</span></a></li>
+      <li><a href="prepaid.html"><i class="fa fa-bolt"></i><span>Plans</span></a></li>
+      <li><a href="faq.html"><i class="fa fa-question-circle"></i><span>FAQs</span></a></li>
+      <li><a href="contact.html"><i class="fa fa-phone"></i><span>Contacts</span></a></li>
+      <li><a href="profile.html"><i class="fa fa-user"></i><span>Profile</span></a></li>
+    </ul>
+  </nav>
+  <section class="hero-section" style="background-image: url(./assets/images/bg-banner.jpg);">
+    <div class="content container-fluid">
+      <div class="row">
+        <div class="col-lg-7 col-sm-12">
+          <h1 class="display-3 w-100vh typing mx-auto"></h1>
+          <p class="lead mt-lg-5 mt-sm-1" data-aos="fade-right" data-aos-delay="300">
+            Experience seamless mobile connectivity with our user-friendly recharge platform, designed for instant
+            top-ups and effortless account management. Stay connected wherever you are with reliable service that
+            adapts to your busy lifestyle.
+          </p>
+          <a href="#started" class="text-decoration-none">
+            <button class="button-86 text-center mx-auto my-5" data-aos="fade-left" data-aos-delay="300"
+              role="button">Get
+              Started</button>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div id="started"></div>
+  </section>
+  <!-- Main Content -->
+
+  <section>
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Left Column: Instant Recharge Card -->
+        <div class="col-lg-6 col-sm-12">
+          <div class="card p-5 my-5" data-aos="fade-right" data-aos-delay="300">
+            <div class="card-body mx-auto">
+              <h5 class="card-title display-5 text-center">Instant Recharge</h5>
+              <p class="card-text my-3">Enter your mobile number</p>
+              <form class="my-3 justify-content-center" id="homeMobileForm">
+                <input type="text" id="homeMobileNumber" class="form-control p-3" placeholder="Mobile Number"
+                  aria-label="Mobile Number">
+                <span id="error-number" class="text-danger"></span>
+                <div class=" d-flex justify-content-center"><button class="button-30 mt-3 text-center"
+                    type="submit">Continue</button></div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Why Choose Us / Feature Highlights -->
+        <div class="col-lg-6 col-sm-12" data-aos="fade-left" data-aos-delay="300">
+          <div class="accordion custom-accordion my-5" id="customAccordion">
+            <!-- Accordion Item 1 -->
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button collapsed custom-btn" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                  How do I recharge my mobile number?
+                </button>
+              </h2>
+              <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+                data-bs-parent="#customAccordion">
+                <div class="accordion-body">
+                  <p>
+                    Simply enter your mobile number in the input field, click continue, and
+                    select your preferred recharge plan. Our platform ensures secure and instant
+                    recharge processing for both 4G and 5G networks. </p>
+                </div>
+              </div>
+            </div>
+            <!-- Accordion Item 2 -->
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed custom-btn" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                  What payment methods are accepted?
+                </button>
+              </h2>
+              <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                data-bs-parent="#customAccordion">
+                <div class="accordion-body">
+                  <p>
+                    We accept all major payment methods including credit/debit cards, UPI, net
+                    banking, and digital wallets. All transactions are secured with
+                    industry-standard encryption. </p>
+                </div>
+              </div>
+            </div>
+            <!-- Accordion Item 3 -->
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed custom-btn" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                  How can I view available recharge plans?
+
+                </button>
+              </h2>
+              <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+                data-bs-parent="#customAccordion">
+                <div class="accordion-body">
+                  <p>
+                    Click on the "Prepaid Plans" button in the navigation bar to access the list. You can
+                    browse through various plans categorized by validity, data limits, and
+                    special offers.</p>
+                </div>
+              </div>
+            </div>
+            <!-- Accordion Item 4 -->
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingFour">
+                <button class="accordion-button collapsed custom-btn" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                  Is my mobile number secure on your platform?
+                </button>
+              </h2>
+              <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
+                data-bs-parent="#customAccordion">
+                <div class="accordion-body">
+                  <p>
+                    Yes, we prioritize your privacy and security. Your mobile number and all
+                    personal information are encrypted and protected according to industry
+                    standards. We never share your data with third parties.</p>
+                </div>
+              </div>
+            </div>
+            <!-- Accordion Item 5 -->
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingFive">
+                <button class="accordion-button collapsed custom-btn" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                  How can I contact customer support?
+                </button>
+              </h2>
+              <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive"
+                data-bs-parent="#customAccordion">
+                <div class="accordion-body">
+                  <p>
+                    You can reach our customer support team through email at support@example.com
+                    or call us at 1-800-123-4567. We're available 24/7 to assist you with any
+                    queries or concerns.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="row mt-5">
+    <article class="col-12">
+      <div id="carouselExample" class="carousel slide carousel-fade w-75 mx-auto rounded-5" data-bs-ride="carousel"
+        data-aos="zoom-in">
+        <div class="carousel-inner rounded-5">
+          <figure class="carousel-item active">
+            <a href="prepaid.html"><img src="./assets/images/banner-1.jpg" class="d-block mx-auto rounded-5"
+                alt="Carousel Image 1"></a>
+          </figure>
+          <figure class="carousel-item">
+            <a href="prepaid.html">
+              <img src="./assets/images/banner-2.jpg" class="d-block mx-auto rounded-5" alt="Carousel Image 2">
+            </a>
+          </figure>
+          <figure class="carousel-item">
+            <a href="prepaid.html">
+              <img src="./assets/images/banner-3.jpg" class="d-block mx-auto rounded-5" alt="Carousel Image 3">
+            </a>
+          </figure>
+        </div>
+        <!-- Custom Previous Button -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+          <i class="bi bi-arrow-left-circle-fill text-dark"></i>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <!-- Custom Next Button -->
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+          <i class="bi bi-arrow-right-circle-fill text-dark"></i>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </article>
+  </section>
+
+  <section class="join-sim-section">
+    <div class="container py-5">
+      <div class="row align-items-center">
+        <!-- Left Column: Information & Features -->
+        <div class="col-lg-6 mb-4">
+          <h2 class="section-title" data-aos="fade-right" data-aos-duration="400">Join the MobiComm Family</h2>
+          <p class="section-description" data-aos="fade-right" data-aos-duration="500">
+            Discover the power of seamless mobile connectivity. Get your new SIM card from MobiComm and enjoy
+            lightning‐fast network speeds, secure payments, round‐the‐clock support, and exclusive offers designed just
+            for you.
+          </p>
+          <ul class="features-list">
+            <li data-aos="fade-right" data-aos-duration="600"><i class="fas fa-bolt"></i> Lightning-Fast Connectivity
+            </li>
+            <li data-aos="fade-right" data-aos-duration="700"><i class="fas fa-shield-alt"></i> Secure & Reliable
+              Service</li>
+            <li data-aos="fade-right" data-aos-duration="800"><i class="fas fa-headset"></i> 24/7 Customer Support</li>
+            <li data-aos="fade-right" data-aos-duration="900"><i class="fas fa-tags"></i> Exclusive Offers & Benefits
+            </li>
+          </ul>
+        </div>
+        <!-- Right Column: Sign-Up Form -->
+        <div class="col-lg-6">
+          <div class="join-form-wrapper p-4" data-aos="fade-left" data-aos-duration="1000">
+            <h3 class="form-title">Get Your New SIM</h3>
+            <form class="join-form" id="joinForm">
+              <div class="form-group mb-3">
+                <input type="text" class="form-control" id="joinName" placeholder="Full Name" required>
+              </div>
+              <div class="form-group mb-3">
+                <input type="email" class="form-control" id="joinEmail" placeholder="Email Address" required>
+              </div>
+              <div class="form-group mb-3">
+                <input type="tel" class="form-control" id="joinPhone" placeholder="Contact Number" required>
+              </div>
+              <div class="form-group mb-4">
+                <select class="form-control" id="joinPlan" required>
+                  <option value="">Select Your Plan</option>
+                  <option value="plan1">MobiComm eSim</option>
+                  <option value="plan2">MobiComm Sim</option>
+                </select>
+              </div>
+              <div class="d-flex justify-content-center">
+                <button class="button-30 mt-3 text-center" type="submit" role="button">Join Now</button>
+              </div>
+            </form>
+            <p class="form-footer">Already have a SIM? <a href="login.html">Login Here</a></p>            
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="row my-5 mx-auto">
+    <article class="col-12">
+      <div class="row justify-content-center">
+        <div class="features text-center mb-5">
+          <h2 class="display-6 mb-4 text-center fw-bold">Why Choose Our Service?</h2>
+        </div>
+        <article class="col-md-4 mb-4 slide-up">
+          <div class="card h-100 border-0 custom shadow-sm rounded-4" data-aos="fade-right">
+            <div class="card-body text-center p-4" data-aos="fade-right">
+              <div class="feature-icon mb-3">
+                <i class="fa-solid fa-shield-virus" style="font-size: 2.5rem;"></i>
+              </div>
+              <h5 class="card-title text-dark">Secure Transactions</h5>
+              <p class="card-text text-light">End-to-end encrypted payments with multi-factor
+                authentication for maximum security.</p>
+            </div>
+          </div>
+        </article>
+        <article class="col-md-4 mb-4 slide-up">
+          <div class="card  h-100 border-0 custom shadow-sm rounded-4" data-aos="fade-right">
+            <div class="card-body text-center p-4" data-aos="fade-right">
+              <div class="feature-icon mb-3">
+                <i class="fa-solid fa-bolt-lightning" style="font-size: 2.5rem;"></i>
+              </div>
+              <h5 class="card-title text-dark">Instant Recharge</h5>
+              <p class="card-text text-light">Experience lightning-fast recharges with real-time
+                confirmation and activation.</p>
+            </div>
+          </div>
+        </article>
+        <article class="col-md-4 mb-4 slide-up">
+          <div class="card h-100 border-0 custom shadow-sm rounded-4" data-aos="fade-right">
+            <div class="card-body text-center p-4" data-aos="fade-right">
+              <div class="feature-icon mb-3">
+                <i class="fa-solid fa-gift" style="font-size: 2.5rem;"></i>
+              </div>
+              <h5 class="card-title text-dark">Exclusive Rewards</h5>
+              <p class="card-text text-light">Earn cashback and points on every recharge. Redeem
+                for exciting offers and discounts.</p>
+            </div>
+          </div>
+        </article>
+      </div>
+      <div class="row justify-content-center mt-3">
+        <article class="col-md-4 mb-4 slide-up">
+          <div class="card h-100 border-0 custom shadow-sm rounded-4" data-aos="fade-right">
+            <div class="card-body text-center p-4" data-aos="fade-right">
+              <div class="feature-icon mb-3">
+                <i class="fa-solid fa-clock-rotate-left" style="font-size: 2.5rem;"></i>
+              </div>
+              <h5 class="card-title text-dark">Auto-Recharge</h5>
+              <p class="card-text text-light">Set up scheduled recharges and never worry about
+                running out of balance again.</p>
+            </div>
+          </div>
+        </article>
+        <article class="col-md-4 mb-4 slide-up">
+          <div class="card h-100 border-0 custom shadow-sm rounded-4" data-aos="fade-right">
+            <div class="card-body text-center p-4" data-aos="fade-right">
+              <div class="feature-icon mb-3" style="font-size: 2.5rem;">
+                <i class="fa-solid fa-headset"></i>
+              </div>
+              <h5 class="card-title text-dark">24/7 Support</h5>
+              <p class="card-text text-light">Get instant assistance through live chat, email, or
+                phone support anytime, anywhere.</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </article>
+  </section>
+
+  <footer class="footer mb-lg-0">
+    <div class="container py-5">
+      <div class="row">
+        <!-- About Section -->
+        <div class="col-md-4 mb-4">
+          <h5 class="text-dark" data-aos="fade-right" data-aos-duration="300">About MobiComm</h5>
+          <p data-aos="fade-right" data-aos-duration="400">
+            MobiComm provides seamless mobile connectivity and instant recharge solutions for a hassle-free experience.
+          </p>
+        </div>
+        <!-- Quick Links -->
+        <div class="col-md-4 mb-4">
+          <h5 class="text-dark" data-aos="fade-down" data-aos-duration="500">Quick Links</h5>
+          <ul class="list-unstyled">
+            <li data-aos="fade-up" data-aos-duration="600"><a href="index.html" class="footer-link">Home</a></li>
+            <li data-aos="fade-up" data-aos-duration="700"><a href="prepaid.html" class="footer-link">Prepaid Plans</a>
+            </li>
+            <li data-aos="fade-up" data-aos-duration="800"><a href="faq.html" class="footer-link">FAQs</a></li>
+            <li data-aos="fade-up" data-aos-duration="900"><a href="contact.html" class="footer-link">Contact Us</a>
+            </li>
+          </ul>
+        </div>
+        <!-- Social Media -->
+        <div class="col-md-4 mb-4">
+          <h5 class="text-dark" data-aos="fade-left" data-aos-duration="300">Connect With Us</h5>
+          <ul class="list-inline social-icons">
+            <li class="list-inline-item" data-aos="fade-left" data-aos-duration="400"><a href="#"><i
+                  class="fab fa-facebook-f"></i></a></li>
+            <li class="list-inline-item" data-aos="fade-left" data-aos-duration="500"><a href="#"><i
+                  class="fab fa-twitter"></i></a></li>
+            <li class="list-inline-item" data-aos="fade-left" data-aos-duration="600"><a href="#"><i
+                  class="fab fa-instagram"></i></a></li>
+            <li class="list-inline-item" data-aos="fade-left" data-aos-duration="700"><a href="#"><i
+                  class="fab fa-linkedin-in"></i></a></li>
+          </ul>
+        </div>
+      </div>
+      <!-- Footer Bottom -->
+      <div class="row">
+        <div class="col-12 text-center mt-4">
+          <p class="mb-0" data-aos="fade-up" data-aos-duration="800">&copy; 2025 MobiComm. All Rights Reserved.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+
+  <script src="./node_modules/aos/dist/aos.js"></script>
+  <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script>
+    AOS.init();
+
+    // Change header style on scroll
+    window.addEventListener('scroll', function () {
+      const header = document.getElementById('header');
+      if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      var text = "Welcome to MobiComm";
+      var i = 0;
+      var speed = 50; // speed in milliseconds per character
+      var lead = document.querySelector('.typing');
+
+      function typeWriter() {
+        if (i < text.length) {
+          lead.textContent += text.charAt(i);
+          i++;
+          setTimeout(typeWriter, speed);
+        }
+
+        const navEntries = performance.getEntriesByType("navigation");
+        if (navEntries.length && navEntries[0].type === "reload") {
+          localStorage.removeItem('mobileNumber');
+        }
+
+        document.getElementById('homeMobileForm').addEventListener('submit', function (e) {
+          e.preventDefault();
+          const mobile = document.getElementById('homeMobileNumber').value.trim();
+          const error = document.getElementById('error-number');
+          if (mobile.length < 10) {
+            error.textContent = 'Please enter a valid 10-digit mobile number.';
+          } else {
+
+            localStorage.setItem('mobileNumber', mobile);
+            // Redirect or move to the next step (e.g., select plan)
+            window.location.href = "prepaid.html"; // or payment.html if that's your flow
+          }
+          // Store mobile number in localStorage
+        });
+      }
+
+      typeWriter();
+    });
+
+    $(document).ready(function () {
+  // Listen for the form submission
+  $("#joinForm").submit(function (e) {
+    e.preventDefault(); // Prevent default page refresh
+
+    // Gather form field values
+    const name = $("#joinName").val().trim();
+    const email = $("#joinEmail").val().trim();
+    const phone = $("#joinPhone").val().trim();
+    const plan = $("#joinPlan").val();
+
+    // Create the object to send to the JSON server
+    const newUserRequestObj = {
+      name: name,
+      email: email,
+      contactNumber: phone,
+      simPlan: plan
+    };
+
+    // POST request to the JSON server's newUserRequest array
+    $.ajax({
+      url: "http://localhost:3000/newUserRequest", // Adjust if needed
+      type: "POST",
+      data: JSON.stringify(newUserRequestObj),
+      contentType: "application/json",
+      success: function () {
+        alert("Your request has been submitted successfully!");
+        // Optionally clear the form
+        $("#joinForm")[0].reset();
+      },
+      error: function (err) {
+        console.error("Error adding to newUserRequest:", err);
+        alert("There was an error submitting your request. Please try again later.");
+      }
+    });
+  });
+});
+
+
+  </script>
+</body>
+
+</html>

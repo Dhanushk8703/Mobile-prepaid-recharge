@@ -1,0 +1,298 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #f3f6f9, #e9ecef);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .payment-container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1000px;
+    padding: 30px;
+    position: relative;
+  }
+
+  /* ----------------------------------------------------- */
+  /* Header & Animations                                   */
+  /* ----------------------------------------------------- */
+  .payment-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, #28a745, #2fa31e);
+    border-radius: 10px;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    animation: fadeInDown 0.5s ease-in-out;
+  }
+
+  .payment-header h1 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+  }
+
+  .payment-header p {
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ----------------------------------------------------- */
+  /* Plan Summary                                          */
+  /* ----------------------------------------------------- */
+  .plan-summary {
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+    animation: fadeIn 0.5s ease-in-out 0.2s forwards;
+    opacity: 0;
+  }
+
+  .plan-summary h4 {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    color: #333;
+  }
+
+  .plan-summary p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 5px;
+  }
+
+  /* ----------------------------------------------------- */
+  /* Mobile Number Section                                 */
+  /* ----------------------------------------------------- */
+  #mobileSection {
+    margin-bottom: 1.5rem;
+    animation: fadeIn 0.5s ease-in-out 0.3s forwards;
+    opacity: 0;
+  }
+
+  #mobileSection p,
+  #mobileSection label {
+    font-size: 1rem;
+    color: #2c3e50;
+  }
+
+  /* ----------------------------------------------------- */
+  /* Payment Method Section                                */
+  /* ----------------------------------------------------- */
+  .payment-method {
+    text-align: center;
+    background: rgba(0, 0, 0, 0.03);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    animation: fadeIn 0.5s ease-in-out 0.4s forwards;
+    opacity: 0;
+  }
+
+  .payment-method label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .form-check-inline {
+    display: inline-block;
+    margin: 10px 8px 0 8px;
+  }
+
+  .form-check-input {
+    accent-color: #ff6f61;
+    transform: scale(1.2);
+    cursor: pointer;
+  }
+
+  .form-check-label {
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #333;
+    margin-left: 6px;
+  }
+
+  .form-check-input:checked+.form-check-label {
+    font-weight: bold;
+    color: #ff6f61;
+  }
+
+  /* ----------------------------------------------------- */
+  /* Payment Form                                          */
+  /* ----------------------------------------------------- */
+  #paymentForm {
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 20px;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    color: #fff;
+    animation: fadeIn 0.5s ease-in-out 0.5s forwards;
+    opacity: 0;
+  }
+
+  .payment-fields {
+    margin-top: 15px;
+  }
+
+  .form-label {
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+    color: #fff;
+  }
+
+  .form-control,
+  .form-select {
+    background: rgb(255, 255, 255);
+    border: none;
+    border-radius: 6px;
+    color: #000000;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    outline: none;
+    background: rgb(255, 255, 255);
+    transform: scale(1.01);
+  }
+
+  .form-control::placeholder {
+    color: rgba(0, 0, 0, 0.7);
+  }
+
+  /* ----------------------------------------------------- */
+  /* Button Styling                                        */
+  /* ----------------------------------------------------- */
+  .btn-pay {
+    display: inline-block;
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    background: #ff6f61;
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-pay:hover {
+    background: #e64a45;
+    transform: scale(1.03);
+    box-shadow: 0 4px 8px rgba(255, 111, 97, 0.3);
+  }
+
+  /* ----------------------------------------------------- */
+  /* Processing & Success Sections                         */
+  /* ----------------------------------------------------- */
+  .loader {
+    width: 50px;
+    height: 50px;
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 30px auto 0;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .success-message {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    margin-top: 30px;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out forwards;
+  }
+
+  .success-message h2 {
+    font-size: 1.8rem;
+    color: #28a745;
+    margin-bottom: 20px;
+  }
+
+  .transaction-details {
+    text-align: left;
+    margin: 20px auto;
+    max-width: 500px;
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+  }
+
+  .transaction-details p {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: #555;
+  }
+
+  .btn-warning {
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    margin-top: 20px;
+    transition: background 0.3s ease;
+    border: none;
+  }
+
+  .btn-warning:hover {
+    background: #d48806;
+    color: #fff;
+  }
+
+  /* ----------------------------------------------------- */
+  /* FadeIn Animation Keyframes                            */
+  /* ----------------------------------------------------- */
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(15px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
