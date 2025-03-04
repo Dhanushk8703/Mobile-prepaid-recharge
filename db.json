@@ -113,7 +113,7 @@
         },
         {
           "username": "gokulakannan",
-          "name": "Gokulakannan",
+          "name": "Gokulakannan SV",
           "phone": "9360425967",
           "email": "gokulakannan@gmail.com",
           "activePlan": {
@@ -133,15 +133,6 @@
           "feedback": "",
           "favoritePlans": [
             {
-              "id": "recommended1",
-              "categoryId": 1,
-              "name": "Smart Choice Plan",
-              "price": 249,
-              "validity": "28 days",
-              "description": "Recommended for balanced usage with excellent OTT offers.",
-              "status": "active"
-            },
-            {
               "id": "data1",
               "categoryId": 4,
               "name": "Ultra Data Plan",
@@ -149,6 +140,31 @@
               "validity": "28 days",
               "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
               "status": "active"
+            },
+            {
+              "id": "ott3",
+              "name": "OTT Ultimate Pack",
+              "data": "Unlimited",
+              "validity": "84 days",
+              "price": 699,
+              "description": "Unlimited access to all OTT platforms.",
+              "ottDetails": [
+                {
+                  "platform": "Netflix",
+                  "validity": "30 Days",
+                  "icon": "./assets/images/netflix.png"
+                },
+                {
+                  "platform": "Disney+",
+                  "validity": "30 Days",
+                  "icon": "./assets/images/hotstar.png"
+                },
+                {
+                  "platform": "Amazon Prime",
+                  "validity": "30 Days",
+                  "icon": "./assets/images/amazon.png"
+                }
+              ]
             }
           ]
         },
