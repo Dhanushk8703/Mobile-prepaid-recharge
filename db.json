@@ -4,7 +4,7 @@
       "details": [
         {
           "username": "dhanush",
-          "name": "Dhanush",
+          "name": "Dhanush K",
           "phone": "6369216867",
           "email": "dhanush@gmail.com",
           "activePlan": {
@@ -46,6 +46,21 @@
               "validity": "28 days",
               "description": "High-speed data with free subscriptions to OTT platforms like Netflix.",
               "status": "active"
+            },
+            {
+              "id": "ott1",
+              "name": "OTT Starter Pack",
+              "data": "500MB/day",
+              "validity": "28 days",
+              "price": 199,
+              "description": "Enjoy limited OTT access with this starter pack.",
+              "ottDetails": [
+                {
+                  "platform": "Netflix",
+                  "validity": "15 Days",
+                  "icon": "./assets/images/netflix.png"
+                }
+              ]
             }
           ]
         },
@@ -622,11 +637,6 @@
   },
   "categories": [
     {
-      "id": "5",
-      "name": "Combo Packs",
-      "plans": []
-    },
-    {
       "id": "6",
       "name": "OTT Packs",
       "plans": []
@@ -650,26 +660,19 @@
       "id": "4",
       "name": "Data Addon",
       "plans": []
+    },
+    {
+      "id": "5",
+      "name": "Combo Packs",
+      "plans": []
+    },
+    {
+      "id": "7",
+      "name": "Netflix Plans",
+      "plans": []
     }
   ],
   "plans": [
-    {
-      "id": "popular2",
-      "categoryId": 2,
-      "name": "Best Data Plan",
-      "data": "2GB/day",
-      "price": 279,
-      "validity": "28 days",
-      "description": "Popular choice for high-speed data with OTT subscriptions.",
-      "status": "active",
-      "ottDetails": [
-        {
-          "platform": "Netflix",
-          "validity": "30 Days",
-          "icon": "./assets/images/netflix.png"
-        }
-      ]
-    },
     {
       "id": "popular3",
       "categoryId": 2,
@@ -699,79 +702,6 @@
       "ottDetails": [
         {
           "platform": "Hotstar",
-          "validity": "30 Days",
-          "icon": "./assets/images/hotstar.png"
-        }
-      ]
-    },
-    {
-      "id": "combo1",
-      "categoryId": 5,
-      "name": "Unlimited Combo",
-      "data": "Unlimited",
-      "price": 699,
-      "validity": "84 days",
-      "description": "Unlimited calls & data along with OTT offers including Amazon Prime.",
-      "status": "active",
-      "ottDetails": [
-        {
-          "platform": "Amazon Prime",
-          "validity": "30 Days",
-          "icon": "./assets/images/amazon.png"
-        }
-      ]
-    },
-    {
-      "id": "combo2",
-      "categoryId": 5,
-      "name": "Balanced Combo",
-      "data": "1.5GB/day",
-      "price": 449,
-      "validity": "56 days",
-      "description": "Balanced talktime and data benefits with OTT trials.",
-      "status": "active",
-      "ottDetails": [
-        {
-          "platform": "Hotstar",
-          "validity": "30 Days",
-          "icon": "./assets/images/hotstar.png"
-        }
-      ]
-    },
-    {
-      "id": "combo3",
-      "categoryId": 5,
-      "name": "Budget Combo",
-      "data": "1GB/day",
-      "price": 299,
-      "validity": "28 days",
-      "description": "Affordable combo plan with essential data and call benefits, plus OTT offers.",
-      "status": "active",
-      "ottDetails": [
-        {
-          "platform": "YouTube Premium",
-          "validity": "30 Days",
-          "icon": "./assets/images/youtube.png"
-        }
-      ]
-    },
-    {
-      "id": "combo4",
-      "categoryId": 5,
-      "name": "Premium Combo",
-      "data": "3GB/day",
-      "price": 899,
-      "validity": "84 days",
-      "description": "Premium plan offering high-speed data, unlimited calls and multiple OTT subscriptions.",
-      "status": "active",
-      "ottDetails": [
-        {
-          "platform": "Netflix",
-          "validity": "30 Days",
-          "icon": "./assets/images/netflix.png"
-        },
-        {
-          "platform": "Disney+",
           "validity": "30 Days",
           "icon": "./assets/images/hotstar.png"
         }
@@ -845,7 +775,7 @@
     },
     {
       "id": "ott4",
-      "name": "OTT Pack",
+      "name": "OTT Combo Pack",
       "categoryId": 6,
       "price": 99,
       "validity": "28",
@@ -1030,23 +960,6 @@
       ]
     },
     {
-      "id": "popular2",
-      "categoryId": 2,
-      "name": "Best Data Plan",
-      "data": "2GB/day",
-      "price": 279,
-      "validity": "28 days",
-      "description": "Popular choice for high-speed data with OTT subscriptions.",
-      "status": "active",
-      "ottDetails": [
-        {
-          "platform": "Netflix",
-          "validity": "30 Days",
-          "icon": "./assets/images/netflix.png"
-        }
-      ]
-    },
-    {
       "id": "data1",
       "categoryId": 4,
       "name": "Ultra Data Plan",
@@ -1118,9 +1031,141 @@
           "icon": "./assets/images/amazon.png"
         }
       ]
+    },
+    {
+      "id": "popular2",
+      "categoryId": 2,
+      "name": "Best Data Plan",
+      "data": "2GB/day",
+      "price": 279,
+      "validity": "28 days",
+      "description": "Popular choice for high-speed data with OTT subscriptions.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Netflix",
+          "validity": "30 Days",
+          "icon": "./assets/images/netflix.png"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "name": "OTT Damaka",
+      "categoryId": 6,
+      "price": 769,
+      "validity": "56",
+      "active": true
+    },
+    {
+      "id": "combo1",
+      "categoryId": 5,
+      "name": "Unlimited Combo",
+      "data": "Unlimited",
+      "price": 699,
+      "validity": "84 days",
+      "description": "Unlimited calls & data along with OTT offers including Amazon Prime.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Amazon Prime",
+          "validity": "30 Days",
+          "icon": "./assets/images/amazon.png"
+        }
+      ]
+    },
+    {
+      "id": "combo2",
+      "categoryId": 5,
+      "name": "Balanced Combo",
+      "data": "1.5GB/day",
+      "price": 449,
+      "validity": "56 days",
+      "description": "Balanced talktime and data benefits with OTT trials.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Hotstar",
+          "validity": "30 Days",
+          "icon": "./assets/images/hotstar.png"
+        }
+      ]
+    },
+    {
+      "id": "combo3",
+      "categoryId": 5,
+      "name": "Budget Combo",
+      "data": "1GB/day",
+      "price": 299,
+      "validity": "28 days",
+      "description": "Affordable combo plan with essential data and call benefits, plus OTT offers.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "YouTube Premium",
+          "validity": "30 Days",
+          "icon": "./assets/images/youtube.png"
+        }
+      ]
+    },
+    {
+      "id": "combo4",
+      "categoryId": 5,
+      "name": "Premium Combo",
+      "data": "3GB/day",
+      "price": 899,
+      "validity": "84 days",
+      "description": "Premium plan offering high-speed data, unlimited calls and multiple OTT subscriptions.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Netflix",
+          "validity": "30 Days",
+          "icon": "./assets/images/netflix.png"
+        },
+        {
+          "platform": "Disney+",
+          "validity": "30 Days",
+          "icon": "./assets/images/hotstar.png"
+        }
+      ]
+    },
+    {
+      "id": "1",
+      "name": "Basic Netflix",
+      "categoryId": 7,
+      "price": 189,
+      "validity": "24",
+      "active": true
+    },
+    {
+      "id": "2",
+      "name": "Premium Packs",
+      "categoryId": 7,
+      "price": 499,
+      "validity": "30",
+      "active": true
     }
   ],
-  "deactivatedPlans": [],
+  "deactivatedPlans": [
+    {
+      "id": "popular2",
+      "categoryId": 2,
+      "name": "Best Data Plan",
+      "data": "2GB/day",
+      "price": 279,
+      "validity": "28 days",
+      "description": "Popular choice for high-speed data with OTT subscriptions.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Netflix",
+          "validity": "30 Days",
+          "icon": "./assets/images/netflix.png"
+        }
+      ]
+    }
+  ],
   "deactivatedCategories": [],
   "newUserRequest": [
     {
@@ -1150,6 +1195,13 @@
       "email": "venkat@gmail.com",
       "contactNumber": "8855226644",
       "simPlan": "plan1"
+    },
+    {
+      "id": "a39e",
+      "name": "Swarnalatha",
+      "email": "swarnalatha@gmail.com",
+      "contactNumber": "9360134501",
+      "simPlan": "plan2"
     }
   ]
 }

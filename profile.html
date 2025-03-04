@@ -53,7 +53,6 @@
                     <h2>Dhanush</h2>
                     <p>dhanush@gmail.com</p>
                     <p>+91 9876543210</p>
-                    <p>TN, India</p>
                     <button id="logoutBtn" class="logout-btn">Logout</button>
                 </div>
             </div>
@@ -80,11 +79,6 @@
                             <h4>Phone</h4>
                             <p class="info-text" data-key="phone">+91 9876543210</p>
                             <input type="text" class="info-input" data-key="phone" value="+91 9876543210" />
-                        </div>
-                        <div>
-                            <h4>Location</h4>
-                            <p class="info-text" data-key="location">TN, India</p>
-                            <input type="text" class="info-input" data-key="location" value="TN, India" />
                         </div>
                         <!-- Edit Actions (Save / Cancel) -->
                         <div id="editActions" style="display: none; text-align: right; margin-top: 10px;">
@@ -155,6 +149,13 @@
                 </div>
             </div>
         </div>
+        <!-- Favorite Plans Section -->
+        <div class="container my-4">
+            <h4 class="mb-3">My Favorite Plans</h4>
+            <div id="favoritePlansContainer" class="row">
+                <!-- Favorite plan cards will be appended here dynamically -->
+            </div>
+        </div>
     </div>
 
     <footer class="footer">
@@ -208,6 +209,7 @@
     </footer>
 
     <script src="./node_modules/aos/dist/aos.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
     <script>
         AOS.init();
@@ -227,24 +229,26 @@
         });
 
         document.addEventListener("DOMContentLoaded", async function () {
-            // Get the logged-in user's phone number (set during login)
+            // Check if user is logged in
             if (!sessionStorage.getItem("loggedIn") || !sessionStorage.getItem("phone")) {
                 window.location.href = "login.html";
                 return;
             }
             const userPhone = sessionStorage.getItem("phone");
 
+            let currentUser = null; // will hold the logged-in user details
+
             try {
-                // Fetch the user data from db.json
-                const response = await fetch("db.json");
+                // Fetch the dashboard data from the JSON server
+                const response = await fetch("http://localhost:3000/dashboard");
                 if (!response.ok) {
-                    console.error("Failed to fetch db.json");
+                    console.error("Failed to fetch dashboard data");
                     return;
                 }
                 const data = await response.json();
-                const registeredUsers = data.dashboard.users.details;
+                const registeredUsers = data.users.details;
                 // Find the user with the matching phone number
-                const currentUser = registeredUsers.find(u => u.phone === userPhone);
+                currentUser = registeredUsers.find(u => u.phone === userPhone);
 
                 if (!currentUser) {
                     alert("User not found. Please log in again.");
@@ -264,6 +268,7 @@
                 }
 
                 // --- Update Personal Information Section ---
+                // We will only allow editing email and name.
                 function updateField(key, value, disable = false) {
                     const textEl = document.querySelector(`.info-text[data-key="${key}"]`);
                     const inputEl = document.querySelector(`.info-input[data-key="${key}"]`);
@@ -277,9 +282,10 @@
                         }
                     }
                 }
+                // Only update fullname and email (phone remains uneditable)
                 updateField("fullname", currentUser.name);
                 updateField("email", currentUser.email);
-                updateField("phone", currentUser.phone, true); // Disable editing phone
+                updateField("phone", currentUser.phone, true);
                 updateField("location", currentUser.location || "Not specified");
 
                 // --- Update Active Plan Section ---
@@ -337,7 +343,7 @@
                 console.error("Error fetching user data:", error);
             }
 
-            // Initialize elements for edit functionality
+            // --- Initialize Edit Functionality ---
             const editBtn = document.getElementById('editBtn');
             const cancelBtn = document.getElementById('cancelBtn');
             const saveBtn = document.getElementById('saveBtn');
@@ -345,49 +351,247 @@
             const infoInputs = document.querySelectorAll('.info-input');
             const editActions = document.getElementById('editActions');
 
-            // Edit button: Show input fields and hide static texts
+            // Edit button: Show input fields for fullname and email only
             editBtn.addEventListener('click', () => {
-                infoTexts.forEach(el => el.style.display = 'none');
-                infoInputs.forEach(el => {
-                    if (el.getAttribute('data-key') !== 'phone') {
-                        el.style.display = 'block';
+                // Hide static texts and show inputs for fullname and email
+                infoTexts.forEach(el => {
+                    if (el.getAttribute("data-key") === "fullname" || el.getAttribute("data-key") === "email") {
+                        el.style.display = "none";
                     }
                 });
-                editActions.style.display = 'block';
-                editBtn.style.display = 'none';
+                infoInputs.forEach(el => {
+                    if (el.getAttribute("data-key") === "fullname" || el.getAttribute("data-key") === "email") {
+                        el.style.display = "block";
+                    }
+                });
+                editActions.style.display = "block";
+                editBtn.style.display = "none";
             });
 
-            // Cancel button: Hide input fields and revert changes
+            // Cancel button: Hide inputs and revert to static texts
             cancelBtn.addEventListener('click', () => {
                 infoInputs.forEach(el => {
-                    if (el.getAttribute('data-key') !== 'phone') {
-                        const key = el.getAttribute('data-key');
+                    if (el.getAttribute("data-key") === "fullname" || el.getAttribute("data-key") === "email") {
+                        const key = el.getAttribute("data-key");
                         const textEl = document.querySelector(`.info-text[data-key="${key}"]`);
                         el.value = textEl.textContent;
-                        el.style.display = 'none';
+                        el.style.display = "none";
                     }
                 });
-                infoTexts.forEach(el => el.style.display = 'block');
-                editActions.style.display = 'none';
-                editBtn.style.display = 'inline-block';
+                infoTexts.forEach(el => {
+                    if (el.getAttribute("data-key") === "fullname" || el.getAttribute("data-key") === "email") {
+                        el.style.display = "block";
+                    }
+                });
+                editActions.style.display = "none";
+                editBtn.style.display = "inline-block";
             });
 
-            // Save button: Update static texts with input values
+            // Save button: Update static texts with input values and update server (only for fullname and email)
             saveBtn.addEventListener('click', () => {
                 infoInputs.forEach(el => {
-                    if (el.getAttribute('data-key') !== 'phone') {
-                        const key = el.getAttribute('data-key');
+                    if (el.getAttribute("data-key") === "fullname" || el.getAttribute("data-key") === "email") {
+                        const key = el.getAttribute("data-key");
                         const textEl = document.querySelector(`.info-text[data-key="${key}"]`);
                         textEl.textContent = el.value;
-                        el.style.display = 'none';
+                        el.style.display = "none";
                     }
                 });
-                infoTexts.forEach(el => el.style.display = 'block');
-                editActions.style.display = 'none';
-                editBtn.style.display = 'inline-block';
-                // Optionally, send updated info to your server via AJAX here.
+                infoTexts.forEach(el => {
+                    if (el.getAttribute("data-key") === "fullname" || el.getAttribute("data-key") === "email") {
+                        el.style.display = "block";
+                    }
+                });
+                editActions.style.display = "none";
+                editBtn.style.display = "inline-block";
+                // Update the server with new details
+                updateUserDetails({
+                    username: currentUser.username,
+                    name: document.querySelector('.info-text[data-key="fullname"]').textContent,
+                    email: document.querySelector('.info-text[data-key="email"]').textContent
+                });
             });
+
+            // Function to update user details on the JSON server
+            async function updateUserDetails(updatedFields) {
+                try {
+                    const response = await fetch("http://localhost:3000/dashboard");
+                    if (!response.ok) {
+                        console.error("Failed to fetch dashboard data for update");
+                        return;
+                    }
+                    const dashboardData = await response.json();
+                    // Update only the matching user's details
+                    dashboardData.users.details = dashboardData.users.details.map(user => {
+                        if (user.username === updatedFields.username) {
+                            return { ...user, name: updatedFields.name, email: updatedFields.email };
+                        }
+                        return user;
+                    });
+                    await fetch("http://localhost:3000/dashboard", {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(dashboardData)
+                    });
+                    alert("User details updated successfully.");
+                } catch (err) {
+                    console.error("Error updating user details:", err);
+                    alert("Error updating user details. Please try again.");
+                }
+            }
         });
+
+        // At the end of your existing script, or in a separate file:
+
+        // 1) Function to fetch and display the current user's favorite plans
+        async function fetchFavoritePlans() {
+            try {
+                // Check if phone is stored in session (meaning user is logged in)
+                const userPhone = sessionStorage.getItem("phone");
+                if (!userPhone) {
+                    console.error("No phone found in session; user not logged in.");
+                    window.location.href = "login.html"; // or your login page
+                    return;
+                }
+
+                // Fetch the dashboard data (which includes users)
+                const response = await fetch("http://localhost:3000/dashboard");
+                if (!response.ok) {
+                    console.error("Failed to fetch dashboard data");
+                    return;
+                }
+
+                const data = await response.json();
+                // Extract the array of users
+                const registeredUsers = data.users.details;
+
+                // Find the user with the matching phone number
+                const currentUser = registeredUsers.find(u => u.phone === userPhone);
+                if (!currentUser) {
+                    alert("User not found. Please log in again.");
+                    window.location.href = "login.html";
+                    return;
+                }
+
+                // Now render the favorite plans
+                renderFavoritePlans(currentUser);
+            } catch (error) {
+                console.error("Error fetching favorite plans:", error);
+            }
+        }
+
+        // 2) Helper function to render the user's favorite plans in a Bootstrap card layout
+        function renderFavoritePlans(user) {
+            const favoritePlansContainer = document.getElementById("favoritePlansContainer");
+            if (!favoritePlansContainer) return; // Container not found
+
+            // Clear the container first
+            favoritePlansContainer.innerHTML = "";
+
+            // If user has a "favoritePlans" array with content
+            if (user.favoritePlans && user.favoritePlans.length > 0) {
+                user.favoritePlans.forEach(plan => {
+                    // Create a column + card for each plan
+                    const colDiv = document.createElement("div");
+                    colDiv.classList.add("col-md-6", "mb-3"); // adjust columns as needed
+
+                    // Build a Bootstrap card for the plan
+                    colDiv.innerHTML = `
+        <div class="card h-100 position-relative" data-plan-id="${plan.id}">
+  <!-- Remove Favorite Button in Top Right -->
+  <button class="btn btn-sm btn-danger remove-fav-plan" style="position: absolute; top: 10px; right: 10px;" title="Remove from Favorites">
+    <i class="fa fa-times"></i>
+  </button>
+  <div class="card-body">
+    <h5 class="card-title">${plan.name}</h5>
+    <p class="card-text text-muted mb-2">Price: ₹${plan.price}</p>
+    <p class="card-text text-muted mb-2">Validity: ${plan.validity}</p>
+    <p class="card-text">${plan.description}</p>
+    <button class="btn btn-primary btn-sm">Recharge</button>
+  </div>
+</div>
+
+      `;
+                    favoritePlansContainer.appendChild(colDiv);
+                });
+            } else {
+                // If no favorite plans, display a simple message
+                favoritePlansContainer.innerHTML = `<p class="text-muted">No favorite plans available.</p>`;
+            }
+        }
+
+        $(document).on("click", ".remove-fav-plan", async function (e) {
+            e.preventDefault();
+
+            // Check if user is logged in by verifying sessionStorage
+            if (!sessionStorage.getItem("loggedIn") || !sessionStorage.getItem("phone")) {
+                alert("Please log in to remove favorite plans.");
+                window.location.href = "login.html";
+                return;
+            }
+
+            // Get the plan ID from the card's data attribute
+            const planCard = $(this).closest(".card");
+            const planId = planCard.data("plan-id").toString();
+
+            // Get logged-in user's phone number from sessionStorage
+            const userPhone = sessionStorage.getItem("phone");
+
+            try {
+                // Fetch the current dashboard data from the JSON server
+                const response = await fetch("http://localhost:3000/dashboard");
+                if (!response.ok) {
+                    alert("Failed to fetch user data. Please try again.");
+                    return;
+                }
+                const dashboard = await response.json();
+                const usersArray = dashboard.users.details;
+
+                // Find the logged-in user by phone
+                const currentUser = usersArray.find(u => u.phone === userPhone);
+                if (!currentUser) {
+                    alert("User not found. Please log in again.");
+                    window.location.href = "login.html";
+                    return;
+                }
+
+                // Ensure favoritePlans exists and remove the plan with the matching id
+                if (currentUser.favoritePlans && currentUser.favoritePlans.length > 0) {
+                    const originalLength = currentUser.favoritePlans.length;
+                    currentUser.favoritePlans = currentUser.favoritePlans.filter(fav => fav.id !== planId);
+
+                    if (currentUser.favoritePlans.length === originalLength) {
+                        alert("This plan is not in your favorites.");
+                        return;
+                    }
+
+                    // Update the dashboard on the JSON server (PUT the entire users.details array)
+                    const updateResponse = await fetch("http://localhost:3000/dashboard", {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ users: { ...dashboard.users, details: usersArray } })
+                    });
+
+                    if (updateResponse.ok) {
+                        alert("Plan removed from favorites successfully.");
+                        // Optionally, remove the card from the UI:
+                        planCard.remove();
+                    } else {
+                        alert("Failed to update favorite plans. Please try again.");
+                    }
+                } else {
+                    alert("No favorite plans found for this user.");
+                }
+            } catch (error) {
+                console.error("Error removing favorite plan:", error);
+                alert("An error occurred. Please try again later.");
+            }
+        });
+
+
+        // 3) Call fetchFavoritePlans() after the rest of your code
+        fetchFavoritePlans();
+
     </script>
 </body>
 

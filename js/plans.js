@@ -199,25 +199,30 @@ function renderPlans(categories) {
       const planCard = document.createElement('div');
       planCard.classList.add('col-md-4', 'mb-4');
       planCard.innerHTML = `
-        <div class="plan-card p-4 border rounded shadow-sm h-100" 
-             data-plan-id="${plan.id}" 
-             data-title="${plan.name}" 
-             data-data="${plan.data}" 
-             data-validity="${plan.validity}" 
-             data-price="${plan.price}" 
-             data-description="${plan.description}"
-             data-aos="fade-left" data-aos-duration="500"
-             data-ott='${JSON.stringify(plan.ottDetails || [])}'>
-          <h4 class="plan-title mb-3">${plan.name}</h4>
-          <p class="plan-data"><strong>Data:</strong> ${plan.data}</p>
-          <p class="plan-validity"><strong>Validity:</strong> ${plan.validity} Days</p>
-          <p class="plan-price"><strong>Price:</strong> ₹${plan.price}</p>
-          <p class="plan-description">${plan.description}</p>
-          <div class="btn-group mt-3">
-            <button class="btn-view btn btn-sm btn-outline-primary">View Details</button>
-            <a class="btn-recharge btn btn-sm btn-success" href="payment.html?planId=${plan.id}&price=${plan.price}">Recharge Now</a>
-          </div>
-        </div>
+        <div class="plan-card p-4 border rounded shadow-sm h-100 position-relative" 
+     data-plan-id="${plan.id}" 
+     data-title="${plan.name}" 
+     data-data="${plan.data}" 
+     data-validity="${plan.validity}" 
+     data-price="${plan.price}" 
+     data-description="${plan.description}"
+     data-aos="fade-left" data-aos-duration="500"
+     data-ott='${JSON.stringify(plan.ottDetails || [])}'>
+  <!-- Favorite Button in Top Right Corner -->
+  <button class="btn-fav btn btn-sm btn-outline-danger" style="position: absolute; top: 10px; right: 10px;" title="Add to Favorites">
+    <i class="fa fa-heart"></i>
+  </button>
+  <h4 class="plan-title mb-3">${plan.name}</h4>
+  <p class="plan-data"><strong>Data:</strong> ${plan.data}</p>
+  <p class="plan-validity"><strong>Validity:</strong> ${plan.validity} Days</p>
+  <p class="plan-price"><strong>Price:</strong> ₹${plan.price}</p>
+  <p class="plan-description">${plan.description}</p>
+  <div class="btn-group mt-3">
+    <button class="btn-view btn btn-sm btn-outline-primary">View Details</button>
+    <a class="btn-recharge btn btn-sm btn-success" href="payment.html?planId=${plan.id}&price=${plan.price}">Recharge Now</a>
+  </div>
+</div>
+
       `;
       rowDiv.appendChild(planCard);
     });
@@ -229,6 +234,86 @@ function renderPlans(categories) {
   container.appendChild(navTabs);
   container.appendChild(tabContent);
 }
+
+$(document).on("click", ".btn-fav", async function (e) {
+  e.preventDefault();
+
+  // Check if user is logged in by verifying sessionStorage values.
+  if (!sessionStorage.getItem("loggedIn") || !sessionStorage.getItem("phone")) {
+    alert("Please log in to add favorite plans.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  // Retrieve plan details from the card's data attributes.
+  const planCard = $(this).closest(".plan-card");
+  const planId = planCard.data("plan-id").toString();
+  const plan = {
+    id: planId,
+    name: planCard.data("title"),
+    data: planCard.data("data"),
+    validity: planCard.data("validity"),
+    price: planCard.data("price"),
+    description: planCard.data("description"),
+    ottDetails: planCard.data("ott")
+  };
+
+  const userPhone = sessionStorage.getItem("phone");
+
+  try {
+    // Fetch the current dashboard data from the JSON server.
+    const response = await fetch("http://localhost:3000/dashboard");
+    if (!response.ok) {
+      alert("Error fetching user data. Please try again.");
+      return;
+    }
+    const dashboard = await response.json();
+    const usersArray = dashboard.users.details;
+
+    // Find the logged-in user using their phone number.
+    const currentUser = usersArray.find(u => u.phone === userPhone);
+    if (!currentUser) {
+      alert("User not found. Please log in again.");
+      window.location.href = "login.html";
+      return;
+    }
+
+    // Ensure favoritePlans array exists.
+    if (!currentUser.favoritePlans) {
+      currentUser.favoritePlans = [];
+    }
+
+    // Check if the plan is already in favorites.
+    const alreadyFavorite = currentUser.favoritePlans.some(fav => fav.id === plan.id);
+    if (alreadyFavorite) {
+      alert("This plan is already in your favorites.");
+      return;
+    }
+
+    // Add the plan to the user's favoritePlans array.
+    currentUser.favoritePlans.push(plan);
+
+    // Update the dashboard data on the JSON server.
+    const updatedDashboard = { ...dashboard, users: { ...dashboard.users, details: usersArray } };
+
+    const updateResponse = await fetch("http://localhost:3000/dashboard", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedDashboard)
+    });
+
+    if (updateResponse.ok) {
+      alert("Plan added to favorites successfully!");
+      // Optionally, update UI elements if needed.
+    } else {
+      alert("Failed to update favorite plans. Please try again.");
+    }
+  } catch (error) {
+    console.error("Error updating favorite plans:", error);
+    alert("An error occurred. Please try again later.");
+  }
+});
+
 
 /*******************************************************
  * 4) VIEW DETAILS (MODAL) EVENT DELEGATION
