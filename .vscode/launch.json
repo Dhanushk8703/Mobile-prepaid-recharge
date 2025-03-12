@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-MobilePrepaidRechargeApplication<mobile_prepaid_recharge>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.mobicomm.app.MobilePrepaidRechargeApplication",
+            "projectName": "mobile_prepaid_recharge",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
