@@ -2,6 +2,9 @@ package com.mobicomm.app.model;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
@@ -21,7 +24,8 @@ public class Benefits {
 	private String benefitsName;
 	private String icon;
 	
-	@ManyToMany(mappedBy = "benefits")
-    private Set<Plan> plans;
-	
+	@ManyToMany(mappedBy = "benefits", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@JsonIgnore
+	private Set<Plan> plans;
 }
+

@@ -1,7 +1,6 @@
 package com.mobicomm.app.controller;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,22 +16,22 @@ import com.mobicomm.app.service.BenefitsService;
 public class BenefitsController {
 	
 	@Autowired
-	private BenefitsService benefitService;
+	private BenefitsService benefitsService;
 	
 	@GetMapping("/benefits")
 	public ResponseEntity<?> getAllBenefits() {
-		List<Benefits>benefits = benefitService.getAllBeneifts();
+		List<Benefits> benefits = benefitsService.getAllBenefits();
+		
 		if (benefits.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} else {
-			return new ResponseEntity<>(benefits, HttpStatus.OK);
+			return new ResponseEntity<>(benefits,HttpStatus.OK);
 		}
-		
 	}
 	
 	@PostMapping("/benefits")
 	public ResponseEntity<?> addBenefits(@RequestBody Benefits benefit) {
-		benefitService.addBenefits(benefit);
+		benefitsService.addBenefits(benefit);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

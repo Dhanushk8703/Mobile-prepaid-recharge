@@ -29,7 +29,7 @@ public class PlanController {
 		}
 	}
 	
-	@PostMapping("/addPlans")
+	@PostMapping("/plans")
 	public ResponseEntity<?> addPlans(@RequestBody Plan plan) {
 		planService.addPlan(plan);
 		return new ResponseEntity<>(HttpStatus.OK);

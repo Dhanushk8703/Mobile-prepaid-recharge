@@ -11,35 +11,36 @@ import com.mobicomm.app.repository.PlanBenefitsRepository;
 
 @Service
 public class BenefitsService {
+	
 	@Autowired
-    private PlanBenefitsRepository planBenefitsRepository;
-
-    public Benefits saveBenefitId(Benefits planBenefits) {
+	private PlanBenefitsRepository benefitsRepository;
+	
+	public Benefits saveBenefitsId(Benefits benefit) {
         // Generate the next plan_id dynamically
-        String nextId = generateNextPlanId();
-        planBenefits.setBenefitsId(nextId);
+        String nextId = generateNextBenefitsId();
+        benefit.setBenefitsId(nextId);
 
-        return planBenefitsRepository.save(planBenefits);
+        return benefitsRepository.save(benefit);
     }
 
-    private String generateNextPlanId() {
-        Optional<Benefits> lastPlan = planBenefitsRepository.findTopByOrderByBenefitsIdDesc();
+    private String generateNextBenefitsId() {
+        Optional<Benefits> lastPlan = benefitsRepository.findTopByOrderByBenefitsIdDesc();
 
         if (lastPlan.isPresent()) {
             // Extract number from last ID and increment
             String lastId = lastPlan.get().getBenefitsId(); // e.g., "mbplan005"
-            int num = Integer.parseInt(lastId.substring(6)); // Extract "005" -> 5
-            return String.format("mbcat%03d", num + 1); // Generate "mbplan006"
+            int num = Integer.parseInt(lastId.substring(5)); // Extract "005" -> 5
+            return String.format("mbben%03d", num + 1); // Generate "mbplan006"
         } else {
-            return "mbcat001"; // First entry
+            return "mbben001"; // First entry
         }
     }
     
-    public Benefits addBenefits(Benefits benefit) {
-    	return planBenefitsRepository.save(saveBenefitId(benefit));
+    public void addBenefits(Benefits benefits) {
+    	benefitsRepository.save(saveBenefitsId(benefits));
     }
     
-    public List<Benefits> getAllBeneifts() {
-    	return planBenefitsRepository.findAll();
+    public List<Benefits> getAllBenefits() {
+    	return benefitsRepository.findAll();
     }
 }
