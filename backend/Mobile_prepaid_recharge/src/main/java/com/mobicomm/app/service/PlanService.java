@@ -1,5 +1,6 @@
 package com.mobicomm.app.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ public class PlanService {
 	@Autowired
     private PlanRepository planRepository;
 
-    public Plan savePlan(Plan plan) {
+    public Plan savePlanId(Plan plan) {
         // Generate the next plan_id dynamically
         String nextId = generateNextPlanId();
         plan.setPlanId(nextId);
@@ -32,5 +33,13 @@ public class PlanService {
         } else {
             return "mbplan001"; // First entry
         }
+    }
+    
+    public List<Plan> getAllPlans() {
+    	return planRepository.findAll();
+    }
+    
+    public void addPlan(Plan plan) {
+    	planRepository.save(savePlanId(plan));
     }
 }

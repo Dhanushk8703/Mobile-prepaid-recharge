@@ -1,5 +1,6 @@
 package com.mobicomm.app.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ public class CategoryService {
 	@Autowired
     private CategoryRepository categoryRepository;
 
-    public Category savePlan(Category category) {
+    public Category saveCategoryId(Category category) {
         // Generate the next plan_id dynamically
         String nextId = generateNextPlanId();
         category.setCategoryId(nextId);
@@ -33,5 +34,13 @@ public class CategoryService {
         } else {
             return "mbcat001"; // First entry
         }
+    }
+    
+    public List<Category> getAllCategory() {
+    	return categoryRepository.findAll();
+    }
+    
+    public void addCategory(Category category) {
+    	categoryRepository.save(saveCategoryId(category));
     }
 }

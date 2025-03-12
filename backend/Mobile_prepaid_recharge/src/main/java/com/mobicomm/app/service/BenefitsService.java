@@ -1,5 +1,6 @@
 package com.mobicomm.app.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ public class BenefitsService {
 	@Autowired
     private PlanBenefitsRepository planBenefitsRepository;
 
-    public Benefits savePlan(Benefits planBenefits) {
+    public Benefits saveBenefitId(Benefits planBenefits) {
         // Generate the next plan_id dynamically
         String nextId = generateNextPlanId();
         planBenefits.setBenefitsId(nextId);
@@ -32,5 +33,13 @@ public class BenefitsService {
         } else {
             return "mbcat001"; // First entry
         }
+    }
+    
+    public Benefits addBenefits(Benefits benefit) {
+    	return planBenefitsRepository.save(saveBenefitId(benefit));
+    }
+    
+    public List<Benefits> getAllBeneifts() {
+    	return planBenefitsRepository.findAll();
     }
 }

@@ -3,9 +3,13 @@ package com.mobicomm.app.model;
 import java.time.LocalDate;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -22,19 +26,23 @@ import lombok.NoArgsConstructor;
 public class Plan {
 	@Id
 	private String planId;
-	private String plan_name;
+	private String planName;
 	
 	private String description;
-	private Double plan_price;
+	private Double planPrice;
 	private Long validity;
-	private LocalDate created_at;
-	private LocalDate updated_at;
+	
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
+	private LocalDate createdAt;
+    
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
+	private LocalDate updatedAt;
 	
 	 @ManyToOne
 	 @JoinColumn(name = "category_id", nullable = false) // Foreign Key
 	 private Category category;
 	 
-	 @ManyToMany
+	 @ManyToMany( cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	 @JoinTable(
 	    name = "plan_benefit",
 	    joinColumns = @JoinColumn(name = "plan_id"),
