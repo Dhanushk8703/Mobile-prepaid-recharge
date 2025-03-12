@@ -653,11 +653,6 @@
   },
   "categories": [
     {
-      "id": "6",
-      "name": "OTT Packs",
-      "plans": []
-    },
-    {
       "id": "1",
       "name": "Recommended",
       "plans": []
@@ -686,26 +681,14 @@
       "id": "7",
       "name": "Netflix Plans",
       "plans": []
+    },
+    {
+      "id": "6",
+      "name": "OTT Packs",
+      "plans": []
     }
   ],
   "plans": [
-    {
-      "id": "popular3",
-      "categoryId": 2,
-      "name": "Combo Saver",
-      "data": "1GB/day",
-      "price": 399,
-      "validity": "56 days",
-      "description": "Popular combo plan balancing data and talktime with OTT benefits.",
-      "status": "active",
-      "ottDetails": [
-        {
-          "platform": "Amazon Prime",
-          "validity": "30 Days",
-          "icon": "./assets/images/amazon.png"
-        }
-      ]
-    },
     {
       "id": "popular4",
       "categoryId": 2,
@@ -722,80 +705,6 @@
           "icon": "./assets/images/hotstar.png"
         }
       ]
-    },
-    {
-      "id": "ott1",
-      "categoryId": 6,
-      "name": "OTT Starter Pack",
-      "data": "500MB/day",
-      "price": 199,
-      "validity": "28 days",
-      "description": "Enjoy limited OTT access with this starter pack.",
-      "status": "active",
-      "ottDetails": [
-        {
-          "platform": "Netflix",
-          "validity": "15 Days",
-          "icon": "./assets/images/netflix.png"
-        }
-      ]
-    },
-    {
-      "id": "ott2",
-      "categoryId": 6,
-      "name": "OTT Premium Pack",
-      "data": "1GB/day",
-      "price": 399,
-      "validity": "56 days",
-      "description": "Unlimited OTT viewing with premium channels.",
-      "status": "active",
-      "ottDetails": [
-        {
-          "platform": "Disney+",
-          "validity": "30 Days",
-          "icon": "./assets/images/hotstar.png"
-        },
-        {
-          "platform": "Amazon Prime",
-          "validity": "30 Days",
-          "icon": "./assets/images/amazon.png"
-        }
-      ]
-    },
-    {
-      "id": "ott3",
-      "categoryId": 6,
-      "name": "OTT Ultimate Pack",
-      "data": "Unlimited",
-      "price": 699,
-      "validity": "84 days",
-      "description": "Unlimited access to all OTT platforms.",
-      "status": "active",
-      "ottDetails": [
-        {
-          "platform": "Netflix",
-          "validity": "30 Days",
-          "icon": "./assets/images/netflix.png"
-        },
-        {
-          "platform": "Disney+",
-          "validity": "30 Days",
-          "icon": "./assets/images/hotstar.png"
-        },
-        {
-          "platform": "Amazon Prime",
-          "validity": "30 Days",
-          "icon": "./assets/images/amazon.png"
-        }
-      ]
-    },
-    {
-      "id": "ott4",
-      "name": "OTT Combo Pack",
-      "categoryId": 6,
-      "price": 99,
-      "validity": "28",
-      "active": true
     },
     {
       "id": "recommended1",
@@ -1066,14 +975,6 @@
       ]
     },
     {
-      "id": "5",
-      "name": "OTT Damaka",
-      "categoryId": 6,
-      "price": 769,
-      "validity": "56",
-      "active": true
-    },
-    {
       "id": "combo1",
       "categoryId": 5,
       "name": "Unlimited Combo",
@@ -1161,6 +1062,88 @@
       "price": 499,
       "validity": "30",
       "active": true
+    },
+    {
+      "id": "ott1",
+      "categoryId": 6,
+      "name": "OTT Starter Pack",
+      "data": "500MB/day",
+      "price": 199,
+      "validity": "28 days",
+      "description": "Enjoy limited OTT access with this starter pack.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Netflix",
+          "validity": "15 Days",
+          "icon": "./assets/images/netflix.png"
+        }
+      ]
+    },
+    {
+      "id": "ott2",
+      "categoryId": 6,
+      "name": "OTT Premium Pack",
+      "data": "1GB/day",
+      "price": 399,
+      "validity": "56 days",
+      "description": "Unlimited OTT viewing with premium channels.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Disney+",
+          "validity": "30 Days",
+          "icon": "./assets/images/hotstar.png"
+        },
+        {
+          "platform": "Amazon Prime",
+          "validity": "30 Days",
+          "icon": "./assets/images/amazon.png"
+        }
+      ]
+    },
+    {
+      "id": "ott3",
+      "categoryId": 6,
+      "name": "OTT Ultimate Pack",
+      "data": "Unlimited",
+      "price": 699,
+      "validity": "84 days",
+      "description": "Unlimited access to all OTT platforms.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Netflix",
+          "validity": "30 Days",
+          "icon": "./assets/images/netflix.png"
+        },
+        {
+          "platform": "Disney+",
+          "validity": "30 Days",
+          "icon": "./assets/images/hotstar.png"
+        },
+        {
+          "platform": "Amazon Prime",
+          "validity": "30 Days",
+          "icon": "./assets/images/amazon.png"
+        }
+      ]
+    },
+    {
+      "id": "ott4",
+      "name": "OTT Combo Pack",
+      "categoryId": 6,
+      "price": 99,
+      "validity": "28",
+      "active": true
+    },
+    {
+      "id": "5",
+      "name": "OTT Damaka",
+      "categoryId": 6,
+      "price": 769,
+      "validity": "56",
+      "active": true
     }
   ],
   "deactivatedPlans": [
@@ -1178,6 +1161,23 @@
           "platform": "Netflix",
           "validity": "30 Days",
           "icon": "./assets/images/netflix.png"
+        }
+      ]
+    },
+    {
+      "id": "popular3",
+      "categoryId": 2,
+      "name": "Combo Saver",
+      "data": "1GB/day",
+      "price": 399,
+      "validity": "56 days",
+      "description": "Popular combo plan balancing data and talktime with OTT benefits.",
+      "status": "active",
+      "ottDetails": [
+        {
+          "platform": "Amazon Prime",
+          "validity": "30 Days",
+          "icon": "./assets/images/amazon.png"
         }
       ]
     }
