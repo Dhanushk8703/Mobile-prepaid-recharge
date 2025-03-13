@@ -3,9 +3,6 @@ package com.mobicomm.app.model;
 import java.time.LocalDate;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -30,24 +27,16 @@ public class Plan {
 	private String description;
 	private Double planPrice;
 	private Long validity;
-	
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
 	private LocalDate createdAt;
-    
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
 	private LocalDate updatedAt;
 	
 	@ManyToOne
 	@JoinColumn(name = "category_id", nullable = false) // Foreign Key
 	private Category category;
 	 
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(
-	    name = "plan_benefit",
-	    joinColumns = @JoinColumn(name = "plan_id"),
-	    inverseJoinColumns = @JoinColumn(name = "benefits_id") // Ensure correct column names
-	)
-	@JsonIgnore
+	@ManyToMany(cascade = CascadeType.PERSIST)
+	@JoinTable(name = "planbenefits",
+		joinColumns = @JoinColumn(name = "planId"),inverseJoinColumns = @JoinColumn(name = "benefitsId"))
 	private Set<Benefits> benefits;
 
 	@Enumerated(EnumType.STRING)

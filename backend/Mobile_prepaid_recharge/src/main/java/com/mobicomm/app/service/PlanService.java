@@ -1,30 +1,20 @@
 package com.mobicomm.app.service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.mobicomm.app.model.Benefits;
 import com.mobicomm.app.model.Category;
 import com.mobicomm.app.model.Plan;
+import com.mobicomm.app.model.Status;
 import com.mobicomm.app.repository.CategoryRepository;
-import com.mobicomm.app.repository.PlanBenefitsRepository;
 import com.mobicomm.app.repository.PlanRepository;
 
 @Service
 public class PlanService {
     @Autowired
     private PlanRepository planRepository;
-    
-    @Autowired
-    private PlanBenefitsRepository benefitsRepository;
-    
-    @Autowired
-    private BenefitsService benefitsService;
     
     @Autowired
     private CategoryRepository categoryRepository; // **Added Category Repository**
@@ -42,17 +32,6 @@ public class PlanService {
             .orElseThrow(() -> new IllegalArgumentException("Category not found for ID: " + plan.getCategory().getCategoryId()));
         
         plan.setCategory(category);
-        
-        // **Handle Benefits Mapping**
-        Set<Benefits> managedBenefits = new HashSet<>();
-        for (Benefits benefit : plan.getBenefits()) {
-            Benefits existingBenefit = benefitsRepository.findById(benefit.getBenefitsId())
-                .orElseGet(() -> benefitsRepository.save(benefitsService.saveBenefitsId(benefit)));
-            
-            managedBenefits.add(existingBenefit);
-        }
-        plan.setBenefits(managedBenefits);
-        
         return planRepository.save(plan);
     }
 
@@ -74,5 +53,70 @@ public class PlanService {
     
     public void addPlan(Plan plan) {
         planRepository.save(savePlanId(plan));
+    }
+    
+    public Optional<Plan> getPlanById(String planId) {
+    	return planRepository.findById(planId);
+    }
+    
+    public Plan updatePlan(String planId, Plan plan) {
+    	Optional<Plan> existPlan = planRepository.findById(planId);
+    	
+    	if (existPlan.isPresent()) {
+    		Plan updatePlan = existPlan.get();
+    		updatePlan.setPlanName(plan.getPlanName());
+    		updatePlan.setPlanPrice(plan.getPlanPrice());
+    		updatePlan.setBenefits(plan.getBenefits());
+    		updatePlan.setCategory(plan.getCategory());
+    		updatePlan.setDescription(plan.getDescription());
+    		updatePlan.setValidity(plan.getValidity());
+    		return planRepository.save(updatePlan);
+    	} else {
+    		throw new RuntimeException("Plan not found");
+    	}
+    }
+    
+    public Plan deactivatePlan(String planId) {
+    	Optional<Plan> existPlan = planRepository.findById(planId);
+    	
+    	if (existPlan.isPresent()) {
+    		Plan plan = existPlan.get();
+    		
+    		if (plan.getStatus() == Status.STATUS_INACTIVE) {
+    			throw new RuntimeException("The plan is Already in inactive");
+    		} 
+    		
+    		plan.setStatus(Status.STATUS_INACTIVE);
+    		
+    		return planRepository.save(plan);
+    	} else {
+    		throw new RuntimeException("Plan not found");
+    	}
+    }
+    
+    public Plan activatePlan(String planId) {
+	Optional<Plan> existPlan = planRepository.findById(planId);
+    	
+    	if (existPlan.isPresent()) {
+    		Plan plan = existPlan.get();
+    		
+    		if (plan.getStatus() == Status.STATUS_ACTIVE) {
+    			throw new RuntimeException("The plan is Already in active");
+    		} 
+    		
+    		plan.setStatus(Status.STATUS_ACTIVE);
+    		
+    		return planRepository.save(plan);
+    	} else {
+    		throw new RuntimeException("Plan not found");
+    	}
+    }
+    
+    public void deletePlanById(String planId) {
+    	if (planRepository.findById(planId).isEmpty()) {
+    		throw new RuntimeException("Plan not found");
+    	} else {
+    		planRepository.deleteById(planId);
+    	}
     }
 }

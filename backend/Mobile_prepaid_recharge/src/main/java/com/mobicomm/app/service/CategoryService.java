@@ -7,13 +7,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.mobicomm.app.model.Category;
+import com.mobicomm.app.model.Plan;
+import com.mobicomm.app.model.Status;
 import com.mobicomm.app.repository.CategoryRepository;
+import com.mobicomm.app.repository.PlanRepository;
 
 @Service
 public class CategoryService {
 
 	@Autowired
     private CategoryRepository categoryRepository;
+	
+	@Autowired
+	private PlanRepository planRepository;
 
     public Category saveCategoryId(Category category) {
         // Generate the next plan_id dynamically
@@ -47,4 +53,85 @@ public class CategoryService {
 	public Optional<Category> getCategoryById(String categoryId) {
 		return categoryRepository.findById(categoryId);
 	}
+	
+	public Category updateCategory(String categoryId, Category category) {
+		Optional<Category> existCategory = categoryRepository.findById(categoryId);
+		if(existCategory.isPresent()) {
+			Category updateCategory = existCategory.get();
+			updateCategory.setCategoryName(category.getCategoryName());
+			return categoryRepository.save(updateCategory);
+		} else {
+			throw new RuntimeException("Category not found");
+		}
+	}
+	
+	public Category deactivateCategory(String categoryId) {
+		Optional<Category> existCategory = categoryRepository.findById(categoryId);
+		
+		if (existCategory.isPresent()) {
+			Category category = existCategory.get();
+			
+			if(category.getStatus() == Status.STATUS_INACTIVE) {
+				throw new RuntimeException("The category is already inactive");
+			} else {
+				category.setStatus(Status.STATUS_INACTIVE);
+			}
+			
+			List<Plan> plansCategory = existCategory.get().getPlans();
+			
+			for (Plan plan : plansCategory) {
+				plan.setStatus(Status.STATUS_INACTIVE);
+				planRepository.save(plan);
+			}
+			return categoryRepository.save(category);
+		} else {
+			throw new RuntimeException("Category not found");
+		}
+	}
+	
+	public Category activateCategory(String categoryId) {
+		Optional<Category> existCategory = categoryRepository.findById(categoryId);
+		
+		if (existCategory.isPresent()) {
+			Category category = existCategory.get();
+			
+			if(category.getStatus() == Status.STATUS_ACTIVE) {
+				throw new RuntimeException("The category is already active");
+			} else {
+				category.setStatus(Status.STATUS_ACTIVE);
+			}
+			
+			List<Plan> plansCategory = existCategory.get().getPlans();
+			
+			for (Plan plan : plansCategory) {
+				plan.setStatus(Status.STATUS_ACTIVE);
+				planRepository.save(plan);
+			}
+			return categoryRepository.save(category);
+		} else {
+			throw new RuntimeException("Category not found");
+		}
+	}
+	
+	public void deleteCategoryById(String categoryId) {
+	    Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
+
+	    if (categoryOptional.isPresent()) {
+	        Category category = categoryOptional.get();
+
+	        // Fetch associated plans
+	        List<Plan> plans = planRepository.findByCategory(category);
+
+	        if (!plans.isEmpty()) {
+	            // Delete all associated plans before deleting the category
+	            planRepository.deleteAll(plans);
+	        }
+
+	        // Delete the category
+	        categoryRepository.delete(category);
+	    } else {
+	        throw new RuntimeException("Category not found with ID: " + categoryId);
+	    }
+	}
+
 }
