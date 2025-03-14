@@ -1,5 +1,6 @@
 package com.mobicomm.app.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +50,8 @@ public class CategoryService {
     public void addCategory(Category category) {
     	if (category.getStatus() == null) {
     		category.setStatus(Status.STATUS_ACTIVE);
+    		category.setCreatedAt(LocalDate.now());
+    		category.setUpdatedAt(LocalDate.now());
     		categoryRepository.save(saveCategoryId(category));
 
     	} else {
@@ -65,6 +68,8 @@ public class CategoryService {
 		if(existCategory.isPresent()) {
 			Category updateCategory = existCategory.get();
 			updateCategory.setCategoryName(category.getCategoryName());
+    		updateCategory.setUpdatedAt(LocalDate.now());
+
 			return categoryRepository.save(updateCategory);
 		} else {
 			throw new RuntimeException("Category not found");

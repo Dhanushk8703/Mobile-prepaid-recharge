@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,12 +43,14 @@ public class CategoryController {
 	}
 	
 	@PostMapping
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	public ResponseEntity<?> addCategory(@RequestBody Category category) {
 		categoryService.addCategory(category);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/{categoryId}")
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	public ResponseEntity<?> getCategoryById(@PathVariable String categoryId) {
 		Optional<Category> categoryExist = categoryService.getCategoryById(categoryId);
 		
@@ -60,6 +63,7 @@ public class CategoryController {
 	}
 	
 	@PutMapping("/{categoryId}")
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	public ResponseEntity<?> updateCategory(@PathVariable String categoryId, @RequestBody Category category) {
 		Optional<Category> existCategory = categoryService.getCategoryById(categoryId);
 		
@@ -72,6 +76,7 @@ public class CategoryController {
 	}
 	
 	@PutMapping("/deactivate/{categoryId}")
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	public ResponseEntity<Map<String, String>> deactivateCategory(@PathVariable String categoryId) {
 	    categoryService.deactivateCategory(categoryId);
 	    Map<String, String> response = new HashMap<>();
@@ -80,6 +85,7 @@ public class CategoryController {
 	}
 
 	@PutMapping("/activate/{categoryId}")
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	public ResponseEntity<Map<String, String>> activateCategory(@PathVariable String categoryId) {
 	    categoryService.activateCategory(categoryId);
 	    Map<String, String> response = new HashMap<>();
@@ -88,6 +94,7 @@ public class CategoryController {
 	}
 
 	@DeleteMapping("/delete/{categoryId}")
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	public ResponseEntity<Map<String, String>> deleteCategoryById(@PathVariable String categoryId) {
 	    categoryService.deleteCategoryById(categoryId);
 	    Map<String, String> response = new HashMap<>();

@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,19 +51,21 @@ public class PlanController {
 	    }
 	}
 
-	
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	@PostMapping
 	public ResponseEntity<?> addPlans(@RequestBody Plan plan) {
 		planService.addPlan(plan);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 	
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	@PutMapping("/{planId}")
 	public ResponseEntity<?> updatePlans(@PathVariable String planId, @RequestBody Plan plan) {
 		planService.updatePlan(planId, plan);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	@PutMapping("/deactivate/{id}")
 	public ResponseEntity<Map<String, String>> deactivatePlan(@PathVariable String id) {
 	    planService.deactivatePlan(id);
@@ -70,6 +73,8 @@ public class PlanController {
 	    response.put("message", "Plan activated successfully");
 	    return ResponseEntity.ok(response);
 	}
+	
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	@PutMapping("/activate/{id}")
 	public ResponseEntity<Map<String, String>> activatePlan(@PathVariable String id) {
 	    planService.activatePlan(id);
@@ -78,6 +83,7 @@ public class PlanController {
 	    return ResponseEntity.ok(response);
 	}
 	
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	@DeleteMapping("/{planId}")
 	public ResponseEntity<Map<String, String>> deletePlanById(@PathVariable String planId) {
 	    planService.deletePlanById(planId);

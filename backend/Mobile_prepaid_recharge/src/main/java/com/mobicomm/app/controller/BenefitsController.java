@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,18 +39,21 @@ public class BenefitsController {
 		}
 	}
 	
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	@PostMapping
 	public ResponseEntity<?> addBenefits(@RequestBody Benefits benefit) {
 		benefitsService.addBenefits(benefit);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	@GetMapping("/{benefitId}")
 	public ResponseEntity<?> getBenefitById(@PathVariable String benefitId) {
 		Optional<Benefits>benefit =  benefitsService.getBenefitById(benefitId);
 		return new ResponseEntity<>(benefit,HttpStatus.OK);
 	}
 	
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	@PutMapping("/{benefitId}")
 	public ResponseEntity<?> updateBenefits(@PathVariable String benefitId, @RequestBody Benefits benefit) {
 	    Optional<Benefits> existingBenefit = benefitsService.getBenefitById(benefitId);
@@ -68,6 +72,7 @@ public class BenefitsController {
 	    }
 	}
 
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	@DeleteMapping("/delete/{benefitId}")
 	public ResponseEntity<?> deleteBenefitById(@PathVariable String benefitId) {
 	    benefitsService.deleteBenefitById(benefitId);

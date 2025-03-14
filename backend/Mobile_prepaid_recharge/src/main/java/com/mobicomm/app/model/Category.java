@@ -1,5 +1,6 @@
 package com.mobicomm.app.model;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,6 +23,8 @@ public class Category {
 	@Id
 	private String categoryId;
 	private String categoryName;
+	private LocalDate createdAt;
+	private LocalDate updatedAt;
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
