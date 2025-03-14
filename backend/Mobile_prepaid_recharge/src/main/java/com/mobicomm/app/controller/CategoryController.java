@@ -1,11 +1,14 @@
 package com.mobicomm.app.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +23,7 @@ import com.mobicomm.app.service.CategoryService;
 
 @RestController
 @RequestMapping("/api/category")
+@CrossOrigin(origins = "*")
 public class CategoryController {
 	
 	@Autowired
@@ -43,6 +47,18 @@ public class CategoryController {
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 	
+	@GetMapping("/{categoryId}")
+	public ResponseEntity<?> getCategoryById(@PathVariable String categoryId) {
+		Optional<Category> categoryExist = categoryService.getCategoryById(categoryId);
+		
+		if (categoryExist.isPresent()) {
+			Category category = categoryExist.get();
+			return new ResponseEntity<>(category,HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
 	@PutMapping("/{categoryId}")
 	public ResponseEntity<?> updateCategory(@PathVariable String categoryId, @RequestBody Category category) {
 		Optional<Category> existCategory = categoryService.getCategoryById(categoryId);
@@ -56,20 +72,27 @@ public class CategoryController {
 	}
 	
 	@PutMapping("/deactivate/{categoryId}")
-	public ResponseEntity<?> deactivateCategory(@PathVariable String categoryId) {
-		categoryService.deactivateCategory(categoryId);
-		return new ResponseEntity<>(HttpStatus.OK);
+	public ResponseEntity<Map<String, String>> deactivateCategory(@PathVariable String categoryId) {
+	    categoryService.deactivateCategory(categoryId);
+	    Map<String, String> response = new HashMap<>();
+	    response.put("message", "Category deactivated successfully");
+	    return ResponseEntity.ok(response);
 	}
-	
+
 	@PutMapping("/activate/{categoryId}")
-	public ResponseEntity<?> activateCategory(@PathVariable String categoryId) {
-		categoryService.activateCategory(categoryId);
-		return new ResponseEntity<>(HttpStatus.OK);
+	public ResponseEntity<Map<String, String>> activateCategory(@PathVariable String categoryId) {
+	    categoryService.activateCategory(categoryId);
+	    Map<String, String> response = new HashMap<>();
+	    response.put("message", "Category activated successfully");
+	    return ResponseEntity.ok(response);
 	}
-	
+
 	@DeleteMapping("/delete/{categoryId}")
-	public ResponseEntity<?> deleteCategoryById(@PathVariable String categoryId) {
-		categoryService.deleteCategoryById(categoryId);
-		return new ResponseEntity<>(HttpStatus.OK);
+	public ResponseEntity<Map<String, String>> deleteCategoryById(@PathVariable String categoryId) {
+	    categoryService.deleteCategoryById(categoryId);
+	    Map<String, String> response = new HashMap<>();
+	    response.put("message", "Category deleted successfully");
+	    return ResponseEntity.ok(response);
 	}
+
 }

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard - Plan Management</title>
   <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="./css/admin.css">
+  <link rel="stylesheet" href="../css/admin.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
@@ -22,8 +22,8 @@
   <div class="container-fluid">
     <div class="row">
       <!-- Permanent Sidebar for medium and larger screens -->
-      <nav class="col-md-3 sidebar d-md-block d-sm-none">
-        <h3 class="my-4 display-4">Admin Panel</h3>
+      <nav class="col-md-2 sidebar d-md-block d-sm-none">
+        <h3 class="my-4">Admin Panel</h3>
         <ul class="nav flex-column mt-4">
           <li class="nav-item">
             <a href="#" class="nav-link active-sts active text-white" data-target="dashboardSection">
@@ -85,11 +85,10 @@
       </nav>
 
       <!-- Main Content -->
-      <main class="col-md-9 content">
-        <nav class="navbar navbar-expand-lg navbar-light shadow-sm rounded-5 mt-2 px-2"
-          style="background-color: #2c3e50;">
-          <div class="container-fluid ">
-            <div class="row w-100">
+      <main class="col-md-10 content">
+        <nav class="navbar navbar-expand-lg navbar-light rounded-5 mt-2" style="background-color: #2c3e50;">
+          <div class="container-fluid">
+            <div class="row w-100  px-3">
               <div class="col-6">
                 <h1 class="display-6 fw-semibold text-white text-body-emphasis">MobiComm</h1>
               </div>
@@ -165,8 +164,8 @@
         <!-- Category Management Section -->
         <div id="categoryManagementSection" class="section d-none features">
           <h2>Category Management</h2><br>
-          <button class="btn-svg mb-3" id="addCategoryBtn">
-            <i class="fa fa-plus me-2"></i>Add New Category
+          <button class="btn-svg mb-3" onclick="openAddCategoryModal()">
+            <i class="fa fa-plus me-2"></i>Add Category
           </button>
 
           <!-- Nav tabs for Active vs Deactivated Categories -->
@@ -195,7 +194,9 @@
                     <tr>
                       <th>ID</th>
                       <th>Category Name</th>
-                      <th>Associated Plans</th>
+                      <th>Category Status</th>
+                      <th>Created On</th>
+                      <th>Updated On</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -213,7 +214,9 @@
                     <tr>
                       <th>ID</th>
                       <th>Category Name</th>
-                      <th>Associated Plans</th>
+                      <th>Category Status</th>
+                      <th>Created On</th>
+                      <th>Updated On</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -222,12 +225,63 @@
               </div>
             </div>
           </div>
+          <!-- Benefits Table -->
+          <!-- Benefit Modal for Add/Edit -->
+          <div class="modal fade" id="benefitModal" tabindex="-1" aria-labelledby="benefitModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <form id="benefitForm">
+                  <!-- Hidden input for benefit ID (used for editing) -->
+                  <input type="text" id="benefitId" hidden />
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="benefitModalLabel">Add New Benefit</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="mb-3">
+                      <label for="benefitName" class="form-label">Benefit Name</label>
+                      <input type="text" class="form-control" id="benefitName" required />
+                    </div>
+                    <div class="mb-3">
+                      <label for="benefitIcon" class="form-label">Benefit Icon</label>
+                      <input type="text" class="form-control" id="benefitIcon" required />
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="submit" id="saveBenefitBtn" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Benefits Table -->
+          <div class="mt-4 table-responsive">
+            <h4>Benefits</h4>
+            <button class="btn-svg mb-3" id="benefitsTable" onclick="openAddBenefitModal()">
+              <i class="fa fa-plus me-2"></i>Add Benefits
+            </button>
+            <table class="table table-striped" id="benefitsTable">
+              <thead class="thead">
+                <tr>
+                  <th>Benefit ID</th>
+                  <th>Benefit Name</th>
+                  <th>Benefit Icon</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
         </div>
 
         <!-- Plan Management Section -->
         <div id="planManagementSection" class="section d-none features">
           <h2>Plan Management</h2><br>
-          <button class="btn-svg mb-3" id="addPlanBtn"><i class="fa fa-plus me-2"></i>Add New Plan</button>
+          <button class="btn-svg mb-3" onclick="openAddPlanModal()"><i class="fa fa-plus me-2"></i> Add Plan</button>
 
           <!-- Nav tabs for Active vs Deactivated Plans -->
           <ul class="nav nav-tabs" id="plansTab" role="tablist">
@@ -258,12 +312,19 @@
                       <th>Category</th>
                       <th>Price</th>
                       <th>Validity</th>
+                      <th>Description</th>
+                      <th>Created On</th>
+                      <th>Updated On</th>
+                      <th>Benefits</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
-                  <tbody></tbody>
+                  <tbody>
+                    <!-- Your dynamic data rows -->
+                  </tbody>
                 </table>
               </div>
+
             </div>
 
             <!-- Deactivated Plans Tab Pane -->
@@ -278,6 +339,10 @@
                       <th>Category</th>
                       <th>Price</th>
                       <th>Validity</th>
+                      <th>Description</th>
+                      <th>Created On</th>
+                      <th>Updated On</th>
+                      <th>Benefits</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -287,6 +352,8 @@
             </div>
           </div>
         </div>
+
+
         <!-- User Management Section -->
         <div id="userManagementSection" class="section d-none features">
           <h2>User Management</h2>
@@ -294,8 +361,8 @@
           <!-- Nav tabs for User Details vs User Queries -->
           <ul class="nav nav-tabs" id="userTabs" role="tablist">
             <li class="nav-item">
-              <button class="nav-link active" id="user-details-tab" data-bs-toggle="tab"
-                data-bs-target="#user-details" type="button" role="tab">
+              <button class="nav-link active" id="user-details-tab" data-bs-toggle="tab" data-bs-target="#user-details"
+                type="button" role="tab">
                 User Details
               </button>
             </li>
@@ -371,7 +438,7 @@
               </tbody>
             </table>
           </div>
-          </div>
+        </div>
       </main>
     </div>
   </div>
@@ -380,24 +447,20 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <form id="categoryForm">
+          <!-- Hidden input for categoryId -->
+          <input type="text" id="categoryId" hidden />
           <div class="modal-header">
             <h5 class="modal-title" id="categoryModalLabel">Add New Category</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <!-- Hidden field for Category ID (used for editing) -->
-            <div class="mb-3">
-              <label for="categoryId" class="form-label">Category ID</label>
-              <input type="text" class="form-control" id="categoryId" required />
-            </div>
             <div class="mb-3">
               <label for="categoryName" class="form-label">Category Name</label>
               <input type="text" class="form-control" id="categoryName" required />
             </div>
-            <!-- You can add additional fields here if needed -->
           </div>
           <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="submit" id="saveCategoryBtn" class="btn btn-primary">Save</button>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
         </form>
@@ -405,39 +468,62 @@
     </div>
   </div>
 
-  <!-- Modal for Plan Add/Edit -->
+
   <div class="modal fade" id="planModal" tabindex="-1" aria-labelledby="planModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg"> <!-- Use modal-lg for a wider horizontal layout -->
       <div class="modal-content">
         <form id="planForm">
+          <input type="hidden" id="planId" /> <!-- Hidden input for existing plan ID -->
           <div class="modal-header">
             <h5 class="modal-title" id="planModalLabel">Add New Plan</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div class="mb-3">
-              <label for="planName" class="form-label">Plan Id</label>
-              <input type="text" class="form-control" id="planId" />
-            </div>
-            <div class="mb-3">
-              <label for="planName" class="form-label">Plan Name</label>
-              <input type="text" class="form-control" id="planName" required />
-            </div>
-            <div class="mb-3">
-              <label for="planCategory" class="form-label">Category</label>
-              <select id="planCategory" class="form-select" required></select>
-            </div>
-            <div class="mb-3">
-              <label for="planPrice" class="form-label">Price (₹)</label>
-              <input type="number" class="form-control" id="planPrice" required />
-            </div>
-            <div class="mb-3">
-              <label for="planValidity" class="form-label">Validity (Days)</label>
-              <input type="number" class="form-control" id="planValidity" required />
-            </div>
+            <div class="container-fluid">
+              <!-- Row 1: Plan Name & Category -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="planName" class="form-label">Plan Name</label>
+                  <input type="text" class="form-control" id="planName" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="planCategory" class="form-label">Category</label>
+                  <select id="planCategory" class="form-select" required></select>
+                </div>
+              </div>
+              <!-- Row 2: Price & Validity -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="planPrice" class="form-label">Price (₹)</label>
+                  <input type="number" class="form-control" id="planPrice" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="planValidity" class="form-label">Validity (Days)</label>
+                  <input type="number" class="form-control" id="planValidity" required />
+                </div>
+              </div>
+              <!-- Row 3: Description -->
+              <div class="row mb-3">
+                <div class="col-12">
+                  <label for="planDescription" class="form-label">Description</label>
+                  <textarea class="form-control" id="planDescription" rows="2" required></textarea>
+                </div>
+              </div>
+              <!-- Row 4: Benefits (with dynamic addition) -->
+              <div class="row mb-3">
+                <div class="mb-3">
+                  <label for="ottDetails" class="form-label">Benefits</label>
+                  <select class="form-select" id="ottDetails" multiple>
+                    <!-- Populated dynamically -->
+                  </select>
+                  <small class="form-text text-muted">Hold Ctrl (Windows) / Command (Mac) to select
+                    multiple.</small>
+                </div>
+              </div>
+            </div> <!-- container-fluid -->
           </div>
           <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="submit" id="addPlanBtn" class="btn btn-primary">Add Plan</button>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
         </form>
@@ -536,69 +622,9 @@
       </div>
     </div>
   </div>
+  <script src="../js/admin.js"></script>
+  <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
 
-
-
-  <!-- jQuery and Bootstrap Bundle -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Admin JS -->
-  <script src="./js/admin.js"></script>
-  <script>
-    document.querySelectorAll('.nav-link.active-sts').forEach(link => {
-      link.addEventListener('click', function (e) {
-        e.preventDefault();
-
-        // Get the target attribute from data-target or data-bs-target
-        const targetAttr = this.getAttribute('data-target') || this.getAttribute('data-bs-target');
-        if (!targetAttr) return;
-
-        // Remove the '#' if it exists in the attribute value
-        const targetId = targetAttr.startsWith('#') ? targetAttr.substring(1) : targetAttr;
-
-        // Hide all content sections (assuming sections have the class "section" and "features")
-        document.querySelectorAll('.section.features').forEach(section => {
-          section.classList.add('d-none');
-        });
-
-        // Show the selected section
-        const targetSection = document.getElementById(targetId);
-        if (targetSection) {
-          targetSection.classList.remove('d-none');
-        }
-
-        // Update active class on nav links
-        document.querySelectorAll('.nav-link.active-sts').forEach(item => {
-          item.classList.remove('active');
-        });
-        this.classList.add('active');
-      });
-    });
-
-    // Fetch new user requests on page load
-    fetch('http://localhost:3000/newUserRequest')
-      .then(res => res.json())
-      .then(data => {
-        const $tbody = $('#newUserRequestsTable tbody');
-        $tbody.empty();
-        data.forEach(user => {
-          $tbody.append(`
-            <tr>
-              <td>${user.id}</td>
-              <td>${user.name}</td>
-              <td>${user.email}</td>
-              <td>${user.contactNumber}</td>
-              <td>${user.simPlan}</td>
-              <td><button class="btn btn-sm btn-success approve-user mx-2 my-2"><i class="fa-solid fa-square-check"></i></button>
-                  <button class="btn btn-sm btn-danger reject-user mx-2 my-2"><i class="fa-solid fa-trash-can"></i></button></td>
-            </tr>
-          `);
-        });
-      })
-      .catch(err => console.error('Error fetching new user requests:', err));
-
-  </script>
 </body>
 
 </html>

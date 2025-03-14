@@ -22,9 +22,9 @@ public class CategoryService {
 	private PlanRepository planRepository;
 
     public Category saveCategoryId(Category category) {
-        // Generate the next plan_id dynamically
         String nextId = generateNextPlanId();
         category.setCategoryId(nextId);
+        
 
         return categoryRepository.save(category);
     }
@@ -47,7 +47,13 @@ public class CategoryService {
     }
     
     public void addCategory(Category category) {
-    	categoryRepository.save(saveCategoryId(category));
+    	if (category.getStatus() == null) {
+    		category.setStatus(Status.STATUS_ACTIVE);
+    		categoryRepository.save(saveCategoryId(category));
+
+    	} else {
+    		categoryRepository.save(saveCategoryId(category));
+    	}
     }
 
 	public Optional<Category> getCategoryById(String categoryId) {

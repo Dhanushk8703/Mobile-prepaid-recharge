@@ -1,5 +1,6 @@
 package com.mobicomm.app.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,15 @@ public class PlanService {
     }
     
     public void addPlan(Plan plan) {
-        planRepository.save(savePlanId(plan));
+    	plan.setCreatedAt(LocalDate.now());
+    	plan.setUpdatedAt(LocalDate.now());
+    	
+    	if (plan.getStatus() == null) {
+    		plan.setStatus(Status.STATUS_ACTIVE);
+    		planRepository.save(savePlanId(plan));
+    	} else {
+    		planRepository.save(savePlanId(plan));
+    	}
     }
     
     public Optional<Plan> getPlanById(String planId) {
@@ -70,6 +79,7 @@ public class PlanService {
     		updatePlan.setCategory(plan.getCategory());
     		updatePlan.setDescription(plan.getDescription());
     		updatePlan.setValidity(plan.getValidity());
+    		updatePlan.setUpdatedAt(LocalDate.now());
     		return planRepository.save(updatePlan);
     	} else {
     		throw new RuntimeException("Plan not found");
@@ -87,6 +97,7 @@ public class PlanService {
     		} 
     		
     		plan.setStatus(Status.STATUS_INACTIVE);
+    		plan.setUpdatedAt(LocalDate.now());
     		
     		return planRepository.save(plan);
     	} else {
@@ -105,6 +116,7 @@ public class PlanService {
     		} 
     		
     		plan.setStatus(Status.STATUS_ACTIVE);
+    		plan.setUpdatedAt(LocalDate.now());
     		
     		return planRepository.save(plan);
     	} else {

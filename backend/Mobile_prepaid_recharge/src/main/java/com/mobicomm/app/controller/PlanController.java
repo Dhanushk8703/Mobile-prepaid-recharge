@@ -1,9 +1,14 @@
 package com.mobicomm.app.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +23,7 @@ import com.mobicomm.app.service.PlanService;
 
 @RestController
 @RequestMapping("/api/plans")
+@CrossOrigin(origins = "*")
 public class PlanController {
 	
 	@Autowired
@@ -34,6 +40,17 @@ public class PlanController {
 		}
 	}
 	
+	@GetMapping("/{planId}")
+	public ResponseEntity<Plan> getPlanById(@PathVariable String planId) {
+	    Optional<Plan> planOptional = planService.getPlanById(planId); // Make sure your service has this method
+	    if (planOptional.isPresent()) {
+	        return ResponseEntity.ok(planOptional.get());
+	    } else {
+	        return ResponseEntity.notFound().build();
+	    }
+	}
+
+	
 	@PostMapping
 	public ResponseEntity<?> addPlans(@RequestBody Plan plan) {
 		planService.addPlan(plan);
@@ -46,21 +63,27 @@ public class PlanController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	@PutMapping("/deactivate/{planId}")
-	public ResponseEntity<?> deactivatePlan(@PathVariable String planId) {
-		planService.deactivatePlan(planId);
-		return new ResponseEntity<>(HttpStatus.OK);
+	@PutMapping("/deactivate/{id}")
+	public ResponseEntity<Map<String, String>> deactivatePlan(@PathVariable String id) {
+	    planService.deactivatePlan(id);
+	    Map<String, String> response = new HashMap<>();
+	    response.put("message", "Plan activated successfully");
+	    return ResponseEntity.ok(response);
 	}
-	
-	@PutMapping("/activate/{planId}")
-	public ResponseEntity<?> activatePlan(@PathVariable String planId) {
-		planService.activatePlan(planId);
-		return new ResponseEntity<>(HttpStatus.OK);
+	@PutMapping("/activate/{id}")
+	public ResponseEntity<Map<String, String>> activatePlan(@PathVariable String id) {
+	    planService.activatePlan(id);
+	    Map<String, String> response = new HashMap<>();
+	    response.put("message", "Plan activated successfully");
+	    return ResponseEntity.ok(response);
 	}
 	
 	@DeleteMapping("/{planId}")
-	public ResponseEntity<?> deletePlanById(@PathVariable String planId) {
-		planService.deletePlanById(planId);
-		return new ResponseEntity<>(HttpStatus.OK);
+	public ResponseEntity<Map<String, String>> deletePlanById(@PathVariable String planId) {
+	    planService.deletePlanById(planId);
+	    Map<String, String> responseBody = new HashMap<>();
+	    responseBody.put("message", "Plan successfully deleted");
+	    return ResponseEntity.ok(responseBody);
 	}
+
 }

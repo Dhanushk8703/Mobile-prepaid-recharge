@@ -7,7 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.mobicomm.app.model.Benefits;
+import com.mobicomm.app.model.Plan;
 import com.mobicomm.app.repository.PlanBenefitsRepository;
+
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class BenefitsService {
@@ -43,4 +47,32 @@ public class BenefitsService {
     public List<Benefits> getAllBenefits() {
     	return benefitsRepository.findAll();
     }
+    
+    public Optional<Benefits> getBenefitById(String benefitId) {
+    	Optional<Benefits> benefits = benefitsRepository.findById(benefitId);
+    	if (benefits.isPresent()) {
+    		return benefits;
+    	} else {
+    		throw new RuntimeException("Benefit not found");
+    	}
+    }
+    
+    @Transactional
+    public void deleteBenefitById(String benefitId) {
+        // Find the benefit (or throw if not found)
+        Benefits benefit = benefitsRepository.findById(benefitId)
+                .orElseThrow(() -> new EntityNotFoundException("Benefit not found with id: " + benefitId));
+        
+        // Remove the benefit from all associated plans
+        // This assumes your Benefits entity has a collection of plans
+        if (benefit.getPlans() != null) {
+            for (Plan plan : benefit.getPlans()) {
+                plan.getBenefits().remove(benefit);
+            }
+        }
+        
+        // Now you can safely delete the benefit
+        benefitsRepository.delete(benefit);
+    }
+
 }

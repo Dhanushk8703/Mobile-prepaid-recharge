@@ -1,793 +1,741 @@
 function logout() {
   sessionStorage.removeItem('adminLoggedIn');
-  window.location.href = 'adminlogin.html'; // Replace with your login page filename.
+  window.location.href = '../html/adminlogin.html'; // Replace with your login page filename.
 }
 
 if (!sessionStorage.getItem('adminLoggedIn')) {
-  window.location.href = 'adminlogin.html';
+  window.location.href = '../html/adminlogin.html';
 }
 
-$(document).ready(function () {
-  // Global variables
-  let users = [];
-  let planCategories = [];        // Active categories
-  let plans = [];                 // Active plans
-  let deactivatedPlans = [];      // Deactivated plans
-  let deactivatedCategories = []; // Deactivated categories
-  let newUserRequest = {};
-
-  // Fetch data from JSON server endpoints
-  $.when(
-    $.getJSON("http://localhost:3000/dashboard"),
-    $.getJSON("http://localhost:3000/categories"),
-    $.getJSON("http://localhost:3000/plans"),
-    $.getJSON("http://localhost:3000/newUserRequest"),
-    $.getJSON("http://localhost:3000/deactivatedPlans"),
-    $.getJSON("http://localhost:3000/deactivatedCategories")
-  ).done(function (dashboardData, categoriesData, plansDataResponse, newUserRequestData, deactPlansData, deactCatsData) {
-    users = dashboardData[0].users.details;
-    planCategories = categoriesData[0];      // Active categories
-    plans = plansDataResponse[0];              // Active plans
-    newUserRequest = newUserRequestData[0];
-    deactivatedPlans = deactPlansData[0];        // Deactivated plans
-    deactivatedCategories = deactCatsData[0];      // Deactivated categories
-
-    updateDashboardStats();
-    renderActivePlansTable();
-    renderDeactivatedPlansTable();
-    renderActiveCategoriesTable();
-    renderDeactivatedCategoriesTable();
-    populateCategoryDropdowns();
-    updateExpiringAndExpiredUsersList()
-  }).fail(function (error) {
-    console.error("Error fetching data:", error);
-  });
-
-  // Sidebar navigation (assumes sidebar links have a data-target attribute)
-  $(".sidebar a.nav-link").click(function (e) {
+document.querySelectorAll('.nav-link.active-sts').forEach(link => {
+  link.addEventListener('click', function (e) {
     e.preventDefault();
-    const target = $(this).data("target");
-    $(".section").addClass("d-none");
-    $("#" + target).removeClass("d-none");
+
+    // Get the target attribute from data-target or data-bs-target
+    const targetAttr = this.getAttribute('data-target') || this.getAttribute('data-bs-target');
+    if (!targetAttr) return;
+
+    // Remove the '#' if it exists in the attribute value
+    const targetId = targetAttr.startsWith('#') ? targetAttr.substring(1) : targetAttr;
+
+    // Hide all content sections (assuming sections have the class "section" and "features")
+    document.querySelectorAll('.section.features').forEach(section => {
+      section.classList.add('d-none');
+    });
+
+    // Show the selected section
+    const targetSection = document.getElementById(targetId);
+    if (targetSection) {
+      targetSection.classList.remove('d-none');
+    }
+
+    // Update active class on nav links
+    document.querySelectorAll('.nav-link.active-sts').forEach(item => {
+      item.classList.remove('active');
+    });
+    this.classList.add('active');
   });
+});
 
-  document.querySelectorAll('.active-sts').forEach(link => {
-    link.addEventListener('click', function(e) {
-      e.preventDefault(); // Prevent default navigation if needed
-      document.querySelectorAll('.active-sts').forEach(item => item.classList.remove('active'));
-      this.classList.add('active');
-    });
-  });  
+// Fetch plans data and populate modal options and tables
+function fetchPlansData() {
+  fetch('http://localhost:8087/api/plans')
+    .then(response => response.json())
+    .then(data => {
+      // Populate category & benefits dropdowns in the plan modal
+      populateModalOptions();
 
-  // Populate category dropdown in the plan modal (for active categories only)
-  function populateCategoryDropdowns() {
-    const $planCategory = $("#planCategory");
-    $planCategory.empty().append('<option value="">Select Category</option>');
-    planCategories.forEach(category => {
-      $planCategory.append(`<option value="${category.id}">${category.name}</option>`);
-    });
-  }
-
-  // Update Dashboard Stats
-  function updateDashboardStats() {
-    $("#dashboardStats").html(`
-  <div class="row">
-    <div class="col-md-4">
-      <div class="card stat-card">
-        <div class="card-body p-3">
-          <h5>Total Users</h5>
-          Total Users: ${users.length}<br>
-          Active Users: ${users.length - 3}<br>
-          </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card stat-card">
-        <div class="card-body">
-          <h5>Total Categories</h5>
-          Active: ${planCategories.length}<br>
-          Deactivated: ${deactivatedCategories.length}
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card stat-card">
-        <div class="card-body">
-        <h5>Total Plans</h5>
-          Active: ${plans.length}<br>
-          Deactivated: ${deactivatedPlans.length}
-        </div>
-      </div>
-    </div>
-  </div>
-`);
-  }
-
-  function getExpiringUsers() {
-    let today = new Date();
-    return users.filter(u => {
-        if (u.activePlan && u.activePlan.expiryDate) {
-            let expiry = new Date(u.activePlan.expiryDate);
-            let diffDays = (expiry - today) / (1000 * 60 * 60 * 24);
-            return diffDays <= 3 && diffDays >= 0;
-        }
-        return false;
-    });
-}
-
-// --- Expiring and Expired Users Section ---
-function updateExpiringAndExpiredUsersList() {
-    const today = new Date();
-    // Filter users with active plan expiring in 3 days or less
-    const expiringUsers = users.filter(u => {
-        if (u.activePlan && u.activePlan.expiryDate) {
-            const expiry = new Date(u.activePlan.expiryDate);
-            const diffDays = (expiry - today) / (1000 * 60 * 60 * 24);
-            return diffDays <= 3 && diffDays >= 0;
-        }
-        return false;
-    });
-
-    // Filter users with expired plans (expiry date in the past)
-    const expiredUsers = users.filter(u => {
-        if (u.activePlan && u.activePlan.expiryDate) {
-            const expiry = new Date(u.activePlan.expiryDate);
-            const diffDays = (expiry - today) / (1000 * 60 * 60 * 24);
-            return diffDays < 0;
-        }
-        return false;
-    });
-
-    // Update the Expiring Plans stat card (if you use it)
-    // Update Expiring Users Table
-    $("#expiringCount").text(expiringUsers.length);
-    const expiringList = $("#expiringUsersList");
-    expiringList.empty();
-
-    if (expiringUsers.length === 0) {
-        expiringList.append(`
-  <tr>
-    <td colspan="4" class="text-center">No users with expiring plans within 3 days.</td>
-  </tr>
-`);
-    } else {
-        expiringUsers.forEach(user => {
-            expiringList.append(`
-      <tr data-uid="${user.username}">
-        <td>${user.name}</td>
-        <td>${user.activePlan.title}</td>
-        <td>${user.activePlan.expiryDate}</td>
-        <td>
-          <button class="btn btn-warning btn-sm notify-btn" data-uid="${user.username}">
-            <i class="fas fa-bell"></i> Notify
+      // Populate tables for active & inactive plans
+      populateTable(
+        data,
+        'activePlansTable',
+        'STATUS_ACTIVE',
+        `
+          <button class="btn btn-sm btn-success" onclick="openEditPlanModal('mbplan001')">
+              <i class="fa-solid fa-pen-to-square"></i>
           </button>
-        </td>
-      </tr>
-    `);
-        });
-    }
-
-    // Update Expired Users Table
-    const expiredList = $("#expiredUsersList");
-    expiredList.empty();
-
-    if (expiredUsers.length === 0) {
-        expiredList.append(`
-  <tr>
-    <td colspan="4" class="text-center">No users with expired plans.</td>
-  </tr>
-`);
-    } else {
-        expiredUsers.forEach(user => {
-            expiredList.append(`
-      <tr data-uid="${user.username}">
-        <td>${user.name}</td>
-        <td>${user.activePlan.title}</td>
-        <td>${user.activePlan.expiryDate}</td>
-        <td>
-          <button class="btn btn-warning btn-sm notify-btn" data-uid="${user.username}">
-            <i class="fas fa-bell"></i> Notify
+          <button id="deactive" class="btn btn-sm btn-danger mx-2 my-2">
+            <i class="fa-solid fa-trash-can"></i>
           </button>
-        </td>
-      </tr>
-    `);
-        });
-    }
+        `
+      );
 
+      populateTable(
+        data,
+        'deactivatedPlansTable',
+        'STATUS_INACTIVE',
+        `
+          <button id="active" class="btn btn-sm btn-success mx-2 my-2">
+            <i class="fa-solid fa-square-check"></i>
+          </button>
+          <button id="delete" class="btn btn-sm btn-danger mx-2 my-2">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        `
+      );
+    })
+    .catch(err => console.error('Error fetching plans:', err));
 }
 
-  /* ================================
-     RENDERING ACTIVE / DEACTIVATED PLANS
-     ================================ */
+// Function to fetch categories from the backend
+function fetchCategoriesData() {
+  fetch("http://localhost:8087/api/category")
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(categories => {
+      populateCategoriesTables(categories);
+    })
+    .catch(error => console.error("Error fetching categories:", error));
+}
 
-  function renderActivePlansTable() {
-    const $tbody = $("#activePlansTable tbody");
-    $tbody.empty();
-    plans.forEach(plan => {
-      const categoryName = planCategories.find(cat => cat.id == plan.categoryId)?.name || "N/A";
-      $tbody.append(`
-    <tr data-id="${plan.id}">
-      <td>${plan.id}</td>
-      <td>${plan.name}</td>
-      <td>${categoryName}</td>
-      <td>${plan.price}</td>
-      <td>${plan.validity}</td>
+function populateCategoriesTables(categories) {
+  const activeTbody = document.querySelector("#activeCategoriesTable tbody");
+  const deactivatedTbody = document.querySelector("#deactivatedCategoriesTable tbody");
+  activeTbody.innerHTML = "";
+  deactivatedTbody.innerHTML = "";
+
+  // Loop through the categories and create table rows
+  categories.forEach(category => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${category.categoryId}</td>
+      <td>${category.categoryName}</td>
+      <td>${category.status}</td>
+      <td>${category.createdOn}</td>
+      <td>${category.updatedOn}</td>
       <td>
-        <button type="button" class="btn btn-sm btn-info mx-2 edit-plan"><i class="fas fa-edit"></i></button>
-        <button type="button" class="btn btn-sm btn-warning mx-2 deactivate-plan"><i class="fa-solid fa-trash-arrow-up"></i></button>
+        ${category.status === "STATUS_ACTIVE"
+        ? `
+              <button class="btn btn-sm btn-info edit-category"  onclick='openEditCategoryModal(${JSON.stringify(category)})' data-id="${category.categoryId}">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button id="deactivateCategory" class="btn btn-sm btn-warning" data-id="${category.categoryId}">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            `
+        : `
+              <button id="activateCategory" class="btn btn-sm btn-info" data-id="${category.categoryId}">
+                <i class="fa-solid fa-square-check"></i>
+              </button>
+              <button id="deleteCategory" class="btn btn-sm btn-warning" data-id="${category.categoryId}">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            `
+      }
       </td>
-    </tr>
-  `);
-    });
-  }
-
-  function renderDeactivatedPlansTable() {
-    const $tbody = $("#deactivatedPlansTable tbody");
-    $tbody.empty();
-    deactivatedPlans.forEach(plan => {
-      const categoryName = planCategories.find(cat => cat.id == plan.categoryId)?.name || "N/A";
-      $tbody.append(`
-    <tr data-id="${plan.id}">
-      <td>${plan.id}</td>
-      <td>${plan.name}</td>
-      <td>${categoryName}</td>
-      <td>${plan.price}</td>
-      <td>${plan.validity}</td>
-      <td>
-        <button type="button" class="btn btn-sm btn-primary mx-2 reactivate-plan"><i class="fa-solid fa-check-double"></i></button>
-        <button type="button" class="btn btn-sm btn-danger mx-2 delete-deactivated-plan"><i class="fas fa-trash-alt"></i></button>
-      </td>
-    </tr>
-  `);
-    });
-  }
-
-  /* ================================
-     RENDERING ACTIVE / DEACTIVATED CATEGORIES
-     ================================ */
-
-  function renderActiveCategoriesTable() {
-    const $tbody = $("#activeCategoriesTable tbody");
-    $tbody.empty();
-    planCategories.forEach(cat => {
-      // Get associated active plans from the active plans array
-      const associatedPlans = plans.filter(p => p.categoryId == cat.id);
-      const planNames = associatedPlans.map(p => p.name).join(", ") || "None";
-      $tbody.append(`
-    <tr data-id="${cat.id}">
-      <td>${cat.id}</td>
-      <td>${cat.name}</td>
-      <td>${planNames}</td>
-      <td>
-        <button type="button" class="btn btn-sm btn-info mx-2 edit-category"><i class="fas fa-edit"></i></button>
-        <button type="button" class="btn btn-sm btn-warning mx-2 deactivate-category"><i class="fa-solid fa-trash-arrow-up"></i></button>
-      </td>
-    </tr>
-  `);
-    });
-  }
-
-  function renderDeactivatedCategoriesTable() {
-    const $tbody = $("#deactivatedCategoriesTable tbody");
-    $tbody.empty();
-    deactivatedCategories.forEach(cat => {
-      // Assuming deactivated category has a "plans" sub-array with associated plans
-      const associatedPlans = cat.plans || [];
-      const planNames = associatedPlans.map(p => p.name).join(", ") || "None";
-      $tbody.append(`
-    <tr data-id="${cat.id}">
-      <td>${cat.id}</td>
-      <td>${cat.name}</td>
-      <td>${planNames}</td>
-      <td>
-        <button type="button" class="btn btn-sm btn-primary mx-2 reactivate-category"><i class="fa-solid fa-check-double"></i></button>
-        <button type="button" class="btn btn-sm btn-danger mx-2 delete-deactivated-category"><i class="fas fa-trash-alt"></i></button>
-      </td>
-    </tr>
-  `);
-    });
-  }
-
-  /* ================================
-     PLAN CRUD OPERATIONS (ACTIVE)
-     ================================*/
-
-  // Add Plan button click
-  $("#addPlanBtn").click(function (e) {
-    e.preventDefault();
-    $("#planForm")[0].reset();
-    $("#planId").val('');
-    $("#planModalLabel").text("Add New Plan");
-    new bootstrap.Modal(document.getElementById('planModal')).show();
-  });
-
-  // Plan form submit (Create or Update)
-  $("#planForm").submit(function (e) {
-    e.preventDefault();
-    const generatedId = Date.now().toString();
-    const planObj = {
-      id: $("#planId").val() || generatedId,
-      name: $("#planName").val(),
-      categoryId: parseInt($("#planCategory").val()),
-      price: parseFloat($("#planPrice").val()),
-      validity: $("#planValidity").val(),
-      active: true
-    };
-
-    const existingIndex = plans.findIndex(p => p.id == planObj.id);
-    if (existingIndex > -1) {
-      // Update plan
-      plans[existingIndex] = planObj;
-      $.ajax({
-        url: `http://localhost:3000/plans/${encodeURIComponent(planObj.id)}`,
-        type: 'PUT',
-        data: JSON.stringify(planObj),
-        contentType: "application/json",
-        success: function () {
-          renderActivePlansTable();
-          bootstrap.Modal.getInstance(document.getElementById('planModal')).hide();
-        },
-        error: function (err) {
-          console.error("Error updating plan:", err);
-        }
-      });
+    `;
+    // Append the row to the appropriate table based on status
+    if (category.status === "STATUS_ACTIVE") {
+      activeTbody.appendChild(row);
     } else {
-      // Create new plan
-      plans.push(planObj);
-      $.ajax({
-        url: "http://localhost:3000/plans",
-        type: 'POST',
-        data: JSON.stringify(planObj),
-        contentType: "application/json",
-        success: function () {
-          renderActivePlansTable();
-          bootstrap.Modal.getInstance(document.getElementById('planModal')).hide();
-        },
-        error: function (err) {
-          console.error("Error creating plan:", err);
+      deactivatedTbody.appendChild(row);
+    }
+  });
+}
+
+// Call the fetch function on page load
+document.addEventListener("DOMContentLoaded", fetchCategoriesData);
+
+
+// Submit handler for the category form (for both add and edit)
+document.getElementById("categoryForm").addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  // Get form values
+  const categoryId = document.getElementById("categoryId").value.trim();
+  const categoryName = document.getElementById("categoryName").value.trim();
+
+  // Build the category object
+  const categoryData = {
+    categoryName: categoryName
+  };
+
+  // Determine the API endpoint and method based on whether categoryId exists
+  let url = "http://localhost:8087/api/category";
+  let method = "POST";
+
+  if (categoryId !== "") {
+    url += `/${encodeURIComponent(categoryId)}`;
+    method = "PUT";
+  }
+
+  fetch(url, {
+    method: method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(categoryData)
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Failed to ${categoryId ? 'update' : 'add'} category`);
+      }
+    })
+    .then(data => {
+      console.log("Category processed successfully:", data);
+      closeCategoryModal();
+      fetchCategoriesData();
+    })
+    .catch(error => console.error("Error processing category:", error));
+});
+
+// Helper function to open the modal in "Add" mode
+function openAddCategoryModal() {
+  document.getElementById("categoryModalLabel").textContent = "Add Category";
+  document.getElementById("saveCategoryBtn").textContent = "Add Category";
+  // Clear the form fields
+  document.getElementById("categoryId").value = "";
+  document.getElementById("categoryName").value = "";
+
+  // Show the modal using Bootstrap 5 API
+  const modalElement = document.getElementById("categoryModal");
+  const categoryModal = new bootstrap.Modal(modalElement);
+  categoryModal.show();
+}
+
+// Helper function to open the modal in "Edit" mode
+function openEditCategoryModal(category) {
+  // Assume "category" is an object with categoryId and categoryName properties
+  document.getElementById("categoryModalLabel").textContent = "Edit Category";
+  document.getElementById("saveCategoryBtn").textContent = "Update Category";
+  document.getElementById("categoryId").value = category.categoryId;
+  document.getElementById("categoryName").value = category.categoryName;
+
+  // Show the modal
+  const modalElement = document.getElementById("categoryModal");
+  const categoryModal = new bootstrap.Modal(modalElement);
+  categoryModal.show();
+}
+
+// Helper function to close the category modal
+function closeCategoryModal() {
+  const modalElement = document.getElementById("categoryModal");
+  const categoryModal = bootstrap.Modal.getInstance(modalElement);
+  if (categoryModal) {
+    categoryModal.hide();
+  }
+}
+document.addEventListener("DOMContentLoaded", fetchPlansData);
+
+// Deactivate a plan from the Active Plans table
+document.getElementById('activeCategoriesTable').addEventListener('click', function (event) {
+  if (event.target.closest('#deactivateCategory')) {
+    const row = event.target.closest('tr');
+    const planId = row.querySelector('td:first-child').textContent.trim();
+
+    fetch(`http://localhost:8087/api/category/deactivate/${encodeURIComponent(planId)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify()
+    })
+      .then(response => {
+        // If the response has no content, return an empty object
+        if (response.status === 204 || !response.headers.get('content-length')) {
+          return {};
         }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Plan deactivated successfully:', data);
+        // Animate removal
+        row.style.transition = "opacity 0.5s";
+        row.style.opacity = 0;
+        setTimeout(() => row.remove(), 500);
+        // Optionally, refresh the table data
+        fetchCategoriesData();
+      })
+      .catch(err => console.error('Error deactivating plan:', err));
+  }
+});
+
+// Activate a plan from the Deactivated Plans table
+document.getElementById('deactivatedCategoriesTable').addEventListener('click', function (event) {
+  if (event.target.closest('#activateCategory')) {
+    const row = event.target.closest('tr');
+    const planId = row.querySelector('td:first-child').textContent.trim();
+    const plan = { status: "STATUS_ACTIVE" };
+
+    fetch(`http://localhost:8087/api/category/activate/${encodeURIComponent(planId)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(plan)
+    })
+      .then(response => {
+        if (response.status === 204 || !response.headers.get('content-length')) {
+          return {};
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Plan activated successfully:', data);
+        row.style.transition = "opacity 0.5s";
+        row.style.opacity = 0;
+        setTimeout(() => row.remove(), 500);
+        fetchCategoriesData();
+      })
+      .catch(err => console.error('Error activating plan:', err));
+  }
+});
+
+// Delete a plan from the Deactivated Plans table
+document.getElementById('deactivatedCategoriesTable').addEventListener('click', function (event) {
+  if (event.target.closest('#deleteCategory')) {
+    const row = event.target.closest('tr');
+    const planId = row.querySelector('td:first-child').textContent.trim();
+    const plan = { status: "STATUS_INACTIVE" };
+
+    fetch(`http://localhost:8087/api/category/${encodeURIComponent(planId)}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(plan)
+    })
+      .then(response => {
+        if (response.status === 204 || !response.headers.get('content-length')) {
+          return {};
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Plan deleted successfully:', data);
+        row.style.transition = "opacity 0.5s";
+        row.style.opacity = 0;
+        setTimeout(() => row.remove(), 500);
+        fetchCategoriesData();
+      })
+      .catch(err => console.error('Error deleting plan:', err));
+  }
+});
+
+
+function populateModalOptions() {
+
+  fetch("http://localhost:8087/api/category")
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(categories => {
+      const categorySelect = document.getElementById("planCategory");
+      categorySelect.innerHTML = "";
+      const uniqueCategories = [...new Set(categories.map(category => category.categoryId))];
+      uniqueCategories.forEach(categoryId => {
+        const option = document.createElement("option");
+        option.value = categoryId;
+        const cat = categories.find(category => category.categoryId === categoryId);
+        option.textContent = cat ? cat.categoryName : "";
+        categorySelect.appendChild(option);
       });
+    })
+    .catch(error => console.error("Error fetching categories:", error));
+
+
+
+  // Example: Populate OTT benefits dropdown (if exists)
+  fetch("http://localhost:8087/api/benefits")
+    .then(response => response.json())
+    .then(benefits => {
+      const ottDropdown = document.getElementById("ottDetails");
+      if (ottDropdown) {
+        ottDropdown.innerHTML = ""; // Clear existing options
+        benefits.forEach(benefit => {
+          const option = document.createElement("option");
+          option.value = benefit.benefitsId;
+          option.textContent = benefit.benefitsName || "Unnamed Benefit";
+          ottDropdown.appendChild(option);
+        });
+      }
+    })
+    .catch(error => console.error("Error fetching OTT benefits:", error));
+}
+
+function populateTable(data, tableId, statusFilter, actionsHtml) {
+  const tbody = document.querySelector(`#${tableId} tbody`);
+  tbody.innerHTML = "";
+  data.forEach(plan => {
+    if (plan.status === statusFilter) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${plan.planId}</td>
+        <td>${plan.planName}</td>
+        <td>${plan.category ? plan.category.categoryName : "N/A"}</td>
+        <td>${plan.planPrice}</td>
+        <td>${plan.validity}</td>
+        <td>${plan.description}</td>
+        <td>${plan.createdAt}</td>
+        <td>${plan.updatedAt}</td>
+        <td>${(plan.benefits && plan.benefits.length) ? plan.benefits.map(b => b.benefitsName).join(', ') : 'None'}</td>
+        <td>${actionsHtml}</td>
+      `;
+      tbody.appendChild(tr);
     }
   });
+}
+fetchPlansData();
 
-  // Edit Plan
-  $(document).on("click", ".edit-plan", function (e) {
-    e.preventDefault();
-    const planId = $(this).closest("tr").data("id");
-    const plan = plans.find(p => p.id == planId);
-    if (plan) {
-      $("#planId").val(plan.id);
-      $("#planName").val(plan.name);
-      $("#planCategory").val(plan.categoryId);
-      $("#planPrice").val(plan.price);
-      $("#planValidity").val(plan.validity);
-      $("#planModalLabel").text("Edit Plan");
-      new bootstrap.Modal(document.getElementById('planModal')).show();
+document.getElementById('activePlansTable').addEventListener('click', function (event) {
+  if (event.target.closest('#deactive')) {
+    const row = event.target.closest('tr');
+    const planId = row.querySelector('td:first-child').textContent.trim();
+    const plan = { status: "STATUS_INACTIVE" };
+
+    fetch(`http://localhost:8087/api/plans/deactivate/${encodeURIComponent(planId)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(plan)
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Plan deactivated successfully:', data);
+        row.style.transition = "opacity 0.5s";
+        row.style.opacity = 0;
+        setTimeout(() => row.remove(), 500);
+        fetchPlansData();
+      })
+      .catch(err => console.error('Error deactivating plan:', err));
+  }
+});
+
+// Event delegation for activating a plan from #deactivatedPlansTable
+document.getElementById('deactivatedPlansTable').addEventListener('click', function (event) {
+  if (event.target.closest('#active')) {
+    const row = event.target.closest('tr');
+    const planId = row.querySelector('td:first-child').textContent.trim();
+    const plan = { status: "STATUS_ACTIVE" };
+
+    fetch(`http://localhost:8087/api/plans/activate/${encodeURIComponent(planId)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(plan)
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Plan activated successfully:', data);
+        row.style.transition = "opacity 0.5s";
+        row.style.opacity = 0;
+        setTimeout(() => row.remove(), 500);
+        fetchPlansData();
+      })
+      .catch(err => console.error('Error activating plan:', err));
+  }
+});
+
+// Event delegation for deleting a plan from #deactivatedPlansTable
+document.getElementById('deactivatedPlansTable').addEventListener('click', function (event) {
+  if (event.target.closest('#delete')) {
+    const row = event.target.closest('tr');
+    const planId = row.querySelector('td:first-child').textContent.trim();
+    const plan = { status: "STATUS_INACTIVE" };
+
+    fetch(`http://localhost:8087/api/plans/${encodeURIComponent(planId)}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(plan)
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Plan deleted successfully:', data);
+        row.style.transition = "opacity 0.5s";
+        row.style.opacity = 0;
+        setTimeout(() => row.remove(), 500);
+        fetchPlansData();
+      })
+      .catch(err => console.error('Error deleting plan:', err));
+  }
+});
+
+document.getElementById('planForm').addEventListener('submit', function (event) {
+  event.preventDefault();
+
+  const planId = document.getElementById('planId').value.trim();
+  const planData = {
+    planName: document.getElementById('planName').value.trim(),
+    category: {
+      categoryId: document.getElementById('planCategory').value.trim()
+    },
+    planPrice: parseFloat(document.getElementById('planPrice').value),
+    validity: parseInt(document.getElementById('planValidity').value),
+    description: document.getElementById('planDescription').value.trim(),
+    benefits: gatherSelectedBenefits()
+  };
+
+  // Decide if we are adding or updating
+  let url = 'http://localhost:8087/api/plans';
+  let method = 'POST';
+
+  if (planId) {
+    // If planId is present, update the plan
+    url += `/${encodeURIComponent(planId)}`;
+    method = 'PUT';
+  }
+
+  fetch(url, {
+    method: method,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(planData)
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Failed to add plan");
+      }
+      // If the server returns 204 or an empty body, skip .json()
+      if (response.status === 204 || !response.headers.get('content-length')) {
+        return {}; // Return an empty object or do something else
+      }
+      fetchPlansData();
+    })
+    .then(data => {
+      console.log("Plan Processed successfully:", data);
+      const modalElement = document.getElementById('planModal');
+      const modalInstance = bootstrap.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      }
+    })
+    .catch(error => {
+      console.error("Error adding plan:", error);
+    })
+});
+
+// Example: gather selected benefits from a multi-select or checkboxes
+function gatherSelectedBenefits() {
+  // Example if you have a multi-select with id "ottDetails"
+  const benefitsSelect = document.getElementById('ottDetails');
+  const selected = Array.from(benefitsSelect.selectedOptions).map(opt => ({
+    benefitsId: opt.value,
+    benefitsName: opt.textContent.trim()
+  }));
+  return selected;
+}
+function openAddPlanModal() {
+  document.getElementById('planModalLabel').textContent = "Add New Plan";
+  document.getElementById('addPlanBtn').textContent = "Add Plan";
+  // Clear hidden planId
+  document.getElementById('planId').value = "";
+  // Clear other fields
+  document.getElementById('planName').value = "";
+  document.getElementById('planCategory').value = "";
+  document.getElementById('planPrice').value = "";
+  document.getElementById('planValidity').value = "";
+  document.getElementById('planDescription').value = "";
+  // If you have benefits checkboxes or multi-select, clear them
+  // Show the modal
+  const planModal = new bootstrap.Modal(document.getElementById('planModal'));
+  planModal.show();
+}
+function openEditPlanModal(planId) {
+  document.getElementById('planModalLabel').textContent = "Edit Plan";
+  document.getElementById('addPlanBtn').textContent = "Update Plan";
+
+  // Fetch the existing plan data
+  fetch(`http://localhost:8087/api/plans/${encodeURIComponent(planId)}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Failed to fetch plan for editing");
+      }
+      return response.json();
+    })
+    .then(plan => {
+      // Populate the hidden planId
+      document.getElementById('planId').value = plan.planId;
+      // Populate other fields
+      document.getElementById('planName').value = plan.planName;
+      document.getElementById('planCategory').value = plan.category ? plan.category.categoryId : "";
+      document.getElementById('planPrice').value = plan.planPrice;
+      document.getElementById('planValidity').value = plan.validity;
+      document.getElementById('planDescription').value = plan.description;
+      // If you have benefits, set them in your multi-select or checkboxes
+      // Then show the modal
+      const planModal = new bootstrap.Modal(document.getElementById('planModal'));
+      planModal.show();
+    })
+    .catch(err => console.error('Error fetching plan for edit:', err));
+}
+
+function fetchBenefitsData() {
+  fetch("http://localhost:8087/api/benefits")
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(benefits => {
+      const tbody = document.querySelector("#benefitsTable tbody");
+      tbody.innerHTML = ""; // Clear existing rows
+
+      benefits.forEach(benefit => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${benefit.benefitsId}</td>
+          <td>${benefit.benefitsName}</td>
+          <td>${benefit.icon || ""}</td>
+          <td>
+            <button class="btn btn-sm btn-info edit-benefit" onclick='openEditBenefitModal(${JSON.stringify(benefit)})' data-id="${benefit.benefitsId}">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button class="btn btn-sm btn-danger delete-benefit" data-id="${benefit.benefitsId}">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    })
+    .catch(error => console.error("Error fetching benefits:", error));
+}
+
+// Call fetchBenefitsData on page load
+document.addEventListener("DOMContentLoaded", fetchBenefitsData);
+
+// 2. Add/Edit Benefit Modal: Form Submission Handler
+document.getElementById("benefitForm").addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  // Retrieve form values
+  const benefitId = document.getElementById("benefitId").value.trim();
+  const benefitName = document.getElementById("benefitName").value.trim();
+  const benefitIcon = document.getElementById("benefitIcon").value.trim();
+
+  // Build benefit data object
+  const benefitData = {
+    benefitsName: benefitName,
+    icon: benefitIcon
+  };
+
+  // Determine API endpoint and method based on presence of benefitId
+  let url = "http://localhost:8087/api/benefits";
+  let method = "POST";
+  if (benefitId !== "") {
+    url += `/${encodeURIComponent(benefitId)}`;
+    method = "PUT";
+  }
+
+  fetch(url, {
+    method: method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(benefitData)
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Failed to ${benefitId ? "update" : "add"} benefit`);
+      }
+      // Handle possible empty response body
+      if (response.status === 204 || !response.headers.get("content-length")) {
+        return {};
+      }
+    })
+    .then(data => {
+      console.log("Benefit processed successfully:", data);
+      closeBenefitModal();
+      fetchBenefitsData(); // Refresh the benefits table
+    })
+    .catch(error => console.error("Error processing benefit:", error));
+});
+
+// 3. Helper Functions for Opening and Closing the Benefit Modal
+
+function openAddBenefitModal() {
+  document.getElementById("benefitModalLabel").textContent = "Add New Benefit";
+  document.getElementById("saveBenefitBtn").textContent = "Add Benefit";
+  // Clear form fields
+  document.getElementById("benefitId").value = "";
+  document.getElementById("benefitName").value = "";
+  document.getElementById("benefitIcon").value = "";
+
+  // Open the modal using Bootstrap 5 API
+  const modalElement = document.getElementById("benefitModal");
+  const benefitModal = new bootstrap.Modal(modalElement);
+  benefitModal.show();
+}
+
+function openEditBenefitModal(benefitId) {
+  // Fetch the benefit data for editing
+  fetch(`http://localhost:8087/api/benefits/${encodeURIComponent(benefitId.benefitsId)}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Failed to fetch benefit details");
+      }
+      return response.json();
+    })
+    .then(benefit => {
+      document.getElementById("benefitModalLabel").textContent = "Edit Benefit";
+      document.getElementById("saveBenefitBtn").textContent = "Update Benefit";
+      document.getElementById("benefitId").value = benefit.benefitsId;
+      document.getElementById("benefitName").value = benefit.benefitsName;
+      document.getElementById("benefitIcon").value = benefit.icon || "";
+
+      const modalElement = document.getElementById("benefitModal");
+      const benefitModal = new bootstrap.Modal(modalElement);
+      benefitModal.show();
+    })
+    .catch(error => console.error("Error fetching benefit for edit:", error));
+}
+
+
+function closeBenefitModal() {
+  const modalElement = document.getElementById("benefitModal");
+  const benefitModal = bootstrap.Modal.getInstance(modalElement);
+  if (benefitModal) {
+    benefitModal.hide();
+  }
+}
+
+document.getElementById("benefitsTable").addEventListener("click", function (event) {
+  const editBtn = event.target.closest(".edit-benefit");
+  if (editBtn) {
+    const benefitId = editBtn.getAttribute("data-id");
+    if (!benefitId) {
+      console.error("Benefit ID is missing on the button.");
+      return;
     }
-  });
+    openEditBenefitModal(benefitId);
+  }
+});
 
-  // Deactivate (Soft Delete) Plan
-  $(document).on("click", ".deactivate-plan", async function (e) {
-    e.preventDefault();
-    if (!confirm("Are you sure you want to deactivate this plan?")) return;
-    const planId = $(this).closest("tr").data("id").toString();
-    let plan = plans.find(p => p.id == planId);
-    if (!plan) {
-      try {
-        plan = await $.getJSON(`http://localhost:3000/plans/${encodeURIComponent(planId)}`);
-      } catch (err) {
-        console.error("Plan not found:", planId, err);
+document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("benefitsTable").addEventListener("click", function (event) {
+    const deleteBtn = event.target.closest(".delete-benefit");
+    if (deleteBtn) {
+      console.log("Delete button clicked");
+
+      const benefitId = deleteBtn.getAttribute("data-id");
+      console.log("Benefit ID extracted:", benefitId);
+
+      if (!benefitId) {
+        console.error("Benefit ID is null or undefined. Check the button's data-id attribute.");
         return;
       }
-    }
-    // Remove from local active array
-    plans = plans.filter(p => p.id !== planId);
-    try {
-      // POST the plan to deactivatedPlans endpoint
-      await $.ajax({
-        url: "http://localhost:3000/deactivatedPlans",
-        type: "POST",
-        data: JSON.stringify(plan),
-        contentType: "application/json"
-      });
-      // DELETE the plan from active plans
-      await $.ajax({
-        url: `http://localhost:3000/plans/${encodeURIComponent(planId)}`,
-        type: "DELETE"
-      });
-      renderActivePlansTable();
-      // Add the plan to local deactivatedPlans array and re-render
-      deactivatedPlans.push(plan);
-      renderDeactivatedPlansTable();
-    } catch (err) {
-      console.error("Error during plan deactivation:", err);
-    }
-  });
 
-  // Reactivate Plan (from deactivated tab)
-  $(document).on("click", ".reactivate-plan", async function (e) {
-    e.preventDefault();
-    if (!confirm("Reactivate this plan?")) return;
-    const planId = $(this).closest("tr").data("id").toString();
-    let plan = deactivatedPlans.find(p => p.id == planId);
-    if (!plan) return;
-    deactivatedPlans = deactivatedPlans.filter(p => p.id !== planId);
-    try {
-      await $.ajax({
-        url: "http://localhost:3000/plans",
-        type: "POST",
-        data: JSON.stringify(plan),
-        contentType: "application/json"
-      });
-      await $.ajax({
-        url: `http://localhost:3000/deactivatedPlans/${encodeURIComponent(planId)}`,
-        type: "DELETE"
-      });
-      plans.push(plan);
-      renderActivePlansTable();
-      renderDeactivatedPlansTable();
-    } catch (err) {
-      console.error("Error reactivating plan:", err);
-    }
-  });
-
-  // Permanently Delete Deactivated Plan
-  $(document).on("click", ".delete-deactivated-plan", async function (e) {
-    e.preventDefault();
-    if (!confirm("Permanently delete this plan?")) return;
-    const planId = $(this).closest("tr").data("id").toString();
-    deactivatedPlans = deactivatedPlans.filter(p => p.id !== planId);
-    try {
-      await $.ajax({
-        url: `http://localhost:3000/deactivatedPlans/${encodeURIComponent(planId)}`,
-        type: "DELETE"
-      });
-      renderDeactivatedPlansTable();
-    } catch (err) {
-      console.error("Error deleting deactivated plan:", err);
-    }
-  });
-
-  /* ================================
-     CATEGORY CRUD OPERATIONS (ACTIVE)
-     ================================*/
-
-  // Add Category button click
-  $("#addCategoryBtn").click(function (e) {
-    e.preventDefault();
-    $("#categoryForm")[0].reset();
-    $("#categoryId").val('');
-    $("#categoryModalLabel").text("Add New Category");
-    new bootstrap.Modal(document.getElementById('categoryModal')).show();
-  });
-
-  // Category form submit (Create or Update)
-  $("#categoryForm").submit(function (e) {
-    e.preventDefault();
-    const generatedId = Date.now().toString();
-    const categoryObj = {
-      id: $("#categoryId").val() || generatedId,
-      name: $("#categoryName").val(),
-      plans: [] // For active category, plans will be handled via the active plans resource
-    };
-    const existingIndex = planCategories.findIndex(c => c.id == categoryObj.id);
-    if (existingIndex > -1) {
-      planCategories[existingIndex] = categoryObj;
-      $.ajax({
-        url: `http://localhost:3000/categories/${encodeURIComponent(categoryObj.id)}`,
-        type: 'PUT',
-        data: JSON.stringify(categoryObj),
-        contentType: "application/json",
-        success: function () {
-          renderActiveCategoriesTable();
-          populateCategoryDropdowns();
-          bootstrap.Modal.getInstance(document.getElementById('categoryModal')).hide();
-        },
-        error: function (err) {
-          console.error("Error updating category:", err);
-        }
-      });
-    } else {
-      planCategories.push(categoryObj);
-      $.ajax({
-        url: "http://localhost:3000/categories",
-        type: 'POST',
-        data: JSON.stringify(categoryObj),
-        contentType: "application/json",
-        success: function () {
-          renderActiveCategoriesTable();
-          populateCategoryDropdowns();
-          bootstrap.Modal.getInstance(document.getElementById('categoryModal')).hide();
-        },
-        error: function (err) {
-          console.error("Error creating category:", err);
-        }
-      });
-    }
-  });
-
-  // Edit Category
-  $(document).on("click", ".edit-category", function (e) {
-    e.preventDefault();
-    const categoryId = $(this).closest("tr").data("id");
-    const category = planCategories.find(c => c.id == categoryId);
-    if (category) {
-      $("#categoryId").val(category.id);
-      $("#categoryName").val(category.name);
-      $("#categoryModalLabel").text("Edit Category");
-      new bootstrap.Modal(document.getElementById('categoryModal')).show();
-    }
-  });
-
-  // Deactivate Category (Soft Delete) – deactivates the category and all associated plans
-  $(document).on("click", ".deactivate-category", async function (e) {
-    e.preventDefault();
-    if (!confirm("Are you sure you want to deactivate this category? All associated plans will be deactivated.")) return;
-    const categoryId = $(this).closest("tr").data("id").toString();
-    const category = planCategories.find(c => c.id == categoryId);
-    if (!category) return;
-
-    planCategories = planCategories.filter(c => c.id !== categoryId);
-    const associatedPlans = plans.filter(p => p.categoryId == categoryId);
-    plans = plans.filter(p => p.categoryId != categoryId);
-
-    const deactivatedCat = {
-      ...category,
-      plans: associatedPlans
-    };
-
-    try {
-      await $.ajax({
-        url: "http://localhost:3000/deactivatedCategories",
-        type: "POST",
-        data: JSON.stringify(deactivatedCat),
-        contentType: "application/json"
-      });
-      await $.ajax({
-        url: `http://localhost:3000/categories/${encodeURIComponent(categoryId)}`,
-        type: "DELETE"
-      });
-
-      for (const plan of associatedPlans) {
-        await $.ajax({
-          url: "http://localhost:3000/deactivatedPlans",
-          type: "POST",
-          data: JSON.stringify(plan),
-          contentType: "application/json"
-        });
-        await $.ajax({
-          url: `http://localhost:3000/plans/${encodeURIComponent(plan.id)}`,
-          type: "DELETE"
-        });
-        deactivatedPlans.push(plan);
-      }
-
-      renderActiveCategoriesTable();
-      renderDeactivatedCategoriesTable();
-      renderActivePlansTable();
-      renderDeactivatedPlansTable();
-      populateCategoryDropdowns();
-    } catch (err) {
-      console.error("Error deactivating category:", err);
-    }
-  });
-
-  // Reactivate Category – reactivates the category and fetches all deactivated plans of that category to reactivate them
-  $(document).on("click", ".reactivate-category", async function (e) {
-    e.preventDefault();
-    if (!confirm("Reactivate this category and its plans?")) return;
-    const categoryId = $(this).closest("tr").data("id").toString();
-    const cat = deactivatedCategories.find(c => c.id == categoryId);
-    if (!cat) return;
-
-    deactivatedCategories = deactivatedCategories.filter(c => c.id != categoryId);
-
-    try {
-      await $.ajax({
-        url: "http://localhost:3000/categories",
-        type: "POST",
-        data: JSON.stringify({ id: cat.id, name: cat.name, plans: [] }),
-        contentType: "application/json"
-      });
-      await $.ajax({
-        url: `http://localhost:3000/deactivatedCategories/${encodeURIComponent(categoryId)}`,
-        type: "DELETE"
-      });
-
-      const associatedPlans = await $.getJSON(`http://localhost:3000/deactivatedPlans?categoryId=${encodeURIComponent(categoryId)}`);
-
-      for (const plan of associatedPlans) {
-        await $.ajax({
-          url: "http://localhost:3000/plans",
-          type: "POST",
-          data: JSON.stringify(plan),
-          contentType: "application/json"
-        });
-        await $.ajax({
-          url: `http://localhost:3000/deactivatedPlans/${encodeURIComponent(plan.id)}`,
-          type: "DELETE"
-        });
-        plans.push(plan);
-        deactivatedPlans = deactivatedPlans.filter(p => p.id !== plan.id);
-      }
-
-      planCategories.push({ id: cat.id, name: cat.name, plans: [] });
-
-      renderActiveCategoriesTable();
-      renderDeactivatedCategoriesTable();
-      renderActivePlansTable();
-      renderDeactivatedPlansTable();
-      populateCategoryDropdowns();
-    } catch (err) {
-      console.error("Error reactivating category:", err);
-    }
-  });
-
-  // Permanently Delete Deactivated Category
-  $(document).on("click", ".delete-deactivated-category", async function (e) {
-    e.preventDefault();
-    if (!confirm("Permanently delete this category?")) return;
-    const categoryId = $(this).closest("tr").data("id").toString();
-    deactivatedCategories = deactivatedCategories.filter(c => c.id !== categoryId);
-    try {
-      await $.ajax({
-        url: `http://localhost:3000/deactivatedCategories/${encodeURIComponent(categoryId)}`,
-        type: "DELETE"
-      });
-      renderDeactivatedCategoriesTable();
-    } catch (err) {
-      console.error("Error deleting deactivated category:", err);
-    }
-  });
-
-  // Permanently Delete Deactivated Plan
-  $(document).on("click", ".delete-deactivated-plan", async function (e) {
-    e.preventDefault();
-    if (!confirm("Permanently delete this plan?")) return;
-    const planId = $(this).closest("tr").data("id").toString();
-    deactivatedPlans = deactivatedPlans.filter(p => p.id !== planId);
-    try {
-      await $.ajax({
-        url: `http://localhost:3000/deactivatedPlans/${encodeURIComponent(planId)}`,
-        type: "DELETE"
-      });
-      renderDeactivatedPlansTable();
-    } catch (err) {
-      console.error("Error deleting deactivated plan:", err);
-    }
-  });
-
-  $(document).ready(function () {
-    // Global array for users (from dashboard.users.details)
-    let users = [];
-  
-    // Fetch dashboard data from the JSON server
-    $.getJSON("http://localhost:3000/dashboard")
-      .done(function (dashboardData) {
-        // Expected dashboard structure:
-        // {
-        //   "users": {
-        //      "total": 15,
-        //      "active": 12,
-        //      "deactivated": 3,
-        //      "details": [ {username, name, phone, email, activePlan, rechargeHistory, query, ...}, ... ]
-        //   }
-        // }
-        users = dashboardData.users.details;
-        renderUsersDetailsTable();
-        renderUserQueriesTable();
+      fetch(`http://localhost:8087/api/benefits/${encodeURIComponent(benefitId)}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" }
       })
-      .fail(function (error) {
-        console.error("Error fetching dashboard data:", error);
-      });
-  
-    // Render the User Details Table (Table 1)
-    function renderUsersDetailsTable() {
-      const $tbody = $("#usersDetailsTable tbody");
-      $tbody.empty();
-      const searchTerm = $("#userSearch").val().toLowerCase();
-      users.forEach(user => {
-        if (user.username.toLowerCase().indexOf(searchTerm) !== -1) {
-          // If activePlan exists, display its title; otherwise "None"
-          const activePlan = user.activePlan ? user.activePlan.title : "None";
-          const viewBtn = `<button class="btn btn-sm btn-success view-user-details mx-2 my-2">View Detail >> </button>`;
-          $tbody.append(`
-            <tr data-username="${user.username}">
-              <td>${user.username}</td>
-              <td>${user.name}</td>
-              <td>${user.phone}</td>
-              <td>${user.email}</td>
-              <td>${activePlan}</td>
-              <td>${viewBtn}</td>
-            </tr>
-          `);
-        }
-      });
+        .then(response => {
+          console.log("Response status:", response.status);
+          if (!response.ok) {
+            throw new Error("Failed to delete benefit");
+          }
+          // If the response is empty, return an empty object.
+          if (response.status === 204 || !response.headers.get("content-length")) {
+            return {};
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log("Benefit deleted successfully:", data);
+          fetchBenefitsData(); // Refresh table data
+        })
+        .catch(error => console.error("Error deleting benefit:", error));
     }
-  
-    // Render the User Queries Table (Table 2)
-    function renderUserQueriesTable() {
-      const $tbody = $("#userQueriesTable tbody");
-      $tbody.empty();
-      users.forEach(user => {
-        if (user.query && user.query.trim() !== "") {
-          $tbody.append(`
-            <tr data-username="${user.username}">
-              <td>${user.username}</td>
-              <td>${user.email}</td>
-              <td>${user.phone}</td>
-              <td>${user.query}</td>
-              <td><button class="btn btn-sm btn-primary solve-query">Solve Query</button></td>
-            </tr>
-          `);
-        }
-      });
-    }
-  
-    // Search functionality: re-render the user details table on keyup
-    $("#userSearch").on("keyup", function () {
-      renderUsersDetailsTable();
-    });
-  
-    // When "View Details" is clicked, open a modal with full user details.
-    $(document).on("click", ".view-user-details", function () {
-      const username = $(this).closest("tr").data("username");
-      const user = users.find(u => u.username === username);
-      if (user) {
-        // Populate modal with basic info
-        $("#detailUsername").text(user.username);
-        $("#detailName").text(user.name);
-        $("#detailPhone").text(user.phone);
-        $("#detailEmail").text(user.email);
-        const activePlan = user.activePlan ? `${user.activePlan.title} (Exp: ${user.activePlan.expiryDate})` : "None";
-        $("#detailActivePlan").text(activePlan);
-  
-        // Populate recharge history table
-        const $rhTbody = $("#detailRechargeHistoryTable tbody");
-        $rhTbody.empty();
-        if (user.rechargeHistory && user.rechargeHistory.length) {
-          user.rechargeHistory.forEach(record => {
-            $rhTbody.append(`
-              <tr>
-                <td>${record.planId}</td>
-                <td>${record.rechargeDate}</td>
-                <td>${record.amount}</td>
-                <td>${record.status}</td>
-              </tr>
-            `);
-          });
-        } else {
-          $rhTbody.append(`<tr><td colspan="4" class="text-center">No recharge history</td></tr>`);
-        }
-        new bootstrap.Modal(document.getElementById("userDetailsModal")).show();
-      }
-    });
-  
-    // When "Solve Query" is clicked in the User Queries table
-    $(document).on("click", ".solve-query", function () {
-      const username = $(this).closest("tr").data("username");
-      if (confirm(`Mark query as solved for ${username}?`)) {
-        const user = users.find(u => u.username === username);
-        if (user) {
-          user.query = ""; // Clear the query (mark as solved)
-          // Update the dashboard on the server by sending the updated users array.
-          // (Depending on your API, you might update only that user instead.)
-          $.ajax({
-            url: "http://localhost:3000/dashboard",
-            type: "PUT",
-            data: JSON.stringify({ users: { details: users } }),
-            contentType: "application/json",
-            success: function () {
-              renderUserQueriesTable();
-              renderUsersDetailsTable();
-            },
-            error: function (err) {
-              console.error("Error updating user query:", err);
-            }
-          });
-        }
-      }
-    });
   });
-  
-});
+
+})
