@@ -1,10 +1,13 @@
 package com.mobicomm.app.model;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,4 +28,7 @@ public class Users {
 	private Long phoneNumber;
 	private LocalDate createdAt;
 	private LocalDate updatedAt;
+	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<UserPlanDetail> userPlanDetails;
 }

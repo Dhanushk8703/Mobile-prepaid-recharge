@@ -1,11 +1,17 @@
 package com.mobicomm.app.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
+
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import com.mobicomm.app.model.Users;
 
 @Repository
-public interface UsersRepository extends JpaRepository<Users, String>{
+public interface UsersRepository extends CrudRepository<Users, String>{
+
+	Optional<Users> findByPhoneNumber(Long phoneNumber);
+
+	Optional<Users> findTopByOrderByUserIdDesc();
 
 }

@@ -24,7 +24,7 @@ import com.mobicomm.app.service.PlanService;
 
 @RestController
 @RequestMapping("/api/plans")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://127.0.0.1:5500")
 public class PlanController {
 	
 	@Autowired

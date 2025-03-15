@@ -1,10 +1,13 @@
 package com.mobicomm.app.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,16 +17,20 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin(origins = "http://127.0.0.1:5500")
+
 public class UsersController {
 	
 	@Autowired
 	private UsersService userService;
 	
-	@GetMapping("/")
+	@GetMapping
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	public ResponseEntity<?> getUsersDetails() {
 		List<Users> usersList = userService.getAllUsers();
 		if (usersList.isEmpty()) {
@@ -32,6 +39,25 @@ public class UsersController {
 			return new ResponseEntity<>(usersList, HttpStatus.OK);
 		}
 		
+	}
+	
+	@GetMapping("/{userId}")
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
+	public ResponseEntity<?> getUserById(@PathVariable String userId) {
+		Optional<Users> user = userService.getUserById(userId);
+		
+		if (user.isPresent()) {
+			return new ResponseEntity<>(user, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
+	@PostMapping
+	public ResponseEntity<?> addUsers(@RequestBody Users user) {
+		userService.addUsers(user);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@PutMapping("/{id}")

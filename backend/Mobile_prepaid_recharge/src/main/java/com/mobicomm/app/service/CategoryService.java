@@ -48,10 +48,11 @@ public class CategoryService {
     }
     
     public void addCategory(Category category) {
+    	category.setCreatedAt(LocalDate.now());
+    	category.setUpdatedAt(LocalDate.now());
+    	
     	if (category.getStatus() == null) {
     		category.setStatus(Status.STATUS_ACTIVE);
-    		category.setCreatedAt(LocalDate.now());
-    		category.setUpdatedAt(LocalDate.now());
     		categoryRepository.save(saveCategoryId(category));
 
     	} else {

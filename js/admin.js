@@ -1,11 +1,27 @@
-function logout() {
-  sessionStorage.removeItem('adminLoggedIn');
-  window.location.href = '../html/adminlogin.html'; // Replace with your login page filename.
+document.getElementById("logoutBtn").addEventListener("click", function () {
+  localStorage.removeItem("adminToken"); // Remove JWT token
+  alert("Logged out successfully!");
+  window.location.href = "adminlogin.html"; // Redirect to login page
+});
+
+if (!localStorage.getItem("adminToken")) {
+  window.location.href = "adminlogin.html"; // Redirect to login if no token
 }
 
-if (!sessionStorage.getItem('adminLoggedIn')) {
-  window.location.href = '../html/adminlogin.html';
+function checkExpiredToken() {
+  const token = localStorage.getItem("adminToken");
+  if (!token) return;
+
+  const payload = JSON.parse(atob(token.split(".")[1]));
+  const exp = payload.exp;
+
+  if (exp < Date.now() / 1000) {
+    localStorage.removeItem("adminToken");
+    alert("Your session has expired, please login again!");
+    window.location.href = "adminlogin.html";
+  }
 }
+setInterval(checkExpiredToken, 1000);
 
 document.querySelectorAll('.nav-link.active-sts').forEach(link => {
   link.addEventListener('click', function (e) {
@@ -37,49 +53,61 @@ document.querySelectorAll('.nav-link.active-sts').forEach(link => {
   });
 });
 
-// Fetch plans data and populate modal options and tables
 function fetchPlansData() {
-  fetch('http://localhost:8087/api/plans')
-    .then(response => response.json())
+  fetch("http://localhost:8087/api/plans", {
+    method: "GET",
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+      "Content-Type": "application/json"
+    }
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
     .then(data => {
-      // Populate category & benefits dropdowns in the plan modal
       populateModalOptions();
-
-      // Populate tables for active & inactive plans
       populateTable(
         data,
-        'activePlansTable',
-        'STATUS_ACTIVE',
+        "activePlansTable",
+        "STATUS_ACTIVE",
         `
-          <button class="btn btn-sm btn-success" onclick="openEditPlanModal('mbplan001')">
-              <i class="fa-solid fa-pen-to-square"></i>
-          </button>
-          <button id="deactive" class="btn btn-sm btn-danger mx-2 my-2">
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        `
+        <button class="btn btn-sm btn-success" onclick="openEditPlanModal('${planId}')">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </button>
+        <button id="deactive" class="btn btn-sm btn-danger mx-2 my-2">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      `
       );
-
       populateTable(
         data,
-        'deactivatedPlansTable',
-        'STATUS_INACTIVE',
+        "deactivatedPlansTable",
+        "STATUS_INACTIVE",
         `
-          <button id="active" class="btn btn-sm btn-success mx-2 my-2">
-            <i class="fa-solid fa-square-check"></i>
-          </button>
-          <button id="delete" class="btn btn-sm btn-danger mx-2 my-2">
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        `
+        <button id="active" class="btn btn-sm btn-success mx-2 my-2">
+          <i class="fa-solid fa-square-check"></i>
+        </button>
+        <button id="delete" class="btn btn-sm btn-danger mx-2 my-2">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      `
       );
     })
-    .catch(err => console.error('Error fetching plans:', err));
+    .catch(err => console.error("Error fetching plans:", err));
 }
 
-// Function to fetch categories from the backend
+
 function fetchCategoriesData() {
-  fetch("http://localhost:8087/api/category")
+  fetch("http://localhost:8087/api/category", {
+    method: "GET",
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+      "Content-Type": "application/json"
+    }
+  })
     .then(response => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -98,7 +126,6 @@ function populateCategoriesTables(categories) {
   activeTbody.innerHTML = "";
   deactivatedTbody.innerHTML = "";
 
-  // Loop through the categories and create table rows
   categories.forEach(category => {
     const row = document.createElement("tr");
     row.innerHTML = `
@@ -110,7 +137,7 @@ function populateCategoriesTables(categories) {
       <td>
         ${category.status === "STATUS_ACTIVE"
         ? `
-              <button class="btn btn-sm btn-info edit-category"  onclick='openEditCategoryModal(${JSON.stringify(category)})' data-id="${category.categoryId}">
+              <button class="btn btn-sm btn-info edit-category" onclick='openEditCategoryModal("${category.categoryId}")' data-id="${category.categoryId}">
                 <i class="fa-solid fa-pen-to-square"></i>
               </button>
               <button id="deactivateCategory" class="btn btn-sm btn-warning" data-id="${category.categoryId}">
@@ -128,7 +155,6 @@ function populateCategoriesTables(categories) {
       }
       </td>
     `;
-    // Append the row to the appropriate table based on status
     if (category.status === "STATUS_ACTIVE") {
       activeTbody.appendChild(row);
     } else {
@@ -136,7 +162,6 @@ function populateCategoriesTables(categories) {
     }
   });
 }
-
 // Call the fetch function on page load
 document.addEventListener("DOMContentLoaded", fetchCategoriesData);
 
@@ -165,7 +190,10 @@ document.getElementById("categoryForm").addEventListener("submit", function (eve
 
   fetch(url, {
     method: method,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify(categoryData)
   })
     .then(response => {
@@ -195,18 +223,31 @@ function openAddCategoryModal() {
   categoryModal.show();
 }
 
-// Helper function to open the modal in "Edit" mode
-function openEditCategoryModal(category) {
-  // Assume "category" is an object with categoryId and categoryName properties
-  document.getElementById("categoryModalLabel").textContent = "Edit Category";
-  document.getElementById("saveCategoryBtn").textContent = "Update Category";
-  document.getElementById("categoryId").value = category.categoryId;
-  document.getElementById("categoryName").value = category.categoryName;
+function openEditCategoryModal(categoryId) {
+  fetch(`http://localhost:8087/api/category/${encodeURIComponent(categoryId)}`, {
+    method: "GET",
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+      "Content-Type": "application/json"
+    }
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Failed to fetch category details");
+      }
+      return response.json();
+    })
+    .then(category => {
+      document.getElementById("categoryModalLabel").textContent = "Edit Category";
+      document.getElementById("saveCategoryBtn").textContent = "Update Category";
+      document.getElementById("categoryId").value = category.categoryId;
+      document.getElementById("categoryName").value = category.categoryName;
 
-  // Show the modal
-  const modalElement = document.getElementById("categoryModal");
-  const categoryModal = new bootstrap.Modal(modalElement);
-  categoryModal.show();
+      const modalElement = document.getElementById("categoryModal");
+      const categoryModal = new bootstrap.Modal(modalElement);
+      categoryModal.show();
+    })
+    .catch(error => console.error("Error fetching category for edit:", error));
 }
 
 // Helper function to close the category modal
@@ -227,7 +268,10 @@ document.getElementById('activeCategoriesTable').addEventListener('click', funct
 
     fetch(`http://localhost:8087/api/category/deactivate/${encodeURIComponent(planId)}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify()
     })
       .then(response => {
@@ -259,7 +303,10 @@ document.getElementById('deactivatedCategoriesTable').addEventListener('click', 
 
     fetch(`http://localhost:8087/api/category/activate/${encodeURIComponent(planId)}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(plan)
     })
       .then(response => {
@@ -279,21 +326,24 @@ document.getElementById('deactivatedCategoriesTable').addEventListener('click', 
   }
 });
 
-// Delete a plan from the Deactivated Plans table
 document.getElementById('deactivatedCategoriesTable').addEventListener('click', function (event) {
   if (event.target.closest('#deleteCategory')) {
     const row = event.target.closest('tr');
     const planId = row.querySelector('td:first-child').textContent.trim();
-    const plan = { status: "STATUS_INACTIVE" };
 
     fetch(`http://localhost:8087/api/category/${encodeURIComponent(planId)}`, {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(plan)
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+        "Content-Type": "application/json"
+      }
     })
       .then(response => {
         if (response.status === 204 || !response.headers.get('content-length')) {
           return {};
+        }
+        if (!response.ok) {
+          throw new Error("Failed to delete category");
         }
         return response.json();
       })
@@ -307,11 +357,14 @@ document.getElementById('deactivatedCategoriesTable').addEventListener('click', 
       .catch(err => console.error('Error deleting plan:', err));
   }
 });
-
-
 function populateModalOptions() {
-
-  fetch("http://localhost:8087/api/category")
+  fetch("http://localhost:8087/api/category", {
+    method: "GET",
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+      "Content-Type": "application/json"
+    }
+  })
     .then(response => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -332,11 +385,19 @@ function populateModalOptions() {
     })
     .catch(error => console.error("Error fetching categories:", error));
 
-
-
-  // Example: Populate OTT benefits dropdown (if exists)
-  fetch("http://localhost:8087/api/benefits")
-    .then(response => response.json())
+  fetch("http://localhost:8087/api/benefits", {
+    method: "GET",
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+      "Content-Type": "application/json"
+    }
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
     .then(benefits => {
       const ottDropdown = document.getElementById("ottDetails");
       if (ottDropdown) {
@@ -352,12 +413,13 @@ function populateModalOptions() {
     .catch(error => console.error("Error fetching OTT benefits:", error));
 }
 
-function populateTable(data, tableId, statusFilter, actionsHtml) {
+function populateTable(data, tableId, statusFilter, actionsHtmlTemplate) {
   const tbody = document.querySelector(`#${tableId} tbody`);
   tbody.innerHTML = "";
   data.forEach(plan => {
     if (plan.status === statusFilter) {
       const tr = document.createElement("tr");
+      const actionsHtml = actionsHtmlTemplate.replace("'mbplan001'", `'${plan.planId}'`);
       tr.innerHTML = `
         <td>${plan.planId}</td>
         <td>${plan.planName}</td>
@@ -384,7 +446,10 @@ document.getElementById('activePlansTable').addEventListener('click', function (
 
     fetch(`http://localhost:8087/api/plans/deactivate/${encodeURIComponent(planId)}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(plan)
     })
       .then(response => response.json())
@@ -408,7 +473,10 @@ document.getElementById('deactivatedPlansTable').addEventListener('click', funct
 
     fetch(`http://localhost:8087/api/plans/activate/${encodeURIComponent(planId)}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(plan)
     })
       .then(response => response.json())
@@ -423,19 +491,27 @@ document.getElementById('deactivatedPlansTable').addEventListener('click', funct
   }
 });
 
-// Event delegation for deleting a plan from #deactivatedPlansTable
 document.getElementById('deactivatedPlansTable').addEventListener('click', function (event) {
   if (event.target.closest('#delete')) {
     const row = event.target.closest('tr');
     const planId = row.querySelector('td:first-child').textContent.trim();
-    const plan = { status: "STATUS_INACTIVE" };
 
     fetch(`http://localhost:8087/api/plans/${encodeURIComponent(planId)}`, {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(plan)
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+        "Content-Type": "application/json"
+      }
     })
-      .then(response => response.json())
+      .then(response => {
+        if (response.status === 204 || !response.headers.get('content-length')) {
+          return {};
+        }
+        if (!response.ok) {
+          throw new Error("Failed to delete plan");
+        }
+        return response.json();
+      })
       .then(data => {
         console.log('Plan deleted successfully:', data);
         row.style.transition = "opacity 0.5s";
@@ -475,6 +551,7 @@ document.getElementById('planForm').addEventListener('submit', function (event) 
   fetch(url, {
     method: method,
     headers: {
+      "Authorization": "Bearer " + localStorage.getItem("adminToken"),
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(planData)
@@ -558,7 +635,13 @@ function openEditPlanModal(planId) {
 }
 
 function fetchBenefitsData() {
-  fetch("http://localhost:8087/api/benefits")
+  fetch("http://localhost:8087/api/benefits", {
+    method: "GET",
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+      "Content-Type": "application/json"
+    }
+  })
     .then(response => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -568,47 +651,38 @@ function fetchBenefitsData() {
     .then(benefits => {
       const tbody = document.querySelector("#benefitsTable tbody");
       tbody.innerHTML = ""; // Clear existing rows
-
       benefits.forEach(benefit => {
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td>${benefit.benefitsId}</td>
-          <td>${benefit.benefitsName}</td>
-          <td>${benefit.icon || ""}</td>
-          <td>
-            <button class="btn btn-sm btn-info edit-benefit" onclick='openEditBenefitModal(${JSON.stringify(benefit)})' data-id="${benefit.benefitsId}">
-              <i class="fa-solid fa-pen-to-square"></i>
-            </button>
-            <button class="btn btn-sm btn-danger delete-benefit" data-id="${benefit.benefitsId}">
-              <i class="fa-solid fa-trash-can"></i>
-            </button>
-          </td>
-        `;
+        <td>${benefit.benefitsId}</td>
+        <td>${benefit.benefitsName}</td>
+        <td>${benefit.icon || ""}</td>
+        <td>
+          <button class="btn btn-sm btn-info edit-benefit" onclick='openEditBenefitModal("${benefit.benefitsId}")' data-id="${benefit.benefitsId}">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
+          <button class="btn btn-sm btn-danger delete-benefit" data-id="${benefit.benefitsId}">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </td>
+      `;
         tbody.appendChild(row);
       });
     })
     .catch(error => console.error("Error fetching benefits:", error));
 }
-
-// Call fetchBenefitsData on page load
 document.addEventListener("DOMContentLoaded", fetchBenefitsData);
-
-// 2. Add/Edit Benefit Modal: Form Submission Handler
 document.getElementById("benefitForm").addEventListener("submit", function (event) {
   event.preventDefault();
-
   // Retrieve form values
   const benefitId = document.getElementById("benefitId").value.trim();
   const benefitName = document.getElementById("benefitName").value.trim();
   const benefitIcon = document.getElementById("benefitIcon").value.trim();
-
-  // Build benefit data object
   const benefitData = {
     benefitsName: benefitName,
     icon: benefitIcon
   };
 
-  // Determine API endpoint and method based on presence of benefitId
   let url = "http://localhost:8087/api/benefits";
   let method = "POST";
   if (benefitId !== "") {
@@ -618,7 +692,10 @@ document.getElementById("benefitForm").addEventListener("submit", function (even
 
   fetch(url, {
     method: method,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify(benefitData)
   })
     .then(response => {
@@ -655,10 +732,12 @@ function openAddBenefitModal() {
 }
 
 function openEditBenefitModal(benefitId) {
-  // Fetch the benefit data for editing
-  fetch(`http://localhost:8087/api/benefits/${encodeURIComponent(benefitId.benefitsId)}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' }
+  fetch(`http://localhost:8087/api/benefits/${encodeURIComponent(benefitId)}`, {
+    method: "GET",
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+      "Content-Type": "application/json"
+    }
   })
     .then(response => {
       if (!response.ok) {
@@ -679,7 +758,6 @@ function openEditBenefitModal(benefitId) {
     })
     .catch(error => console.error("Error fetching benefit for edit:", error));
 }
-
 
 function closeBenefitModal() {
   const modalElement = document.getElementById("benefitModal");
@@ -705,28 +783,25 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("benefitsTable").addEventListener("click", function (event) {
     const deleteBtn = event.target.closest(".delete-benefit");
     if (deleteBtn) {
-      console.log("Delete button clicked");
-
       const benefitId = deleteBtn.getAttribute("data-id");
-      console.log("Benefit ID extracted:", benefitId);
-
       if (!benefitId) {
-        console.error("Benefit ID is null or undefined. Check the button's data-id attribute.");
+        console.error("Benefit ID is null or undefined.");
         return;
       }
 
       fetch(`http://localhost:8087/api/benefits/${encodeURIComponent(benefitId)}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" }
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+          "Content-Type": "application/json"
+        }
       })
         .then(response => {
-          console.log("Response status:", response.status);
-          if (!response.ok) {
-            throw new Error("Failed to delete benefit");
-          }
-          // If the response is empty, return an empty object.
           if (response.status === 204 || !response.headers.get("content-length")) {
             return {};
+          }
+          if (!response.ok) {
+            throw new Error("Failed to delete benefit");
           }
           return response.json();
         })
@@ -737,5 +812,126 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Error deleting benefit:", error));
     }
   });
+});
 
-})
+document.addEventListener('DOMContentLoaded', function () {
+  fetchUserDetails();
+  setupModal();
+});
+
+// Fetch user details on DOM load
+  document.addEventListener('DOMContentLoaded', function() {
+    fetchUserDetails();
+  });
+
+  // Function to fetch user details from the backend API
+  function fetchUserDetails() {
+    // Replace with your actual API endpoint for users
+    fetch('http://localhost:8087/api/users', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('adminToken'),
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok, status: ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => populateUsersTable(data))
+      .catch(err => console.error('Error fetching user details:', err));
+  }
+
+  // Populate the table with user details
+  function populateUsersTable(users) {
+    const tableBody = document.querySelector('#usersDetailsTable tbody');
+    tableBody.innerHTML = ''; // Clear any existing rows
+
+    users.forEach(user => {
+      // Determine active plan name if available
+      let activePlanName = user.activePlan && user.activePlan.planName ? user.activePlan.planName : 'None';
+
+      // Create a table row
+      const tr = document.createElement('tr');
+      // Save the entire user object as a data attribute for later use in the modal
+      tr.setAttribute("data-user", JSON.stringify(user));
+
+      tr.innerHTML = `
+        <td>${user.userId}</td>
+        <td>${user.userName}</td>
+        <td>${user.phoneNumber}</td>
+        <td>${user.email}</td>
+        <td>${activePlanName}</td>
+        <td>
+          <button class="btn btn-sm btn-info" onclick="viewUser(this)">View</button>
+        </td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  }
+
+  function viewUser(button) {
+    // Get the table row element (button -> td -> tr)
+    var row = button.parentNode.parentNode;
+    // Retrieve the user data stored in the row's data attribute
+    var userData = JSON.parse(row.getAttribute("data-user"));
+
+    // Populate modal fields with basic user details
+    document.getElementById("detailUsername").textContent = userData.userId || '';
+    document.getElementById("detailName").textContent = userData.userName || '';
+    document.getElementById("detailPhone").textContent = userData.phoneNumber || '';
+    document.getElementById("detailEmail").textContent = userData.email || '';
+    document.getElementById("detailActivePlan").textContent = 
+      (userData.activePlan && userData.activePlan.planName) ? userData.activePlan.planName : 'None';
+
+    // Clear previous recharge history data
+    document.querySelector("#detailRechargeHistoryTable tbody").innerHTML = '';
+
+    // Fetch recharge history for this user using userId (adjust endpoint as needed)
+    fetchRechargeHistory(userData.userId);
+
+    // Show the modal using Bootstrap 5's Modal API
+    var userModalEl = document.getElementById('userDetailsModal');
+    var userModal = new bootstrap.Modal(userModalEl);
+    userModal.show();
+  }
+
+  // Function to fetch recharge history for a given user
+  function fetchRechargeHistory(userId) {
+    // Replace with your actual API endpoint for recharge history for the user
+    fetch(`http://localhost:8087/api/recharge-history/user/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('adminToken'),
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error fetching recharge history, status: ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => populateRechargeHistoryTable(data))
+      .catch(error => console.error('Error fetching recharge history:', error));
+  }
+
+  // Populate the recharge history table in the modal
+  function populateRechargeHistoryTable(records) {
+    const tbody = document.querySelector("#detailRechargeHistoryTable tbody");
+    tbody.innerHTML = ''; // Clear existing rows
+
+    records.forEach(record => {
+      // Create a table row for each recharge record
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${record.planId}</td>
+        <td>${new Date(record.rechargeDate).toLocaleString()}</td>
+        <td>${record.amountPaid}</td>
+        <td>${record.status || 'Completed'}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }

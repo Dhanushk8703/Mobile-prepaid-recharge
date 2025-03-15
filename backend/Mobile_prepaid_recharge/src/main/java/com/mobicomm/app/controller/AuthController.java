@@ -39,7 +39,7 @@ public class AuthController {
 	private PasswordEncoder passwordEncoder;
 		
 	@PostMapping("/register")
-	public ResponseEntity<String> registerUser(@RequestBody Admin admin) {
+	public ResponseEntity<String> registerAdmin(@RequestBody Admin admin) {
 	    if (adminRepository.findByUsername(admin.getUsername()).isPresent()) {
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists!");
 	    }
@@ -55,7 +55,7 @@ public class AuthController {
 	    return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully!");
 	}
 	
-	@PostMapping("/login")
+	@PostMapping("/admin/login")
 	public ResponseEntity<?> login(@RequestBody Admin admin) {
 		Optional<Admin> existingAdmin = adminRepository.findByUsername(admin.getUsername());
 

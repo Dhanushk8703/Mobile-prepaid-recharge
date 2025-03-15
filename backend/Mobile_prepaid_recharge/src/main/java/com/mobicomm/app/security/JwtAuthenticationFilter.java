@@ -42,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		// Check if the Authorization header contains a Bearer token
 		if (token != null && token.startsWith("Bearer ")) {
-			token = token.substring(7); // Remove "Bearer " prefix
+			token = token.substring(7);
 
 			// Check if the token is expired
 			if (jwtUtil.isTokenExpired(token)) {
@@ -63,9 +63,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			String role = jwtUtil.getRoleFromToken(token);
 
 			// Find the user from the database using the username
-			Optional<Admin> user = adminRepository.findByUsername(username);
+			Optional<Admin> admin = adminRepository.findByUsername(username);
 
-			if (user.isPresent()) {
+			if (admin.isPresent()) {
 				// Create an authority using the role directly from the enum
 				List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
 

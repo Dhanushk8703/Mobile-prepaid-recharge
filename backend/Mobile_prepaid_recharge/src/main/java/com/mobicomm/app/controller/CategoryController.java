@@ -24,7 +24,7 @@ import com.mobicomm.app.service.CategoryService;
 
 @RestController
 @RequestMapping("/api/category")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://127.0.0.1:5500")
 public class CategoryController {
 	
 	@Autowired

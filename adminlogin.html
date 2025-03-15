@@ -36,20 +36,32 @@
   </div>
 
   <script>
-    document.getElementById('adminLoginForm').addEventListener('submit', function (e) {
-      e.preventDefault();
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
+    document.getElementById("adminLoginForm").addEventListener("submit", async function (event) {
+      event.preventDefault(); // Prevent default form submission
 
-      // For demonstration purposes, we'll assume any non-empty username and password are valid.
-      if (username && password) {
-        console.log('Admin logged in with username:', username);
-        sessionStorage.setItem('adminLoggedIn', 'true');
-        window.location.href = './html/admin.html';
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      const response = await fetch("http://localhost:8087/auth/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("adminToken", data.accessToken); // Store JWT token
+        alert("Login successful!");
+        window.location.href = "admin.html";
       } else {
-        alert('Please enter both username and password.');
+        alert("Login failed: " + data.message);
       }
     });
+  </script>
+
   </script>
 </body>
 

@@ -107,7 +107,7 @@
                     <li>
                       <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+                    <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
                   </ul>
                 </div>
               </div>
@@ -417,7 +417,50 @@
               </div>
             </div>
           </div>
+
+          <div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="userDetailsModalLabel">User Details</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <!-- Basic User Information -->
+                  <div class="mb-3">
+                    <p><strong>Username:</strong> <span id="detailUsername"></span></p>
+                    <p><strong>Name:</strong> <span id="detailName"></span></p>
+                    <p><strong>Phone:</strong> <span id="detailPhone"></span></p>
+                    <p><strong>Email:</strong> <span id="detailEmail"></span></p>
+                    <p><strong>Active Plan:</strong> <span id="detailActivePlan"></span></p>
+                  </div>
+                  <!-- Recharge History Table -->
+                  <div class="mb-3">
+                    <h6>Recharge History</h6>
+                    <table class="table table-bordered" id="detailRechargeHistoryTable">
+                      <thead>
+                        <tr>
+                          <th>Plan ID</th>
+                          <th>Recharge Date</th>
+                          <th>Amount</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <!-- Recharge records will be injected here -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
 
         <div id="newUserSection" class="section d-none features">
           <h2>New User Requests</h2>
@@ -581,47 +624,7 @@
     </div>
   </div>
   <!-- User Details Modal -->
-  <div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="userDetailsModalLabel">User Details</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Basic User Information -->
-          <div class="mb-3">
-            <p><strong>Username:</strong> <span id="detailUsername"></span></p>
-            <p><strong>Name:</strong> <span id="detailName"></span></p>
-            <p><strong>Phone:</strong> <span id="detailPhone"></span></p>
-            <p><strong>Email:</strong> <span id="detailEmail"></span></p>
-            <p><strong>Active Plan:</strong> <span id="detailActivePlan"></span></p>
-          </div>
-          <!-- Recharge History Table -->
-          <div class="mb-3">
-            <h6>Recharge History</h6>
-            <table class="table table-bordered" id="detailRechargeHistoryTable">
-              <thead>
-                <tr>
-                  <th>Plan ID</th>
-                  <th>Recharge Date</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Recharge records will be injected here -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
+
   <script src="../js/admin.js"></script>
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
 

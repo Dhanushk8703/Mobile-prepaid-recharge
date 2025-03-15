@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.mobicomm.app.model.Category;
 import com.mobicomm.app.model.Plan;
+import com.mobicomm.app.model.Users;
 
 @Repository
 public interface PlanRepository extends JpaRepository<Plan, String> {

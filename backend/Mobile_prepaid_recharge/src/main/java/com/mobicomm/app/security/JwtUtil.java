@@ -9,6 +9,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.ExpiredJwtException;
+
 
 @Component
 public class JwtUtil {
@@ -34,7 +36,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7)) // 7 days expiry
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24 hours expiry
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -52,10 +54,15 @@ public class JwtUtil {
     }
 
     private Claims getClaimsFromToken(String token) {
-        return Jwts.parserBuilder()
-                   .setSigningKey(key)
-                   .build()
-                   .parseClaimsJws(token)
-                   .getBody();
+        try {
+            return Jwts.parserBuilder()
+                       .setSigningKey(key)
+                       .build()
+                       .parseClaimsJws(token)
+                       .getBody();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims(); // Return claims even if the token is expired
+        }
     }
+
 }
