@@ -35,8 +35,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private RevokedRepository revokedTokenRepository;
 
 	@Override
-	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
+	protected void doFilterInternal(@NonNull HttpServletRequest request, 
+	                                @NonNull HttpServletResponse response, 
+	                                @NonNull FilterChain chain)
 			throws ServletException, IOException {
+		
+		// Only process URLs that start with /admin
+		String path = request.getRequestURI();
+		if (!path.startsWith("/admin")) {
+			chain.doFilter(request, response);
+			return;
+		}
 
 		String token = request.getHeader("Authorization");
 
@@ -62,23 +71,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			String username = jwtUtil.getUsernameFromToken(token);
 			String role = jwtUtil.getRoleFromToken(token);
 
-			// Find the user from the database using the username
+			// Find the admin from the database using the username
 			Optional<Admin> admin = adminRepository.findByUsername(username);
 
 			if (admin.isPresent()) {
 				// Create an authority using the role directly from the enum
-				List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
+				List<SimpleGrantedAuthority> authorities = 
+				    Collections.singletonList(new SimpleGrantedAuthority(role));
 
-				// Create an Authentication object and set it in the SecurityContext
+				// Set the authentication in the security context
 				SecurityContextHolder.getContext()
 						.setAuthentication(new UsernamePasswordAuthenticationToken(username, null, authorities));
 
-				// Log the authorities for debugging
 				System.out.println("Authorities: " + authorities);
 			}
 		}
 
-		// Continue the filter chain
 		chain.doFilter(request, response);
 	}
 }

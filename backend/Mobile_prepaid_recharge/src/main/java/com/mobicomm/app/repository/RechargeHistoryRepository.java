@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface RechargeHistoryRepository extends JpaRepository<RechargeHistory, Long> {
-    List<RechargeHistory> findByUser(Users user);
+	List<RechargeHistory> findByUserId(String userId);
+
 }

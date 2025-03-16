@@ -41,15 +41,12 @@ public class PlanController {
 		}
 	}
 	
-	@GetMapping("/{planId}")
-	public ResponseEntity<Plan> getPlanById(@PathVariable String planId) {
-	    Optional<Plan> planOptional = planService.getPlanById(planId); // Make sure your service has this method
-	    if (planOptional.isPresent()) {
-	        return ResponseEntity.ok(planOptional.get());
-	    } else {
-	        return ResponseEntity.notFound().build();
+	 @GetMapping("/{planId}")
+	    public ResponseEntity<Plan> getPlanById(@PathVariable String planId) {
+	        Optional<Plan> plan = planService.getPlanById(planId);
+	        return plan.map(ResponseEntity::ok)
+	                   .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	    }
-	}
 
 	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	@PostMapping

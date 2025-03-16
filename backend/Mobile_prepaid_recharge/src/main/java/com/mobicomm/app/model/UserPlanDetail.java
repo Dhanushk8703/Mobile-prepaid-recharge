@@ -20,13 +20,8 @@ public class UserPlanDetail {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@ManyToOne  
-    @JoinColumn(name = "plan_id", nullable = false) 
-    private Plan plan;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    private String planId;
+    private String userId;
 	private LocalDateTime rechargedDate;
 	private LocalDateTime expiryDate;
 }

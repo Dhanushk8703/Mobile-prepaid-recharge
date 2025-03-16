@@ -1,47 +1,73 @@
-/*******************************************************
- * 1) FETCH PLANS & CATEGORIES FROM JSON SERVER
- *******************************************************/
-fetchPlans();
-
 // Global variable to store grouped plans data by category
 let plansData = [];
 
-// Change header style on scroll
-window.addEventListener('scroll', function () {
-  const header = document.getElementById('header');
-  header.classList.toggle('scrolled', window.scrollY > 50);
-});
-
-// Fetch categories and plans from the JSON server and group plans by category
-async function fetchPlans() {
+/*******************************************************
+ * 1) FETCH PUBLIC DATA FROM THE BACKEND SERVER
+ *    (No authentication is required for GET endpoints)
+ *******************************************************/
+async function fetchPublicData() {
   try {
+    // Define the base URL for public endpoints
+    const BASE_URL = 'http://localhost:8087/api';
+
     // Fetch categories
-    const catResponse = await fetch('http://localhost:3000/categories');
-    if (!catResponse.ok) {
-      throw new Error(`Categories response not ok, status: ${catResponse.status}`);
+    const categoriesResponse = await fetch(`${BASE_URL}/category`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (!categoriesResponse.ok) {
+      throw new Error(`Categories response not ok, status: ${categoriesResponse.status}`);
     }
-    const categories = await catResponse.json();
+    const categories = await categoriesResponse.json();
 
     // Fetch plans
-    const plansResponse = await fetch('http://localhost:3000/plans');
+    const plansResponse = await fetch(`${BASE_URL}/plans`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
     if (!plansResponse.ok) {
       throw new Error(`Plans response not ok, status: ${plansResponse.status}`);
     }
     const plans = await plansResponse.json();
 
-    // Group plans by category id
-    const categoriesWithPlans = categories.map(category => ({
-      ...category,
-      plans: plans.filter(plan => plan.categoryId == category.id)
-    }));
+    // Fetch benefits (if needed later)
+    const benefitsResponse = await fetch(`${BASE_URL}/benefits`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (!benefitsResponse.ok) {
+      throw new Error(`Benefits response not ok, status: ${benefitsResponse.status}`);
+    }
+    const benefits = await benefitsResponse.json();
 
-    // Store and render
-    plansData = categoriesWithPlans;
-    renderPlans(plansData);
+    // Group plans by category using plan.category.categoryId
+    const structuredCategories = categories.map(category => {
+      return {
+        ...category,
+        plans: plans.filter(plan => plan.category && plan.category.categoryId === category.categoryId)
+      };
+    });
+
+    const structuredData = {
+      categories: structuredCategories,
+      benefits
+    };
+
+    console.log("Fetched Public Data:", structuredData);
+    return structuredData;
   } catch (error) {
-    console.error('Error fetching plans:', error);
+    console.error("Error fetching public data:", error);
   }
 }
+
+// Call the function to load public data and render plans
+fetchPublicData().then(data => {
+  if (data && data.categories) {
+    plansData = data.categories; // Save globally for filtering
+    renderPlans(plansData);
+    populateCategoryFilter(data.categories);
+  }
+});
 
 /*******************************************************
  * 2) MODERN FILTER FUNCTIONALITY (Inline & Offcanvas)
@@ -54,7 +80,7 @@ function applyFilters() {
     useOffcanvas = true;
   }
 
-  // Get values from offcanvas if open; otherwise use inline filters.
+  // Get filter values from the appropriate elements
   const maxPrice = parseInt(
     useOffcanvas
       ? document.getElementById('offcanvasPriceFilter').value
@@ -69,7 +95,7 @@ function applyFilters() {
       : document.getElementById('searchFilter').value
   ).trim().toLowerCase();
 
-  // OTT Platforms filter (use the relevant container)
+  // OTT Platforms filter (if applicable)
   let selectedOTT = [];
   const ottSelector = useOffcanvas
     ? "#filterOffcanvas .ottPlatform:checked"
@@ -105,32 +131,32 @@ function applyFilters() {
   let filteredCategories = [];
 
   plansData.forEach(category => {
-    if (selectedCategory === 'all' || category.id == selectedCategory) {
+    if (selectedCategory === 'all' || category.categoryId == selectedCategory) {
       const filteredPlans = category.plans.filter(plan => {
-        // Price check
-        if (plan.price > maxPrice) return false;
+        // Price check using planPrice
+        if (plan.planPrice > maxPrice) return false;
 
-        // Validity range check (assuming plan.validity is numeric or parseable)
+        // Validity check (assuming validity is numeric)
         const planValidity = parseInt(plan.validity);
         if (isNaN(planValidity) || planValidity < minValidity || planValidity > maxValidity) return false;
 
-        // Data per day range check (assuming plan.dataValue is numeric; adjust if needed)
+        // Data check if applicable (if plan.dataValue exists)
         if (typeof plan.dataValue === 'number') {
           if (plan.dataValue < minData || plan.dataValue > maxData) return false;
         }
 
-        // OTT Platforms check: if any OTT filter is selected, plan must have at least one matching OTT platform
+        // OTT Platforms check: using benefits as a proxy (if any benefit's name matches one of the selected OTT platforms)
         if (selectedOTT.length > 0) {
-          const planOttPlatforms = (plan.ottDetails || []).map(ott => ott.platform);
-          const matchesOtt = selectedOTT.some(platform => planOttPlatforms.includes(platform));
+          const planOtt = plan.benefits ? Array.from(plan.benefits).map(b => b.benefitsName) : [];
+          const matchesOtt = selectedOTT.some(platform => planOtt.includes(platform));
           if (!matchesOtt) return false;
         }
 
-        // 5G filter: if checked, plan must be a 5G plan
+        // 5G filter check (if plan has an is5G boolean)
         if (fiveGOnly && !plan.is5G) return false;
 
-        // Keyword search check (match in plan name or description)
-        const nameMatch = plan.name?.toLowerCase().includes(searchKeyword);
+        // Keyword search in planName or description
+        const nameMatch = plan.planName?.toLowerCase().includes(searchKeyword);
         const descMatch = plan.description?.toLowerCase().includes(searchKeyword);
         if (searchKeyword && !(nameMatch || descMatch)) return false;
 
@@ -146,10 +172,31 @@ function applyFilters() {
   renderPlans(filteredCategories);
 }
 
+// Function to populate category filter dropdown
+function populateCategoryFilter(categories) {
+  const categoryFilter = document.getElementById("categoryFilter");
+  const offcanvasCategoryFilter = document.getElementById("offcanvasCategoryFilter");
+
+  // Clear existing options
+  categoryFilter.innerHTML = `<option value="all">All Categories</option>`;
+  offcanvasCategoryFilter.innerHTML = `<option value="all">All Categories</option>`;
+
+  categories.forEach(category => {
+      let option = document.createElement("option");
+      option.value = category.categoryId;
+      option.textContent = category.categoryName;
+      categoryFilter.appendChild(option);
+
+      let offcanvasOption = option.cloneNode(true);
+      offcanvasCategoryFilter.appendChild(offcanvasOption);
+  });
+}
+
+
 /*******************************************************
  * 3) RENDER PLANS AS TAB PANES
  *******************************************************/
-function renderPlans(categories) {
+function renderPlans(categoriesResponse) {
   const container = document.getElementById('plans-container');
   container.innerHTML = ''; // Clear previous content
 
@@ -164,32 +211,32 @@ function renderPlans(categories) {
   tabContent.className = "tab-content";
   tabContent.id = "categoryTabContent";
 
-  categories.forEach((category, index) => {
-    // Create tab header
+  categoriesResponse.forEach((category, index) => {
+    // Create tab header using category attributes
     const li = document.createElement('li');
     li.className = "nav-item";
     li.role = "presentation";
 
     const tabButton = document.createElement('button');
     tabButton.className = "nav-link w-100" + (index === 0 ? " active" : "");
-    tabButton.id = `tab-${category.id}`;
+    tabButton.id = `tab-${category.categoryId}`;
     tabButton.setAttribute("data-bs-toggle", "tab");
-    tabButton.setAttribute("data-bs-target", `#pane-${category.id}`);
+    tabButton.setAttribute("data-bs-target", `#pane-${category.categoryId}`);
     tabButton.type = "button";
     tabButton.role = "tab";
-    tabButton.setAttribute("aria-controls", `pane-${category.id}`);
+    tabButton.setAttribute("aria-controls", `pane-${category.categoryId}`);
     tabButton.setAttribute("aria-selected", index === 0 ? "true" : "false");
-    tabButton.innerText = category.name;
+    tabButton.innerText = category.categoryName;
 
     li.appendChild(tabButton);
     navTabs.appendChild(li);
 
-    // Create tab pane for the category
+    // Create tab pane for this category
     const tabPane = document.createElement('div');
     tabPane.className = "tab-pane fade" + (index === 0 ? " show active" : "");
-    tabPane.id = `pane-${category.id}`;
+    tabPane.id = `pane-${category.categoryId}`;
     tabPane.role = "tabpanel";
-    tabPane.setAttribute("aria-labelledby", `tab-${category.id}`);
+    tabPane.setAttribute("aria-labelledby", `tab-${category.categoryId}`);
 
     // Create row for plan cards
     const rowDiv = document.createElement('div');
@@ -200,29 +247,33 @@ function renderPlans(categories) {
       planCard.classList.add('col-md-4', 'mb-4');
       planCard.innerHTML = `
         <div class="plan-card p-4 border rounded shadow-sm h-100 position-relative" 
-     data-plan-id="${plan.id}" 
-     data-title="${plan.name}" 
-     data-data="${plan.data}" 
-     data-validity="${plan.validity}" 
-     data-price="${plan.price}" 
-     data-description="${plan.description}"
-     data-aos="fade-left" data-aos-duration="500"
-     data-ott='${JSON.stringify(plan.ottDetails || [])}'>
-  <!-- Favorite Button in Top Right Corner -->
-  <button class="btn-fav btn btn-sm btn-outline-danger" style="position: absolute; top: 10px; right: 10px;" title="Add to Favorites">
-    <i class="fa fa-heart"></i>
-  </button>
-  <h4 class="plan-title mb-3">${plan.name}</h4>
-  <p class="plan-data"><strong>Data:</strong> ${plan.data}</p>
-  <p class="plan-validity"><strong>Validity:</strong> ${plan.validity} Days</p>
-  <p class="plan-price"><strong>Price:</strong> ₹${plan.price}</p>
-  <p class="plan-description">${plan.description}</p>
-  <div class="btn-group mt-3">
-    <button class="btn-view btn btn-sm btn-outline-primary">View Details</button>
-    <a class="btn-recharge btn btn-sm btn-success" href="payment.html?planId=${plan.id}&price=${plan.price}">Recharge Now</a>
-  </div>
-</div>
-
+            data-plan-id="${plan.planId}" 
+            data-title="${plan.planName}" 
+            data-description="${plan.description}"
+            data-validity="${plan.validity}" 
+            data-price="${plan.planPrice}" 
+            data-benefits='${JSON.stringify(plan.benefits ? Array.from(plan.benefits) : [])}'>
+          
+          <!-- Favorite Button in Top Right Corner -->
+          <button class="btn-fav btn btn-sm btn-outline-danger" 
+                  style="position: absolute; top: 10px; right: 10px;" 
+                  title="Add to Favorites">
+            <i class="fa fa-heart"></i>
+          </button>
+          
+          <h4 class="plan-title mb-3">${plan.planName}</h4>
+          <p class="plan-validity"><strong>Validity:</strong> ${plan.validity} Days</p>
+          <p class="plan-price"><strong>Price:</strong> ₹${plan.planPrice}</p>
+          <p class="plan-description">${plan.description}</p>
+          
+          <div class="btn-group mt-3">
+            <button class="btn-view btn btn-sm btn-outline-primary">View Details</button>
+             <a class="btn-recharge btn btn-sm btn-success" 
+   href="payment.html?planId=${plan.planId}&price=${plan.planPrice}&planTitle=${plan.planName}">
+  Recharge Now
+</a>
+          </div>
+        </div>
       `;
       rowDiv.appendChild(planCard);
     });
@@ -235,85 +286,6 @@ function renderPlans(categories) {
   container.appendChild(tabContent);
 }
 
-$(document).on("click", ".btn-fav", async function (e) {
-  e.preventDefault();
-
-  // Check if user is logged in by verifying sessionStorage values.
-  if (!sessionStorage.getItem("loggedIn") || !sessionStorage.getItem("phone")) {
-    alert("Please log in to add favorite plans.");
-    window.location.href = "login.html";
-    return;
-  }
-
-  // Retrieve plan details from the card's data attributes.
-  const planCard = $(this).closest(".plan-card");
-  const planId = planCard.data("plan-id").toString();
-  const plan = {
-    id: planId,
-    name: planCard.data("title"),
-    data: planCard.data("data"),
-    validity: planCard.data("validity"),
-    price: planCard.data("price"),
-    description: planCard.data("description"),
-    ottDetails: planCard.data("ott")
-  };
-
-  const userPhone = sessionStorage.getItem("phone");
-
-  try {
-    // Fetch the current dashboard data from the JSON server.
-    const response = await fetch("http://localhost:3000/dashboard");
-    if (!response.ok) {
-      alert("Error fetching user data. Please try again.");
-      return;
-    }
-    const dashboard = await response.json();
-    const usersArray = dashboard.users.details;
-
-    // Find the logged-in user using their phone number.
-    const currentUser = usersArray.find(u => u.phone === userPhone);
-    if (!currentUser) {
-      alert("User not found. Please log in again.");
-      window.location.href = "login.html";
-      return;
-    }
-
-    // Ensure favoritePlans array exists.
-    if (!currentUser.favoritePlans) {
-      currentUser.favoritePlans = [];
-    }
-
-    // Check if the plan is already in favorites.
-    const alreadyFavorite = currentUser.favoritePlans.some(fav => fav.id === plan.id);
-    if (alreadyFavorite) {
-      alert("This plan is already in your favorites.");
-      return;
-    }
-
-    // Add the plan to the user's favoritePlans array.
-    currentUser.favoritePlans.push(plan);
-
-    // Update the dashboard data on the JSON server.
-    const updatedDashboard = { ...dashboard, users: { ...dashboard.users, details: usersArray } };
-
-    const updateResponse = await fetch("http://localhost:3000/dashboard", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedDashboard)
-    });
-
-    if (updateResponse.ok) {
-      alert("Plan added to favorites successfully!");
-      // Optionally, update UI elements if needed.
-    } else {
-      alert("Failed to update favorite plans. Please try again.");
-    }
-  } catch (error) {
-    console.error("Error updating favorite plans:", error);
-    alert("An error occurred. Please try again later.");
-  }
-});
-
 
 /*******************************************************
  * 4) VIEW DETAILS (MODAL) EVENT DELEGATION
@@ -323,48 +295,50 @@ document.getElementById('plans-container').addEventListener('click', function (e
     const card = e.target.closest('.plan-card');
     const planId = card.getAttribute('data-plan-id');
     const title = card.getAttribute('data-title');
-    const dataPlan = card.getAttribute('data-data');
+    const description = card.getAttribute('data-description');
     const validity = card.getAttribute('data-validity');
     const price = card.getAttribute('data-price');
-    const description = card.getAttribute('data-description');
-    const ottStr = card.getAttribute('data-ott');
+    const benefitsStr = card.getAttribute('data-benefits');
 
-    let ottHTML = '';
-    if (ottStr) {
+    let benefitsHTML = '';
+    if (benefitsStr) {
       try {
-        const ottArr = JSON.parse(ottStr);
-        if (Array.isArray(ottArr) && ottArr.length) {
-          ottHTML = `<h6>OTT Offers:</h6><div class="ott-details">` +
-            ottArr.map(ott => `<div class="ott-item"><i class="${ott.icon}"></i> ${ott.platform} (${ott.validity})</div>`).join('') +
+        const benefitsArr = JSON.parse(benefitsStr);
+        if (Array.isArray(benefitsArr) && benefitsArr.length) {
+          benefitsHTML = `<h6>Benefits:</h6><div class="benefits-details">` +
+            benefitsArr.map(benefit => `<div class="benefit-item"><i class="${benefit.icon}"></i> ${benefit.benefitsName}</div>`).join('') +
             `</div>`;
         }
       } catch (err) {
-        console.error("Error parsing OTT details", err);
+        console.error("Error parsing benefits details", err);
       }
     }
 
+    // Update modal fields (using Bootstrap modal IDs from your prepaid.html)
     document.getElementById('planDetailModalLabel').innerText = title;
     document.getElementById('modalContent').innerHTML = `
-      <p><strong>Data:</strong> ${dataPlan}</p>
       <p><strong>Validity:</strong> ${validity} Days</p>
       <p><strong>Price:</strong> ₹${price}</p>
       <p>${description}</p>
-      ${ottHTML}
+      ${benefitsHTML}
     `;
     document.getElementById('rechargeModalBtn').href = "payment.html?planId=" + planId + "&price=" + price;
+    
+    // Show the modal using Bootstrap's Modal API
     var myModal = new bootstrap.Modal(document.getElementById('planDetailModal'));
     myModal.show();
   }
 });
 
+
 /*******************************************************
  * 5) EVENT LISTENERS FOR FILTERS
  *******************************************************/
-// Inline filters
 document.getElementById('priceFilter').addEventListener('input', function () {
   document.getElementById('priceValue').innerText = `₹${this.value}`;
   applyFilters();
 });
+
 document.getElementById('categoryFilter').addEventListener('change', applyFilters);
 document.getElementById('searchFilter').addEventListener('input', applyFilters);
 document.querySelectorAll('.ottPlatform').forEach(cb => {
@@ -428,4 +402,4 @@ document.getElementById('filterOffcanvas').addEventListener('click', function (e
     const offcanvasInstance = bootstrap.Offcanvas.getInstance(this);
     offcanvasInstance.hide();
   }
-})
+});

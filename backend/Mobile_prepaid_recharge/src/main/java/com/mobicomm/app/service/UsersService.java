@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.mobicomm.app.model.Plan;
 import com.mobicomm.app.model.Users;
 import com.mobicomm.app.repository.UsersRepository;
 
@@ -14,18 +15,18 @@ import com.mobicomm.app.repository.UsersRepository;
 public class UsersService {
 	
 	@Autowired
-	private UsersRepository userRepository;
+	private UsersRepository usersRepository;
 	
 	public Users saveUserId(Users user) {
         String nextId = generateNextUserId();
         user.setUserId(nextId);
         
 
-        return userRepository.save(user);
+        return usersRepository.save(user);
     }
 
     private String generateNextUserId() {
-        Optional<Users> lastPlan = userRepository.findTopByOrderByUserIdDesc();
+        Optional<Users> lastPlan = usersRepository.findTopByOrderByUserIdDesc();
 
         if (lastPlan.isPresent()) {
             // Extract number from last ID and increment
@@ -40,27 +41,30 @@ public class UsersService {
 	public void addUsers(Users user) {
 		user.setCreatedAt(LocalDate.now());
 		user.setUpdatedAt(LocalDate.now());
-		userRepository.save(saveUserId(user));
+		usersRepository.save(saveUserId(user));
 	}
 	
 	public List<Users> getAllUsers() {
-		return (List<Users>) userRepository.findAll();
+		return (List<Users>) usersRepository.findAll();
 	}
 	
 	public Optional<Users> getUserById(String userId) {
-		return userRepository.findById(userId);
+		return usersRepository.findById(userId);
 	}
 	
-	public Users updateUser(String userId, Users user) {
-		Optional<Users> existUser = userRepository.findById(userId);
-		if (existUser.isPresent()) {
-			Users updateUser = existUser.get();
-			updateUser.setUserName(user.getUserName());
-			updateUser.setEmail(user.getEmail());
-			updateUser.setUpdatedAt(LocalDate.now());
-			return userRepository.save(updateUser);
-		} else {
-			throw new RuntimeException("user not found");
-		}
+	public Users updateUser(String userId, Users updatedUser) {
+	    return usersRepository.findById(userId)
+	        .map(user -> {
+	            user.setUserName(updatedUser.getUserName() != null ? updatedUser.getUserName() : user.getUserName());
+	            user.setEmail(updatedUser.getEmail() != null ? updatedUser.getEmail() : user.getEmail());
+	            return usersRepository.save(user);
+	        })
+	        .orElse(null);  // Ensures that if user is not found, null is returned
+	}
+
+
+
+	public Optional<Users> findByMobileNumber(Long mobileNumber) {
+		return usersRepository.findByPhoneNumber(mobileNumber);
 	}
 }

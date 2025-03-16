@@ -23,7 +23,7 @@
                 <a href="index.html" class="text-decoration-none text-white">MobiComm</a>
             </div>
             <nav class="navlinks">
-                <a class="navlink" data-aos="fade-down" data-aos-delay="100" href="index.html">Home</a>
+                <a class="navlink" data-aos="fade-down" data-aos-delay="100" href="../index.html">Home</a>
                 <a class="navlink" data-aos="fade-down" data-aos-delay="200" href="prepaid.html">Prepaid Plans</a>
                 <!-- <a class="navlink" data-aos="fade-down" data-aos-delay="300" href="faq.html">FAQs</a> -->
                 <a class="navlink" data-aos="fade-down" data-aos-delay="400" href="contact.html">Contacts</a>
@@ -173,7 +173,8 @@
                 <div class="col-md-4 mb-4">
                     <h5 class="text-dark" data-aos="fade-down" data-aos-duration="500">Quick Links</h5>
                     <ul class="list-unstyled">
-                        <li data-aos="fade-up" data-aos-duration="600"><a href="../index.html" class="footer-link">Home</a>
+                        <li data-aos="fade-up" data-aos-duration="600"><a href="../index.html"
+                                class="footer-link">Home</a>
                         </li>
                         <li data-aos="fade-up" data-aos-duration="700"><a href="prepaid.html"
                                 class="footer-link">Prepaid Plans</a></li>
@@ -223,9 +224,10 @@
             }
         });
 
+
         document.getElementById('logoutBtn').addEventListener('click', () => {
             sessionStorage.removeItem('loggedIn');
-            window.location.href = 'index.html';
+            window.location.href = '../index.html';
         });
 
         document.addEventListener("DOMContentLoaded", async function () {
@@ -239,16 +241,19 @@
             let currentUser = null; // will hold the logged-in user details
 
             try {
-                // Fetch the dashboard data from the JSON server
-                const response = await fetch("http://localhost:3000/dashboard");
+                // Fetch user details directly from your backend
+                const response = await fetch(`http://localhost:8087/api/users/phone/${userPhone}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                        // If authentication is not required, you can remove any Authorization header
+                    }
+                });
                 if (!response.ok) {
-                    console.error("Failed to fetch dashboard data");
-                    return;
+                    throw new Error("Failed to fetch user details, status: " + response.status);
                 }
-                const data = await response.json();
-                const registeredUsers = data.users.details;
-                // Find the user with the matching phone number
-                currentUser = registeredUsers.find(u => u.phone === userPhone);
+                currentUser = await response.json();
+
 
                 if (!currentUser) {
                     alert("User not found. Please log in again.");
@@ -261,14 +266,13 @@
                 if (sidebar) {
                     const nameEl = sidebar.querySelector("h2");
                     const pEls = sidebar.querySelectorAll("p");
-                    if (nameEl) nameEl.textContent = currentUser.name;
+                    if (nameEl) nameEl.textContent = currentUser.userName;
                     if (pEls[0]) pEls[0].textContent = currentUser.email;
-                    if (pEls[1]) pEls[1].textContent = currentUser.phone;
+                    if (pEls[1]) pEls[1].textContent = currentUser.phoneNumber;
                     if (pEls[2]) pEls[2].textContent = currentUser.location || "Not specified";
                 }
 
                 // --- Update Personal Information Section ---
-                // We will only allow editing email and name.
                 function updateField(key, value, disable = false) {
                     const textEl = document.querySelector(`.info-text[data-key="${key}"]`);
                     const inputEl = document.querySelector(`.info-input[data-key="${key}"]`);
@@ -282,63 +286,106 @@
                         }
                     }
                 }
-                // Only update fullname and email (phone remains uneditable)
-                updateField("fullname", currentUser.name);
+                updateField("fullname", currentUser.userName);
                 updateField("email", currentUser.email);
-                updateField("phone", currentUser.phone, true);
+                updateField("phone", currentUser.phoneNumber, true);
                 updateField("location", currentUser.location || "Not specified");
 
-                // --- Update Active Plan Section ---
-                const activePlanSection = document.querySelector(".profile-details .card-body");
-                if (activePlanSection) {
-                    if (currentUser.activePlan) {
-                        activePlanSection.innerHTML = `
-          <h5 class="card-title text-warning mb-4">Active Plan Details</h5>
-          <div class="alert alert-info">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <h6 class="mb-1">${currentUser.activePlan.title}</h6>
-                <p class="mb-0 small">Valid till ${currentUser.activePlan.expiryDate}</p>
-              </div>
-              <span class="badge bg-warning text-light">Active</span>
+                async function fetchAndDisplayActivePlan(userId) {
+                    try {
+                        const response = await fetch(`http://localhost:8087/api/userplan/active/${userId}`);
+                        if (!response.ok) {
+                            throw new Error(`Failed to fetch active plan, status: ${response.status}`);
+                        }
+                        const activePlan = await response.json();
+
+                        if (!activePlan || !activePlan.planId) {
+                            document.querySelector(".profile-details .card-body").innerHTML =
+                                `<div class="alert alert-warning">No active plan available.</div>`;
+                            return;
+                        }
+
+                        // Fetch full plan details using the planId
+                        const planResponse = await fetch(`http://localhost:8087/api/plans/${activePlan.planId}`);
+                        if (!planResponse.ok) {
+                            throw new Error(`Failed to fetch plan details, status: ${planResponse.status}`);
+                        }
+                        const plan = await planResponse.json();
+
+                        document.querySelector(".profile-details .card-body").innerHTML = `
+            <h5 class="card-title text-warning mb-4">Active Plan Details</h5>
+            <div class="alert alert-info">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">${plan.planName}</h6>
+                        <p class="mb-0 small">Valid till ${activePlan.expiryDate}</p>
+                    </div>
+                    <span class="badge bg-warning text-light">Active</span>
+                </div>
+                <hr>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <small class="text-muted d-block">Data Left</small>
+                        <span>${plan.data || "N/A"}</span>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">SMS Balance</small>
+                        <span>${plan.sms || "N/A"}</span>
+                    </div>
+                </div>
             </div>
-            <hr>
-            <div class="row g-2">
-              <div class="col-6">
-                <small class="text-muted d-block">Data Left</small>
-                <span>${currentUser.activePlan.dataLeft || "N/A"}</span>
-              </div>
-              <div class="col-6">
-                <small class="text-muted d-block">SMS Balance</small>
-                <span>${currentUser.activePlan.smsBalance || "N/A"}</span>
-              </div>
-            </div>
-          </div>
         `;
-                    } else {
-                        activePlanSection.innerHTML = `<div class="alert alert-warning">No active plan available.</div>`;
+                    } catch (error) {
+                        console.error("Error fetching active plan or plan details:", error);
+                        document.querySelector(".profile-details .card-body").innerHTML =
+                            `<div class="alert alert-danger">Error loading active plan details.</div>`;
                     }
                 }
+
+                fetchAndDisplayActivePlan(currentUser.userId);
 
                 // --- Update Recharge History Section ---
                 const rechargeTbody = document.querySelector(".recharge-history tbody");
-                if (rechargeTbody) {
-                    rechargeTbody.innerHTML = "";
-                    if (currentUser.rechargeHistory && currentUser.rechargeHistory.length > 0) {
-                        currentUser.rechargeHistory.forEach(item => {
-                            const tr = document.createElement("tr");
-                            tr.innerHTML = `
-            <td>${item.rechargeDate}</td>
-            <td>${item.planId}</td>
-            <td>₹${item.amount}</td>
-            <td><span style="color:${item.status.toLowerCase() === "active" ? "green" : "red"};">${item.status}</span></td>
-          `;
-                            rechargeTbody.appendChild(tr);
-                        });
-                    } else {
-                        rechargeTbody.innerHTML = `<tr><td colspan="4" class="text-center">No recharge history available.</td></tr>`;
+                // After fetching the currentUser details...
+                // For example, after you've set up the sidebar and personal info:
+                const userId = currentUser.userId; // Assuming the backend returns a userId field
+
+                // Fetch recharge history using a separate endpoint
+                fetch(`http://localhost:8087/api/recharge-history/user/${userId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                        // Remove the Authorization header if not needed
                     }
-                }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Failed to fetch recharge history, status: " + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(historyData => {
+                        const rechargeTbody = document.querySelector(".recharge-history tbody");
+                        if (rechargeTbody) {
+                            rechargeTbody.innerHTML = ""; // Clear existing rows
+                            if (Array.isArray(historyData) && historyData.length > 0) {
+                                historyData.forEach(item => {
+                                    const tr = document.createElement("tr");
+                                    tr.innerHTML = `
+                    <td>${new Date(item.rechargeDate).toLocaleString()}</td>
+                    <td>${item.planId}</td>
+                    <td>₹${item.amountPaid}</td>
+                    <td><span style="color:${(item.status && item.status.toLowerCase() === "active") ? "green" : "red"};">${item.status || "Success"}</span></td>
+                `;
+                                    rechargeTbody.appendChild(tr);
+                                });
+                            } else {
+                                rechargeTbody.innerHTML = `<tr><td colspan="4" class="text-center">No recharge history available.</td></tr>`;
+                            }
+                        }
+                    })
+                    .catch(error => console.error("Error fetching recharge history:", error));
+
             } catch (error) {
                 console.error("Error fetching user data:", error);
             }
@@ -353,7 +400,6 @@
 
             // Edit button: Show input fields for fullname and email only
             editBtn.addEventListener('click', () => {
-                // Hide static texts and show inputs for fullname and email
                 infoTexts.forEach(el => {
                     if (el.getAttribute("data-key") === "fullname" || el.getAttribute("data-key") === "email") {
                         el.style.display = "none";
@@ -389,50 +435,75 @@
 
             // Save button: Update static texts with input values and update server (only for fullname and email)
             saveBtn.addEventListener('click', () => {
-                infoInputs.forEach(el => {
-                    if (el.getAttribute("data-key") === "fullname" || el.getAttribute("data-key") === "email") {
-                        const key = el.getAttribute("data-key");
-                        const textEl = document.querySelector(`.info-text[data-key="${key}"]`);
-                        textEl.textContent = el.value;
-                        el.style.display = "none";
-                    }
-                });
-                infoTexts.forEach(el => {
-                    if (el.getAttribute("data-key") === "fullname" || el.getAttribute("data-key") === "email") {
-                        el.style.display = "block";
-                    }
-                });
-                editActions.style.display = "none";
-                editBtn.style.display = "inline-block";
-                // Update the server with new details
-                updateUserDetails({
-                    username: currentUser.username,
-                    name: document.querySelector('.info-text[data-key="fullname"]').textContent,
-                    email: document.querySelector('.info-text[data-key="email"]').textContent
-                });
+                const updatedName = document.querySelector('.info-input[data-key="fullname"]').value.trim();
+                const updatedEmail = document.querySelector('.info-input[data-key="email"]').value.trim();
+
+                const payload = {
+                    userName: updatedName || currentUser.name, // Ensure it doesn't become null
+                    email: updatedEmail || currentUser.email
+                };
+
+                console.log("Updating user with payload:", payload); // Debugging log
+
+                fetch(`http://localhost:8087/api/users/${currentUser.userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Failed to update user details, status: " + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Updated user response:", data); // Debugging log
+
+                        // Update the UI
+                        document.querySelector('.info-text[data-key="fullname"]').textContent = data.userName || currentUser.name;
+                        document.querySelector('.info-text[data-key="email"]').textContent = data.email || currentUser.email;
+
+                        // Store updated user details
+                        currentUser.name = data.userName;
+                        currentUser.email = data.email;
+
+                        // Hide input fields and show the static text again
+                        infoInputs.forEach(el => {
+                            if (el.getAttribute("data-key") === "fullname" || el.getAttribute("data-key") === "email") {
+                                el.style.display = "none";
+                            }
+                        });
+                        infoTexts.forEach(el => {
+                            if (el.getAttribute("data-key") === "fullname" || el.getAttribute("data-key") === "email") {
+                                el.style.display = "block";
+                            }
+                        });
+
+                        editActions.style.display = "none";
+                        editBtn.style.display = "inline-block";
+                        alert("User details updated successfully.");
+                    })
+                    .catch(error => {
+                        console.error("Error updating user details:", error);
+                        alert("Error updating user details. Please try again.");
+                    });
             });
 
-            // Function to update user details on the JSON server
+
+            // Function to update user details on the backend
             async function updateUserDetails(updatedFields) {
                 try {
-                    const response = await fetch("http://localhost:3000/dashboard");
-                    if (!response.ok) {
-                        console.error("Failed to fetch dashboard data for update");
-                        return;
-                    }
-                    const dashboardData = await response.json();
-                    // Update only the matching user's details
-                    dashboardData.users.details = dashboardData.users.details.map(user => {
-                        if (user.username === updatedFields.username) {
-                            return { ...user, name: updatedFields.name, email: updatedFields.email };
-                        }
-                        return user;
-                    });
-                    await fetch("http://localhost:3000/dashboard", {
+                    const response = await fetch(`http://localhost:8087/api/users/${currentUser.userId}`, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(dashboardData)
+                        body: JSON.stringify(updatedFields)
                     });
+                    if (!response.ok) {
+                        console.error("Failed to update user details, status:", response.status);
+                        return;
+                    }
                     alert("User details updated successfully.");
                 } catch (err) {
                     console.error("Error updating user details:", err);
@@ -440,157 +511,6 @@
                 }
             }
         });
-
-        // At the end of your existing script, or in a separate file:
-
-        // 1) Function to fetch and display the current user's favorite plans
-        async function fetchFavoritePlans() {
-            try {
-                // Check if phone is stored in session (meaning user is logged in)
-                const userPhone = sessionStorage.getItem("phone");
-                if (!userPhone) {
-                    console.error("No phone found in session; user not logged in.");
-                    window.location.href = "login.html"; // or your login page
-                    return;
-                }
-
-                // Fetch the dashboard data (which includes users)
-                const response = await fetch("http://localhost:3000/dashboard");
-                if (!response.ok) {
-                    console.error("Failed to fetch dashboard data");
-                    return;
-                }
-
-                const data = await response.json();
-                // Extract the array of users
-                const registeredUsers = data.users.details;
-
-                // Find the user with the matching phone number
-                const currentUser = registeredUsers.find(u => u.phone === userPhone);
-                if (!currentUser) {
-                    alert("User not found. Please log in again.");
-                    window.location.href = "login.html";
-                    return;
-                }
-
-                // Now render the favorite plans
-                renderFavoritePlans(currentUser);
-            } catch (error) {
-                console.error("Error fetching favorite plans:", error);
-            }
-        }
-
-        // 2) Helper function to render the user's favorite plans in a Bootstrap card layout
-        function renderFavoritePlans(user) {
-            const favoritePlansContainer = document.getElementById("favoritePlansContainer");
-            if (!favoritePlansContainer) return; // Container not found
-
-            // Clear the container first
-            favoritePlansContainer.innerHTML = "";
-
-            // If user has a "favoritePlans" array with content
-            if (user.favoritePlans && user.favoritePlans.length > 0) {
-                user.favoritePlans.forEach(plan => {
-                    // Create a column + card for each plan
-                    const colDiv = document.createElement("div");
-                    colDiv.classList.add("col-md-6", "mb-3"); // adjust columns as needed
-
-                    // Build a Bootstrap card for the plan
-                    colDiv.innerHTML = `
-        <div class="card h-100 position-relative" data-plan-id="${plan.id}">
-  <!-- Remove Favorite Button in Top Right -->
-  <button class="btn btn-sm btn-danger remove-fav-plan" style="position: absolute; top: 10px; right: 10px;" title="Remove from Favorites">
-    <i class="fa fa-times"></i>
-  </button>
-  <div class="card-body">
-    <h5 class="card-title">${plan.name}</h5>
-    <p class="card-text text-muted mb-2">Price: ₹${plan.price}</p>
-    <p class="card-text text-muted mb-2">Validity: ${plan.validity}</p>
-    <p class="card-text">${plan.description}</p>
-    <button class="btn btn-primary btn-sm">Recharge</button>
-  </div>
-</div>
-
-      `;
-                    favoritePlansContainer.appendChild(colDiv);
-                });
-            } else {
-                // If no favorite plans, display a simple message
-                favoritePlansContainer.innerHTML = `<p class="text-muted">No favorite plans available.</p>`;
-            }
-        }
-
-        $(document).on("click", ".remove-fav-plan", async function (e) {
-            e.preventDefault();
-
-            // Check if user is logged in by verifying sessionStorage
-            if (!sessionStorage.getItem("loggedIn") || !sessionStorage.getItem("phone")) {
-                alert("Please log in to remove favorite plans.");
-                window.location.href = "login.html";
-                return;
-            }
-
-            // Get the plan ID from the card's data attribute
-            const planCard = $(this).closest(".card");
-            const planId = planCard.data("plan-id").toString();
-
-            // Get logged-in user's phone number from sessionStorage
-            const userPhone = sessionStorage.getItem("phone");
-
-            try {
-                // Fetch the current dashboard data from the JSON server
-                const response = await fetch("http://localhost:3000/dashboard");
-                if (!response.ok) {
-                    alert("Failed to fetch user data. Please try again.");
-                    return;
-                }
-                const dashboard = await response.json();
-                const usersArray = dashboard.users.details;
-
-                // Find the logged-in user by phone
-                const currentUser = usersArray.find(u => u.phone === userPhone);
-                if (!currentUser) {
-                    alert("User not found. Please log in again.");
-                    window.location.href = "login.html";
-                    return;
-                }
-
-                // Ensure favoritePlans exists and remove the plan with the matching id
-                if (currentUser.favoritePlans && currentUser.favoritePlans.length > 0) {
-                    const originalLength = currentUser.favoritePlans.length;
-                    currentUser.favoritePlans = currentUser.favoritePlans.filter(fav => fav.id !== planId);
-
-                    if (currentUser.favoritePlans.length === originalLength) {
-                        alert("This plan is not in your favorites.");
-                        return;
-                    }
-
-                    // Update the dashboard on the JSON server (PUT the entire users.details array)
-                    const updateResponse = await fetch("http://localhost:3000/dashboard", {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ users: { ...dashboard.users, details: usersArray } })
-                    });
-
-                    if (updateResponse.ok) {
-                        alert("Plan removed from favorites successfully.");
-                        // Optionally, remove the card from the UI:
-                        planCard.remove();
-                    } else {
-                        alert("Failed to update favorite plans. Please try again.");
-                    }
-                } else {
-                    alert("No favorite plans found for this user.");
-                }
-            } catch (error) {
-                console.error("Error removing favorite plan:", error);
-                alert("An error occurred. Please try again later.");
-            }
-        });
-
-
-        // 3) Call fetchFavoritePlans() after the rest of your code
-        fetchFavoritePlans();
 
     </script>
 </body>

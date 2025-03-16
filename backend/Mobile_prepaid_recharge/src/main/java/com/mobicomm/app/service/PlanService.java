@@ -79,6 +79,8 @@ public class PlanService {
     		updatePlan.setCategory(plan.getCategory());
     		updatePlan.setDescription(plan.getDescription());
     		updatePlan.setValidity(plan.getValidity());
+    		updatePlan.setSms(plan.getSms());
+    		updatePlan.setData(plan.getData());
     		updatePlan.setUpdatedAt(LocalDate.now());
     		return planRepository.save(updatePlan);
     	} else {

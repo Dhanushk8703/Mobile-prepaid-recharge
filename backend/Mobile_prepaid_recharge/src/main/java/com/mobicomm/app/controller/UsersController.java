@@ -60,9 +60,28 @@ public class UsersController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	@PutMapping("/{id}")
-	public ResponseEntity<?> putMethodName(@PathVariable String userId, @RequestBody Users user) {
-		Users updateUser = userService.updateUser(userId, user);
-		 return new ResponseEntity<>(updateUser,HttpStatus.OK);
+	@GetMapping("/phone/{phone}")
+	public ResponseEntity<?> getUserByPhone(@PathVariable Long phone) {
+	    Optional<Users> user = userService.findByMobileNumber(phone);
+	    if (user.isPresent()) {
+	        return ResponseEntity.ok(user.get());
+	    } else {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	    }
 	}
+	
+	@PutMapping("/{userId}")
+	public ResponseEntity<?> updateUser(@PathVariable String userId, @RequestBody Users user) {
+	    System.out.println("Updating user: " + userId);
+	    System.out.println("Received user data: " + user);
+
+	    Users updatedUser = userService.updateUser(userId, user);
+	    
+	    if (updatedUser == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+	    }
+
+	    return ResponseEntity.ok(updatedUser);
+	}
+
 }

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../node_modules/aos/dist/aos.css">
+    <link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.css">
+
+    <title>Payment</title>
+</head>
+
+<body class="bg-light">
+
+    <div class="container justify-content-center my-auto">
+        <div class="card shadow-lg mx-auto my-5" data-aos="fade-down" data-aos-delay="200" id="mobileNumberSection"
+            style="max-width: 400px; border: none; border-radius: 15px; background: linear-gradient(145deg, #ffffff, #f5f5f5);">
+            <div class="position-absolute top-0 start-0 m-3">
+                <a href="prepaid.html" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left-circle"></i>
+                </a>
+            </div>
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <i class="bi bi-phone text-warning" style="font-size: 2.5rem;"></i>
+                    <h4 class="card-title text-primary mt-3 fw-bold">Enter Mobile Number</h4>
+                </div>
+                <form id="mobileNumberForm" onsubmit="validateAndProceed(event)" class="d-flex flex-column">
+                    <div class="mb-4">
+                        <label for="mobileNumber" class="form-label fw-semibold text-dark">Mobile Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="bi bi-telephone text-warning"></i>
+                            </span>
+                            <input type="tel" class="form-control border-warning bg-light" id="mobileNumber"
+                                placeholder="Enter 10-digit mobile number" style="border-radius: 0 8px 8px 0;">
+                        </div>
+                        <span id="error" class="text-secondary"></span>
+                        <div class="form-text mt-2 text-dark">
+                            <i class="bi bi-info-circle me-1 text-warning"></i>
+                            Please enter a valid 10-digit mobile number
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-outline-warning btn-lg fw-semibold"
+                            style="border-radius: 8px; padding: 12px;">
+                            <i class="bi bi-arrow-right-circle me-2"></i>
+                            Proceed to Payment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../node_modules/aos/dist/aos.js"></script>
+    <script>
+        AOS.init();
+
+        const params = new URLSearchParams(window.location.search);
+        const planId = params.get('planId') || 'N/A';
+        const price = params.get('price') || '0';
+        const planTitle = params.get('planTitle') || 'Unknown Plan';
+
+        // D
+        function validateAndProceed(event) {
+            event.preventDefault();
+            const mobileNumber = document.getElementById('mobileNumber').value;
+            const error = document.getElementById('error');
+
+            if (mobileNumber.length === 10 && /^\d+$/.test(mobileNumber)) {
+                // ✅ Store in localStorage
+                localStorage.setItem('mobileNumber', mobileNumber);
+
+                // ✅ Redirect to payment page
+                window.location.href = `payment.html?planId=${encodeURIComponent(planId)}&price=${encodeURIComponent(price)}&planTitle=${encodeURIComponent(planTitle)}`;
+            } else {
+                error.textContent = "*Enter a valid 10-digit mobile number";
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>

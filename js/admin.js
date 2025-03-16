@@ -67,37 +67,68 @@ function fetchPlansData() {
       }
       return response.json();
     })
-    .then(data => {
-      populateModalOptions();
-      populateTable(
-        data,
-        "activePlansTable",
-        "STATUS_ACTIVE",
-        `
-        <button class="btn btn-sm btn-success" onclick="openEditPlanModal('${planId}')">
-          <i class="fa-solid fa-pen-to-square"></i>
-        </button>
-        <button id="deactive" class="btn btn-sm btn-danger mx-2 my-2">
-          <i class="fa-solid fa-trash-can"></i>
-        </button>
-      `
-      );
-      populateTable(
-        data,
-        "deactivatedPlansTable",
-        "STATUS_INACTIVE",
-        `
-        <button id="active" class="btn btn-sm btn-success mx-2 my-2">
-          <i class="fa-solid fa-square-check"></i>
-        </button>
-        <button id="delete" class="btn btn-sm btn-danger mx-2 my-2">
-          <i class="fa-solid fa-trash-can"></i>
-        </button>
-      `
-      );
+    .then(plans => {
+      populatePlansTables(plans);
     })
-    .catch(err => console.error("Error fetching plans:", err));
+    .catch(error => console.error("Error fetching plans:", error));
 }
+
+function populatePlansTables(plans) {
+  const activeTbody = document.querySelector("#activePlansTable tbody");
+  const deactivatedTbody = document.querySelector("#deactivatedPlansTable tbody");
+  activeTbody.innerHTML = "";
+  deactivatedTbody.innerHTML = "";
+
+  plans.forEach(plan => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${plan.planId}</td>
+      <td>${plan.planName}</td>
+      <td>${plan.category ? plan.category.categoryName : "N/A"}</td>
+      <td>${plan.planPrice}</td>
+      <td>${plan.data}</td>
+      <td>${plan.sms}</td>
+      <td>${plan.validity}</td>
+      <td>${plan.description}</td>
+      <td>${plan.createdAt}</td>
+      <td>${plan.updatedAt}</td>
+      <td>${(plan.benefits && plan.benefits.length) ? plan.benefits.map(b => b.benefitsName).join(', ') : 'None'}</td>
+      <td>
+        ${
+          plan.status === "STATUS_ACTIVE"
+            ? `
+              <button class="btn btn-sm btn-success edit-plan-btn" 
+                      onclick='openEditPlanModal("${plan.planId}")' 
+                      data-plan-id="${plan.planId}">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button id="deactive" class="btn btn-sm btn-danger mx-2 my-2" 
+                      data-plan-id="${plan.planId}">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            `
+            : `
+              <button id="active" class="btn btn-sm btn-success mx-2 my-2" 
+                      data-plan-id="${plan.planId}">
+                <i class="fa-solid fa-square-check"></i>
+              </button>
+              <button id="delete" class="btn btn-sm btn-danger mx-2 my-2" 
+                      data-plan-id="${plan.planId}">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            `
+        }
+      </td>
+    `;
+    if (plan.status === "STATUS_ACTIVE") {
+      activeTbody.appendChild(row);
+    } else {
+      deactivatedTbody.appendChild(row);
+    }
+  });
+}
+
+fetchPlansData();
 
 
 function fetchCategoriesData() {
@@ -357,6 +388,7 @@ document.getElementById('deactivatedCategoriesTable').addEventListener('click', 
       .catch(err => console.error('Error deleting plan:', err));
   }
 });
+
 function populateModalOptions() {
   fetch("http://localhost:8087/api/category", {
     method: "GET",
@@ -412,31 +444,6 @@ function populateModalOptions() {
     })
     .catch(error => console.error("Error fetching OTT benefits:", error));
 }
-
-function populateTable(data, tableId, statusFilter, actionsHtmlTemplate) {
-  const tbody = document.querySelector(`#${tableId} tbody`);
-  tbody.innerHTML = "";
-  data.forEach(plan => {
-    if (plan.status === statusFilter) {
-      const tr = document.createElement("tr");
-      const actionsHtml = actionsHtmlTemplate.replace("'mbplan001'", `'${plan.planId}'`);
-      tr.innerHTML = `
-        <td>${plan.planId}</td>
-        <td>${plan.planName}</td>
-        <td>${plan.category ? plan.category.categoryName : "N/A"}</td>
-        <td>${plan.planPrice}</td>
-        <td>${plan.validity}</td>
-        <td>${plan.description}</td>
-        <td>${plan.createdAt}</td>
-        <td>${plan.updatedAt}</td>
-        <td>${(plan.benefits && plan.benefits.length) ? plan.benefits.map(b => b.benefitsName).join(', ') : 'None'}</td>
-        <td>${actionsHtml}</td>
-      `;
-      tbody.appendChild(tr);
-    }
-  });
-}
-fetchPlansData();
 
 document.getElementById('activePlansTable').addEventListener('click', function (event) {
   if (event.target.closest('#deactive')) {
@@ -534,6 +541,8 @@ document.getElementById('planForm').addEventListener('submit', function (event) 
     },
     planPrice: parseFloat(document.getElementById('planPrice').value),
     validity: parseInt(document.getElementById('planValidity').value),
+    data: parseInt(document.getElementById('planData').value),
+    sms: parseInt(document.getElementById('planSms').value),
     description: document.getElementById('planDescription').value.trim(),
     benefits: gatherSelectedBenefits()
   };
@@ -598,42 +607,91 @@ function openAddPlanModal() {
   document.getElementById('planName').value = "";
   document.getElementById('planCategory').value = "";
   document.getElementById('planPrice').value = "";
+  document.getElementById('planSms').value = "";
+  document.getElementById('planData').value = "";
   document.getElementById('planValidity').value = "";
   document.getElementById('planDescription').value = "";
   // If you have benefits checkboxes or multi-select, clear them
   // Show the modal
   const planModal = new bootstrap.Modal(document.getElementById('planModal'));
+  populateModalOptions();
   planModal.show();
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll('.edit-plan-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const planId = this.getAttribute('data-plan-id');
+      openEditPlanModal(planId);
+    });
+  });
+});
+// Function to open the plan edit modal and populate it with current plan details
 function openEditPlanModal(planId) {
+  console.log("openEditPlanModal called with planId:", planId);
+  // Update modal title and button text
   document.getElementById('planModalLabel').textContent = "Edit Plan";
   document.getElementById('addPlanBtn').textContent = "Update Plan";
 
-  // Fetch the existing plan data
-  fetch(`http://localhost:8087/api/plans/${encodeURIComponent(planId)}`)
+  // Fetch plan details from the backend using the provided planId
+  fetch(`http://localhost:8087/api/plans/${encodeURIComponent(planId)}`, {
+    method: 'GET',
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+      "Content-Type": "application/json"
+    }
+  })
     .then(response => {
       if (!response.ok) {
-        throw new Error("Failed to fetch plan for editing");
+        throw new Error("Failed to fetch plan for editing, status: " + response.status);
       }
       return response.json();
     })
     .then(plan => {
-      // Populate the hidden planId
+      console.log("Fetched plan:", plan);
+      // Populate modal fields with plan details
       document.getElementById('planId').value = plan.planId;
-      // Populate other fields
       document.getElementById('planName').value = plan.planName;
-      document.getElementById('planCategory').value = plan.category ? plan.category.categoryId : "";
+      // Set category dropdown using the category id (if category is an object) and also update a display field for category name.
+      if (plan.category) {
+        document.getElementById('planCategory').value = plan.category.categoryId || plan.category;
+        // Assume there's an element to display the category name; adjust the ID as needed.
+        const categoryNameElem = document.getElementById('planCategoryName');
+        if (categoryNameElem) {
+          categoryNameElem.textContent = plan.category.categoryName || plan.category;
+        }
+      } else {
+        document.getElementById('planCategory').value = "";
+      }
       document.getElementById('planPrice').value = plan.planPrice;
       document.getElementById('planValidity').value = plan.validity;
+      document.getElementById('planSms').value = plan.sms;
+      document.getElementById('planData').value = plan.data;
       document.getElementById('planDescription').value = plan.description;
-      // If you have benefits, set them in your multi-select or checkboxes
-      // Then show the modal
-      const planModal = new bootstrap.Modal(document.getElementById('planModal'));
+      populateModalOptions();
+      const ottDetailsField = document.getElementById('ottDetails');
+      if (ottDetailsField && plan.benefits && plan.benefits.length) {
+        Array.from(ottDetailsField.options).forEach(option => {
+          option.selected = plan.benefits.some(b => b.benefitsId === option.value);
+        });
+      } else {
+        // Optionally, if you have a display field for benefits, you can update it like this:
+        const benefitsDisplay = document.getElementById('planBenefitsDisplay');
+        if (benefitsDisplay) {
+          benefitsDisplay.textContent = plan.benefits && plan.benefits.length 
+            ? plan.benefits.map(b => b.benefitsName).join(', ')
+            : 'None';
+        }
+      }
+  
+      // Initialize and show the modal using Bootstrap
+      const modalElement = document.getElementById('planModal');
+      const planModal = new bootstrap.Modal(modalElement);
       planModal.show();
     })
-    .catch(err => console.error('Error fetching plan for edit:', err));
-}
+    .catch(err => console.error("Error fetching plan for edit:", err));
 
+}  
 function fetchBenefitsData() {
   fetch("http://localhost:8087/api/benefits", {
     method: "GET",
@@ -660,9 +718,6 @@ function fetchBenefitsData() {
         <td>
           <button class="btn btn-sm btn-info edit-benefit" onclick='openEditBenefitModal("${benefit.benefitsId}")' data-id="${benefit.benefitsId}">
             <i class="fa-solid fa-pen-to-square"></i>
-          </button>
-          <button class="btn btn-sm btn-danger delete-benefit" data-id="${benefit.benefitsId}">
-            <i class="fa-solid fa-trash-can"></i>
           </button>
         </td>
       `;
@@ -778,87 +833,45 @@ document.getElementById("benefitsTable").addEventListener("click", function (eve
     openEditBenefitModal(benefitId);
   }
 });
-
-document.addEventListener("DOMContentLoaded", function () {
-  document.getElementById("benefitsTable").addEventListener("click", function (event) {
-    const deleteBtn = event.target.closest(".delete-benefit");
-    if (deleteBtn) {
-      const benefitId = deleteBtn.getAttribute("data-id");
-      if (!benefitId) {
-        console.error("Benefit ID is null or undefined.");
-        return;
-      }
-
-      fetch(`http://localhost:8087/api/benefits/${encodeURIComponent(benefitId)}`, {
-        method: "DELETE",
-        headers: {
-          "Authorization": "Bearer " + localStorage.getItem("adminToken"),
-          "Content-Type": "application/json"
-        }
-      })
-        .then(response => {
-          if (response.status === 204 || !response.headers.get("content-length")) {
-            return {};
-          }
-          if (!response.ok) {
-            throw new Error("Failed to delete benefit");
-          }
-          return response.json();
-        })
-        .then(data => {
-          console.log("Benefit deleted successfully:", data);
-          fetchBenefitsData(); // Refresh table data
-        })
-        .catch(error => console.error("Error deleting benefit:", error));
-    }
-  });
-});
-
 document.addEventListener('DOMContentLoaded', function () {
   fetchUserDetails();
-  setupModal();
 });
 
-// Fetch user details on DOM load
-  document.addEventListener('DOMContentLoaded', function() {
-    fetchUserDetails();
-  });
-
-  // Function to fetch user details from the backend API
-  function fetchUserDetails() {
-    // Replace with your actual API endpoint for users
-    fetch('http://localhost:8087/api/users', {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('adminToken'),
-        'Content-Type': 'application/json'
+// Function to fetch user details from the backend API
+function fetchUserDetails() {
+  // Replace with your actual API endpoint for users
+  fetch('http://localhost:8087/api/users', {
+    method: 'GET',
+    headers: {
+      'Authorization': 'Bearer ' + localStorage.getItem('adminToken'),
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok, status: ' + response.status);
       }
+      return response.json();
     })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok, status: ' + response.status);
-        }
-        return response.json();
-      })
-      .then(data => populateUsersTable(data))
-      .catch(err => console.error('Error fetching user details:', err));
-  }
+    .then(data => populateUsersTable(data))
+    .catch(err => console.error('Error fetching user details:', err));
+}
 
-  // Populate the table with user details
-  function populateUsersTable(users) {
-    const tableBody = document.querySelector('#usersDetailsTable tbody');
-    tableBody.innerHTML = ''; // Clear any existing rows
+// Populate the table with user details
+function populateUsersTable(users) {
+  const tableBody = document.querySelector('#usersDetailsTable tbody');
+  tableBody.innerHTML = ''; // Clear any existing rows
 
-    users.forEach(user => {
-      // Determine active plan name if available
-      let activePlanName = user.activePlan && user.activePlan.planName ? user.activePlan.planName : 'None';
+  users.forEach(user => {
+    // Determine active plan name if available
+    let activePlanName = user.activePlan && user.activePlan.planName ? user.activePlan.planName : 'None';
 
-      // Create a table row
-      const tr = document.createElement('tr');
-      // Save the entire user object as a data attribute for later use in the modal
-      tr.setAttribute("data-user", JSON.stringify(user));
+    // Create a table row
+    const tr = document.createElement('tr');
+    // Save the entire user object as a data attribute for later use in the modal
+    tr.setAttribute("data-user", JSON.stringify(user));
 
-      tr.innerHTML = `
+    tr.innerHTML = `
         <td>${user.userId}</td>
         <td>${user.userName}</td>
         <td>${user.phoneNumber}</td>
@@ -868,70 +881,139 @@ document.addEventListener('DOMContentLoaded', function () {
           <button class="btn btn-sm btn-info" onclick="viewUser(this)">View</button>
         </td>
       `;
-      tableBody.appendChild(tr);
-    });
-  }
+    tableBody.appendChild(tr);
+  });
+}
 
-  function viewUser(button) {
-    // Get the table row element (button -> td -> tr)
-    var row = button.parentNode.parentNode;
-    // Retrieve the user data stored in the row's data attribute
-    var userData = JSON.parse(row.getAttribute("data-user"));
+function viewUser(button) {
+  // Get the table row element (button -> td -> tr)
+  var row = button.parentNode.parentNode;
+  // Retrieve the user data stored in the row's data attribute
+  var userData = JSON.parse(row.getAttribute("data-user"));
 
-    // Populate modal fields with basic user details
-    document.getElementById("detailUsername").textContent = userData.userId || '';
-    document.getElementById("detailName").textContent = userData.userName || '';
-    document.getElementById("detailPhone").textContent = userData.phoneNumber || '';
-    document.getElementById("detailEmail").textContent = userData.email || '';
-    document.getElementById("detailActivePlan").textContent = 
-      (userData.activePlan && userData.activePlan.planName) ? userData.activePlan.planName : 'None';
-
-    // Clear previous recharge history data
-    document.querySelector("#detailRechargeHistoryTable tbody").innerHTML = '';
-
-    // Fetch recharge history for this user using userId (adjust endpoint as needed)
-    fetchRechargeHistory(userData.userId);
-
-    // Show the modal using Bootstrap 5's Modal API
-    var userModalEl = document.getElementById('userDetailsModal');
-    var userModal = new bootstrap.Modal(userModalEl);
-    userModal.show();
-  }
-
-  // Function to fetch recharge history for a given user
-  function fetchRechargeHistory(userId) {
-    // Replace with your actual API endpoint for recharge history for the user
-    fetch(`http://localhost:8087/api/recharge-history/user/${userId}`, {
+  // Populate modal fields with basic user details
+  document.getElementById("detailUsername").textContent = userData.userId || '';
+  document.getElementById("detailName").textContent = userData.userName || '';
+  document.getElementById("detailPhone").textContent = userData.phoneNumber || '';
+  document.getElementById("detailEmail").textContent = userData.email || '';
+  function fetchActivePlanDetails(userId) {
+    fetch(`http://localhost:8087/api/userplan/active/${userId}`, {
       method: 'GET',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('adminToken'),
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
         'Content-Type': 'application/json'
       }
     })
       .then(response => {
         if (!response.ok) {
-          throw new Error('Error fetching recharge history, status: ' + response.status);
+          throw new Error('Error fetching active plan details, status: ' + response.status);
         }
         return response.json();
       })
-      .then(data => populateRechargeHistoryTable(data))
-      .catch(error => console.error('Error fetching recharge history:', error));
+      .then(async data => {
+        console.log("Active Plan Response:", data); // Debugging Log
+
+        // Ensure we have valid data
+        if (!Array.isArray(data) || data.length === 0) {
+          console.error("No active plan found");
+          document.getElementById("detailActivePlan").textContent = 'None';
+          return;
+        }
+
+        const activePlan = data[0]; // Get the first active plan
+        if (!activePlan || !activePlan.planId) {
+          console.error("Active plan missing planId:", activePlan);
+          document.getElementById("detailActivePlan").textContent = 'Unknown Plan';
+          return;
+        }
+
+        try {
+          // Fetch plan details using planId
+          const planResponse = await fetch(`http://localhost:8087/api/plans/${activePlan.planId}`);
+          if (!planResponse.ok) throw new Error('Failed to fetch plan details');
+
+          const planData = await planResponse.json();
+          document.getElementById("detailActivePlan").textContent = planData.planName || 'Unknown Plan';
+        } catch (error) {
+          console.error("Error fetching plan details:", error);
+          document.getElementById("detailActivePlan").textContent = 'Error loading plan';
+        }
+      });
+
   }
 
-  // Populate the recharge history table in the modal
-  function populateRechargeHistoryTable(records) {
-    const tbody = document.querySelector("#detailRechargeHistoryTable tbody");
-    tbody.innerHTML = ''; // Clear existing rows
+  // Example usage:
+  fetchActivePlanDetails("user123"); // Replace "user123" with the actual user ID
 
-    records.forEach(record => {
-      // Create a table row for each recharge record
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
+  // Clear previous recharge history data
+  document.querySelector("#detailRechargeHistoryTable tbody").innerHTML = '';
+
+  // Fetch recharge history for this user using userId (adjust endpoint as needed)
+  fetchRechargeHistory(userData.userId);
+
+  // Show the modal using Bootstrap 5's Modal API
+  var userModalEl = document.getElementById('userDetailsModal');
+  var userModal = new bootstrap.Modal(userModalEl);
+  userModal.show();
+}
+
+function fetchRechargeHistory(userId) {
+  const token = localStorage.getItem('adminToken');
+
+  if (!token) {
+    console.error('No admin token found, please login again.');
+    return;
+  }
+
+  fetch(`http://localhost:8087/api/recharge-history/user/${userId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Error fetching recharge history, status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.length === 0) {
+        displayNoHistoryMessage();
+      } else {
+        populateRechargeHistoryTable(data);
+      }
+    })
+    .catch(error => console.error('Error fetching recharge history:', error));
+}
+
+// Function to display the recharge history in the table
+function populateRechargeHistoryTable(records) {
+  const tbody = document.querySelector("#detailRechargeHistoryTable tbody");
+  tbody.innerHTML = ''; // Clear existing rows
+
+  records.forEach(record => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
         <td>${record.planId}</td>
         <td>${new Date(record.rechargeDate).toLocaleString()}</td>
-        <td>${record.amountPaid}</td>
+        <td>₹${record.amountPaid.toFixed(2)}</td>
         <td>${record.status || 'Completed'}</td>
       `;
-      tbody.appendChild(tr);
-    });
-  }
+    tbody.appendChild(tr);
+  });
+}
+
+// Show a message when no history is found
+function displayNoHistoryMessage() {
+  const tbody = document.querySelector("#detailRechargeHistoryTable tbody");
+  tbody.innerHTML = `
+      <tr>
+        <td colspan="4" class="text-center">No recharge history found.</td>
+      </tr>
+    `;
+}
+
+// Example usage: Replace 'user123' with actual userId
+fetchRechargeHistory('user123');
+

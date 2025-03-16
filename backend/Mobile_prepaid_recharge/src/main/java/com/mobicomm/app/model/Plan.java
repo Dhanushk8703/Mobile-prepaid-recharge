@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -28,6 +30,8 @@ public class Plan {
 	private String planName;
 	private String description;
 	private Double planPrice;
+	private Long data;
+	private Long sms;
 	private Long validity;
 	private LocalDate createdAt;
 	private LocalDate updatedAt;
@@ -41,9 +45,6 @@ public class Plan {
 		joinColumns = @JoinColumn(name = "planId"),inverseJoinColumns = @JoinColumn(name = "benefitsId"))
 	private Set<Benefits> benefits;
 	
-	@OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserPlanDetail> userPlanDetails;
-
 	@Enumerated(EnumType.STRING)
 	private Status status;
 }

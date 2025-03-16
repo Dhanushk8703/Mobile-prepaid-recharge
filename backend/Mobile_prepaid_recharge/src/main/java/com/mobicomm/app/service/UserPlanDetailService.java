@@ -1,17 +1,15 @@
 package com.mobicomm.app.service;
 
+import com.mobicomm.app.model.Plan;
 import com.mobicomm.app.model.RechargeHistory;
 import com.mobicomm.app.model.UserPlanDetail;
-import com.mobicomm.app.model.Users;
 import com.mobicomm.app.repository.RechargeHistoryRepository;
 import com.mobicomm.app.repository.UserPlanDetailRepository;
-import com.mobicomm.app.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserPlanDetailService {
@@ -21,37 +19,43 @@ public class UserPlanDetailService {
 
     @Autowired
     private RechargeHistoryRepository rechargeHistoryRepository;
-
+    
     @Autowired
-    private UsersRepository usersRepository;
+    private PlanService planService;  // Needed for retrieving plan details
 
-    private Users getAuthenticatedUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Long phoneNumber;
-        try {
-            phoneNumber = Long.parseLong(auth.getName());
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("Invalid phone number format in authentication principal: " + auth.getName());
-        }
-        return usersRepository.findByPhoneNumber(phoneNumber)
-                .orElseThrow(() -> new RuntimeException("User not found with phone number: " + phoneNumber));
+    // Retrieve active UserPlanDetail records for the provided userId
+    public List<UserPlanDetail> getActiveUserPlanDetails(String userId) {
+        return userPlanDetailRepository.findByUserIdAndExpiryDateAfter(userId, LocalDateTime.now());
+    }
+    
+    public UserPlanDetail addActivePlan(UserPlanDetail activePlan) {
+        return userPlanDetailRepository.save(activePlan);
+    }
+    
+    public Optional<UserPlanDetail> getLastActivePlan(String userId) {
+        return userPlanDetailRepository
+            .findTopByUserIdAndExpiryDateAfterOrderByRechargedDateDesc(userId, LocalDateTime.now());
     }
 
-    // Retrieve active UserPlanDetail records for the authenticated user
-    public List<UserPlanDetail> getActiveUserPlanDetails() {
-        Users user = getAuthenticatedUser();
-        return userPlanDetailRepository.findByUserAndExpiryDateAfter(user, LocalDateTime.now());
-    }
 
     public void cleanupExpiredPlans() {
         LocalDateTime now = LocalDateTime.now();
+        // Retrieve all expired active plan records
         List<UserPlanDetail> expiredPlans = userPlanDetailRepository.findByExpiryDateBefore(now);
         for (UserPlanDetail upd : expiredPlans) {
             RechargeHistory history = new RechargeHistory();
-            history.setUser(upd.getUser());
-            history.setPlan(upd.getPlan());
+            history.setUserId(upd.getUserId());
+            history.setPlanId(upd.getPlanId());
             history.setRechargeDate(now);
-            history.setAmountPaid(upd.getPlan().getPlanPrice());
+            
+            // Retrieve the plan to get its price (if available)
+            Optional<Plan> planOpt = planService.getPlanById(upd.getPlanId());
+            if (planOpt.isPresent()) {
+                Plan plan = planOpt.get();
+                history.setAmountPaid(plan.getPlanPrice());
+            } else {
+                history.setAmountPaid(0.0);
+            }
             history.setPaymentMethod("Auto-Expired");
             
             rechargeHistoryRepository.save(history);

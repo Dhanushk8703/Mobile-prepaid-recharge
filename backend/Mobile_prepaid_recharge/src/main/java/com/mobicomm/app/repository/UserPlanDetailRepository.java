@@ -1,16 +1,16 @@
 package com.mobicomm.app.repository;
 
-import com.mobicomm.app.model.UserPlanDetail;
-import com.mobicomm.app.model.Users;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
-@Repository
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.mobicomm.app.model.UserPlanDetail;
+
 public interface UserPlanDetailRepository extends JpaRepository<UserPlanDetail, Long> {
-    
-    List<UserPlanDetail> findByUserAndExpiryDateAfter(Users user, LocalDateTime now);
-    
+    List<UserPlanDetail> findByUserIdAndExpiryDateAfter(String userId, LocalDateTime now);
     List<UserPlanDetail> findByExpiryDateBefore(LocalDateTime now);
+	List<UserPlanDetail> findByUserIdAndPlanIdAndExpiryDateAfter(String userId, String planId, LocalDateTime now);
+	Optional<UserPlanDetail> findTopByUserIdAndExpiryDateAfterOrderByRechargedDateDesc(String userId,
+			LocalDateTime now);
 }

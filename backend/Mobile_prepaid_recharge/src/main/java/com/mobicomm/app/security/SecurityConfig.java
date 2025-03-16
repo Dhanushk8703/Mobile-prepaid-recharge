@@ -1,7 +1,6 @@
 package com.mobicomm.app.security;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +22,7 @@ public class SecurityConfig {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
-    PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -33,10 +32,12 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()
-                .anyRequest().authenticated()
+                .requestMatchers("/auth/**").permitAll()      // Public endpoints for authentication
+                .requestMatchers("/admin/**").authenticated()   // Only /admin endpoints require JWT auth
+                .anyRequest().permitAll()                        // All other endpoints are public
             )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // If using JWT
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
@@ -45,23 +46,13 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // EXACTLY match your front-end URL(s)
-        config.setAllowedOrigins(List.of(
-            "http://127.0.0.1:5500",
-            "http://localhost:5500"
-        ));
-
-        // Methods you actually use
+        config.setAllowedOrigins(List.of("http://127.0.0.1:5500", "http://localhost:5500"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-        // Headers you allow
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        // Headers you expose to the browser
         config.setExposedHeaders(List.of("Authorization"));
-        // If you need cookies or other credentials
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // Apply to all endpoints
         source.registerCorsConfiguration("/**", config);
         return source;
     }
