@@ -1,11 +1,35 @@
-document.getElementById("logoutBtn").addEventListener("click", function () {
-  localStorage.removeItem("adminToken"); // Remove JWT token
+document.getElementById("logoutBtn").addEventListener("click", async function () {
+  
+  if (token) {
+    // Send logout request to server (only if your backend supports token revocation)
+    try {
+      const response = await fetch("http://localhost:8087/auth/logout", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refreshToken: localStorage.getItem("refreshToken") }), // Optional if refresh tokens exist
+      });
+      
+      if (!response.ok) {
+        console.warn("Logout request failed:", await response.text());
+      }
+    } catch (error) {
+      console.error("Error during logout request:", error);
+    }
+  }
+
+  // Remove token from local storage and redirect
+  localStorage.removeItem("adminToken");
+  localStorage.removeItem("refreshToken"); // Remove refresh token if stored
   alert("Logged out successfully!");
-  window.location.href = "adminlogin.html"; // Redirect to login page
+  window.location.href = "adminlogin.html";
 });
 
+// Redirect if no token (Ensure this runs early in the script)
 if (!localStorage.getItem("adminToken")) {
-  window.location.href = "adminlogin.html"; // Redirect to login if no token
+  window.location.href = "adminlogin.html";
 }
 
 function checkExpiredToken() {
@@ -152,6 +176,10 @@ function fetchCategoriesData() {
 }
 
 function populateCategoriesTables(categories) {
+  if (!Array.isArray(categories)) {
+    console.error("Error: Expected categories to be an array but got:", categories);
+    return;  // Prevents further execution if categories is not an array
+  }
   const activeTbody = document.querySelector("#activeCategoriesTable tbody");
   const deactivatedTbody = document.querySelector("#deactivatedCategoriesTable tbody");
   activeTbody.innerHTML = "";
@@ -862,9 +890,46 @@ function populateUsersTable(users) {
   const tableBody = document.querySelector('#usersDetailsTable tbody');
   tableBody.innerHTML = ''; // Clear any existing rows
 
-  users.forEach(user => {
+  users.forEach(async user => {
     // Determine active plan name if available
-    let activePlanName = user.activePlan && user.activePlan.planName ? user.activePlan.planName : 'None';
+    async function fetchAndDisplayActivePlan(userId) {
+      try {
+          // Fetch active plan associated with the user
+          const response = await fetch(`http://localhost:8087/api/userplan/active/${userId}`);
+          
+          if (!response.ok) {
+              throw new Error(`Failed to fetch active plan, status: ${response.status}`);
+          }
+  
+          const activePlan = await response.json();
+  
+          // If no active plan found, return null
+          if (!activePlan || !activePlan.planId) {
+              console.warn("No active plan found for user:", userId);
+              return null;
+          }
+  
+          // Fetch the full plan details using the planId
+          const planResponse = await fetch(`http://localhost:8087/api/plans/${activePlan.planId}`);
+          
+          if (!planResponse.ok) {
+              throw new Error(`Failed to fetch plan details, status: ${planResponse.status}`);
+          }
+  
+          const plan = await planResponse.json();  
+          // Return only the plan name
+          return plan.planName;
+  
+      } catch (error) {
+          console.error("Error fetching active plan or plan details:", error);
+          return null; // Return null in case of an error
+      }
+  }
+
+    const activePlan = await fetchAndDisplayActivePlan(user.userId);  
+
+    fetchAndDisplayActivePlan(user.userId);
+    console.log("Active Plan:", activePlan);
 
     // Create a table row
     const tr = document.createElement('tr');
@@ -876,16 +941,16 @@ function populateUsersTable(users) {
         <td>${user.userName}</td>
         <td>${user.phoneNumber}</td>
         <td>${user.email}</td>
-        <td>${activePlanName}</td>
+        <td>${activePlan}</td>
         <td>
-          <button class="btn btn-sm btn-info" onclick="viewUser(this)">View</button>
+          <button class="btn btn-sm btn-info" onclick="viewUser(this,'${activePlan}')">View</button>
         </td>
       `;
     tableBody.appendChild(tr);
   });
 }
 
-function viewUser(button) {
+function viewUser(button, activePlan) {
   // Get the table row element (button -> td -> tr)
   var row = button.parentNode.parentNode;
   // Retrieve the user data stored in the row's data attribute
@@ -896,6 +961,7 @@ function viewUser(button) {
   document.getElementById("detailName").textContent = userData.userName || '';
   document.getElementById("detailPhone").textContent = userData.phoneNumber || '';
   document.getElementById("detailEmail").textContent = userData.email || '';
+  document.getElementById("detailActivePlan").textContent = activePlan || '';
   function fetchActivePlanDetails(userId) {
     fetch(`http://localhost:8087/api/userplan/active/${userId}`, {
       method: 'GET',
@@ -919,8 +985,8 @@ function viewUser(button) {
           document.getElementById("detailActivePlan").textContent = 'None';
           return;
         }
+        const activePlan = await fetchAndDisplayActivePlan(user.userId);  
 
-        const activePlan = data[0]; // Get the first active plan
         if (!activePlan || !activePlan.planId) {
           console.error("Active plan missing planId:", activePlan);
           document.getElementById("detailActivePlan").textContent = 'Unknown Plan';
@@ -1017,3 +1083,155 @@ function displayNoHistoryMessage() {
 // Example usage: Replace 'user123' with actual userId
 fetchRechargeHistory('user123');
 
+// Fetch all active user plan details.
+// Function to fetch all active user plan details
+async function fetchAllActiveUserPlans() {
+  const token = localStorage.getItem("adminToken");
+  if (!token) {
+    console.error("No admin token found. Redirecting to login.");
+    window.location.href = "adminlogin.html";
+    return [];
+  }
+
+  try {
+    const response = await fetch("http://localhost:8087/api/userplan/active/all", {
+      method: "GET",
+      headers: {
+        "Authorization": "Bearer " + token,
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error while fetching active plans, status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error("Error fetching active user plans:", error);
+    return [];
+  }
+}
+
+// Function to filter expiring and expired user plans
+async function getExpiringAndExpiredUserPlans() {
+  const plans = await fetchAllActiveUserPlans();
+  const now = new Date();
+  const expiringPlans = [];
+  const expiredPlans = [];
+
+  plans.forEach(plan => {
+    // Ensure expiryDate exists and is a valid date
+    if (!plan.expiryDate || typeof plan.expiryDate !== "string") {
+      console.warn(`Skipping invalid expiry date for plan:`, plan);
+      return;
+    }
+
+    // Convert expiryDate to a valid JavaScript Date object
+    let expiryDate = new Date(plan.expiryDate);
+    
+    // If expiryDate is still invalid, log an error and skip this plan
+    if (isNaN(expiryDate.getTime())) {
+      console.warn(`Invalid expiry date for plan:`, plan);
+      return;
+    }
+
+    if (expiryDate < now) {
+      expiredPlans.push(plan);
+    } else {
+      const diffInDays = (expiryDate - now) / (1000 * 60 * 60 * 24);
+      if (diffInDays <= 3) {
+        expiringPlans.push(plan);
+      }
+    }
+  });
+  return { expiringPlans, expiredPlans };
+}
+// Function to populate the Expiring Users table
+function populateExpiringUsersTable(expiringPlans) {
+  const tbody = document.getElementById("expiringUsersList");
+  tbody.innerHTML = ""; // Clear previous rows
+
+  if (expiringPlans.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" class="text-center">No users with plans expiring in three days.</td></tr>`;
+    return;
+  }
+
+  expiringPlans.forEach(plan => {
+    const userName = plan.user_id || "Unknown User"; // Adjust based on API response
+    const planName = plan.plan_id || "N/A";
+    const expiryDate = new Date(plan.expiry_date).toLocaleString();
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${userName}</td>
+      <td>${planName}</td>
+      <td>${expiryDate}</td>
+      <td>
+        <button class="btn btn-sm btn-primary" onclick="sendReminder('${plan.user_id}')">
+          Send Reminder
+        </button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+// Function to populate the Expired Users table
+function populateExpiredUsersTable(expiredPlans) {
+  const tbody = document.getElementById("expiredUsersList");
+  tbody.innerHTML = ""; // Clear previous rows
+
+  if (expiredPlans.length === 0) {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td colspan="4" class="text-center">No users with expired plans.</td>`;
+    tbody.appendChild(row);
+    return;
+  }
+
+  expiredPlans.forEach(plan => {
+    const userName = plan.userId || "Unknown User";
+    const planName = plan.planId ? plan.planId : "N/A";
+
+    
+    // Ensure expiryDate is a valid date
+    let expiredOn = "Invalid Date";
+    if (plan.expiryDate) {
+      let parsedDate = new Date(plan.expiryDate);
+      if (!isNaN(parsedDate.getTime())) {
+        expiredOn = parsedDate.toLocaleString(); // Format date properly
+      }
+    }
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${userName}</td>
+      <td>${planName}</td>
+      <td>${expiredOn}</td>
+      <td>
+        <button class="btn btn-sm btn-danger" onclick="renewPlan('${plan.userId}')">
+          Renew Plan
+        </button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+
+// Example action functions
+function sendReminder(userId) {
+  alert("Reminder sent to user: " + userId);
+}
+
+function renewPlan(userId) {
+  alert("Initiate plan renewal for user: " + userId);
+}
+
+// Fetch and display data when the dashboard loads
+document.addEventListener("DOMContentLoaded", async function () {
+  const { expiringPlans, expiredPlans } = await getExpiringAndExpiredUserPlans();
+  populateExpiringUsersTable(expiringPlans);
+  populateExpiredUsersTable(expiredPlans);
+});

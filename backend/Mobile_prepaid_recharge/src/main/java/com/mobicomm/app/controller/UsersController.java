@@ -54,7 +54,7 @@ public class UsersController {
 	}
 	
 	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
-	@PostMapping
+	@PostMapping("/admin")
 	public ResponseEntity<?> addUsers(@RequestBody Users user) {
 		userService.addUsers(user);
 		return new ResponseEntity<>(HttpStatus.OK);

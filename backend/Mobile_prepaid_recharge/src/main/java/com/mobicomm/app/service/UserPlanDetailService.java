@@ -62,4 +62,8 @@ public class UserPlanDetailService {
             userPlanDetailRepository.delete(upd);
         }
     }
+
+	public List<UserPlanDetail> getAllActivePlans() {
+		return userPlanDetailRepository.findAll();
+	}
 }

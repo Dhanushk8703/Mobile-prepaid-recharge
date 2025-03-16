@@ -249,21 +249,18 @@ function renderPlans(categoriesResponse) {
         <div class="plan-card p-4 border rounded shadow-sm h-100 position-relative" 
             data-plan-id="${plan.planId}" 
             data-title="${plan.planName}" 
+            data-data="${plan.data}"
+            data-sms="${plan.sms}"
             data-description="${plan.description}"
             data-validity="${plan.validity}" 
             data-price="${plan.planPrice}" 
             data-benefits='${JSON.stringify(plan.benefits ? Array.from(plan.benefits) : [])}'>
           
-          <!-- Favorite Button in Top Right Corner -->
-          <button class="btn-fav btn btn-sm btn-outline-danger" 
-                  style="position: absolute; top: 10px; right: 10px;" 
-                  title="Add to Favorites">
-            <i class="fa fa-heart"></i>
-          </button>
-          
           <h4 class="plan-title mb-3">${plan.planName}</h4>
           <p class="plan-validity"><strong>Validity:</strong> ${plan.validity} Days</p>
           <p class="plan-price"><strong>Price:</strong> ₹${plan.planPrice}</p>
+          <p class="plan-data"><strong>Data:</strong> ${plan.data} GB</p>
+          <p class="plan-sms"><strong>SMS:</strong> ${plan.sms}</p>
           <p class="plan-description">${plan.description}</p>
           
           <div class="btn-group mt-3">

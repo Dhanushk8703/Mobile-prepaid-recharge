@@ -28,7 +28,14 @@ public class UserPlanDetailController {
         }
     }
 
-
+    @GetMapping("/active/all")
+    public ResponseEntity<List<UserPlanDetail>> getAllActiveUserPlans() {
+        List<UserPlanDetail> activePlans = userPlanDetailService.getAllActivePlans();
+        if (activePlans.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(activePlans);
+    }
 
     // Example endpoint to add a new active plan along with a recharge history record
     @PostMapping("/add")
