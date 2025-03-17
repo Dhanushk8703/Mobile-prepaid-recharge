@@ -21,10 +21,10 @@
     <!-- The main content will be replaced by JS upon submission -->
     <div id="paymentContent">
       <div class="row">
-      <div class="payment-header mb-5">
-        <h1>Payment Details</h1>
-        <p>Complete your recharge process</p>
-      </div>
+        <div class="payment-header mb-5">
+          <h1>Payment Details</h1>
+          <p>Complete your recharge process</p>
+        </div>
         <!-- Payment Header -->
         <!-- Mobile Number Section -->
         <div class="col-sm-6">
@@ -113,16 +113,178 @@
                 </div>
               </div>
             </div>
-            <button type="submit" class="btn-pay">Pay Now</button>
+            <button type="submit" class="btn-pay" id="payNowBtn">Pay Now</button>
           </form>
+          <button id="payBtn" class="btn btn-success">Pay Now</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Bootstrap Bundle JS (optional) -->
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/payment.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+console.log("✅ Page Loaded, Initializing Payment Setup...");
+
+// Wait for Cashfree SDK to load
+try {
+    await waitForCashfreeSDK();
+    console.log("✅ Cashfree SDK Loaded Successfully");
+} catch (error) {
+    console.error("❌ Cashfree SDK Failed to Load:", error);
+    alert("Failed to load Cashfree SDK. Check console for details.");
+    return;
+}
+
+// Setup payment button
+setupPaymentButton();
+});
+
+function waitForCashfreeSDK() {
+return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+        clearInterval(check);
+        reject(new Error("Cashfree SDK not loaded after 10 seconds"));
+    }, 10000);
+
+    const check = setInterval(() => {
+        if (window.Cashfree) {
+            clearTimeout(timeout);
+            clearInterval(check);
+            resolve();
+        }
+    }, 500);
+});
+}
+
+function setupPaymentButton() {
+const payButton = document.getElementById("payBtn");
+
+if (!payButton) {
+    console.error("❌ Pay Button not found on the page!");
+    alert("Payment button is missing. Cannot proceed.");
+    return;
+}
+
+payButton.addEventListener("click", async function () {
+    console.log("🛒 Pay Button Clicked! Initiating Payment...");
+
+    try {
+        // Create order via backend
+        const orderData = await createOrder();
+
+        if (!orderData || !orderData.payment_session_id) {
+            console.error("⚠ Invalid Order Response:", orderData);
+            alert("Failed to get payment session. Check console.");
+            return;
+        }
+
+        console.log("✅ Order Created Successfully. Session ID:", orderData.payment_session_id);
+
+        // Initialize Cashfree SDK with sandbox environment
+        const cashfree = Cashfree({
+            mode: "sandbox" // Explicitly set to sandbox (use "production" for live)
+        });
+
+        // Open payment modal
+        const checkoutResponse = cashfree.checkout({
+            paymentSessionId: orderData.payment_session_id,
+            redirect: false // Ensures modal, not redirect
+        });
+
+        console.log("🔍 Checkout Initiated, Waiting for User Interaction...");
+
+        // Handle the promise response
+        checkoutResponse.then(() => {
+            console.log("✅ Payment Modal Closed. Check payment status if needed.");
+        }).catch(error => {
+            console.error("❌ Payment Modal Error:", error);
+            alert("Payment failed. Check console for details.");
+        });
+
+    } catch (error) {
+        console.error("❌ Payment Process Failed:", error);
+        alert("Payment process failed. Check console.");
+    }
+});
+}
+
+async function createOrder() {
+console.log("🔄 Creating Order with Backend...");
+
+const orderPayload = {
+    order_id: "order_" + Date.now(), // Unique order ID
+    order_amount: 500,
+    order_currency: "INR",
+    customer_details: {
+        customer_id: "12345",
+        customer_name: "User",
+        customer_email: "test@example.com",
+        customer_phone: "9999999999"
+    }
+};
+
+try {
+    const response = await fetch("http://localhost:8087/api/payment/create-order", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderPayload),
+    });
+
+    const data = await response.json();
+    console.log("✅ Backend Response:", data);
+
+    if (!response.ok) {
+        throw new Error(`Server returned ${response.status}: ${JSON.stringify(data)}`);
+    }
+
+    if (!data.payment_session_id) {
+        throw new Error("Missing payment_session_id in response");
+    }
+
+    return data;
+} catch (error) {
+    console.error("❌ Order Creation Failed:", error);
+    throw error;
+}
+}
+</script>
+  <script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+      // Get all radio buttons and payment field divs
+      const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
+      const upiFields = document.getElementById("upiFields");
+      const cardFields = document.getElementById("cardFields");
+      const walletFields = document.getElementById("walletFields");
+      const netbankingFields = document.getElementById("netbankingFields");
+
+      // Function to show only the selected payment field
+      function showPaymentFields(selectedMethod) {
+        upiFields.style.display = selectedMethod === "UPI" ? "block" : "none";
+        cardFields.style.display = selectedMethod === "Card" ? "block" : "none";
+        walletFields.style.display = selectedMethod === "Wallet" ? "block" : "none";
+        netbankingFields.style.display = selectedMethod === "NetBanking" ? "block" : "none";
+      }
+
+      // Attach event listeners to radio buttons
+      paymentMethods.forEach((radio) => {
+        radio.addEventListener("change", function () {
+          showPaymentFields(this.value);
+        });
+      });
+
+      // Set the default view based on the pre-checked radio button
+      const defaultMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+      showPaymentFields(defaultMethod);
+    });
+
+  </script>
 </body>
 
 </html>

@@ -1,5 +1,5 @@
 document.getElementById("logoutBtn").addEventListener("click", async function () {
-  
+  const token = localStorage.getItem("adminToken");
   if (token) {
     // Send logout request to server (only if your backend supports token revocation)
     try {
@@ -191,8 +191,8 @@ function populateCategoriesTables(categories) {
       <td>${category.categoryId}</td>
       <td>${category.categoryName}</td>
       <td>${category.status}</td>
-      <td>${category.createdOn}</td>
-      <td>${category.updatedOn}</td>
+      <td>${category.createdAt}</td>
+      <td>${category.updatedAt}</td>
       <td>
         ${category.status === "STATUS_ACTIVE"
         ? `
@@ -1210,8 +1210,8 @@ function populateExpiredUsersTable(expiredPlans) {
       <td>${planName}</td>
       <td>${expiredOn}</td>
       <td>
-        <button class="btn btn-sm btn-danger" onclick="renewPlan('${plan.userId}')">
-          Renew Plan
+        <button class="btn btn-sm btn-danger" onclick="sendReminder('${plan.userId}')">
+          Send remainder
         </button>
       </td>
     `;
@@ -1219,11 +1219,51 @@ function populateExpiredUsersTable(expiredPlans) {
   });
 }
 
-
-// Example action functions
-function sendReminder(userId) {
-  alert("Reminder sent to user: " + userId);
+function fetchUserEmail(userId) {
+  return fetch(`http://localhost:8087/api/users/${userId}`, {
+    method: "GET",
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+      "Content-Type": "application/json"
+    }
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Error fetching user details, status: " + response.status);
+      }
+      return response.json();
+    })
+    .then(data => {
+      return data.email;
+    })
+    .catch(error => {
+      console.error("Error fetching user email:", error);
+      return null;
+    });
 }
+
+async function sendReminder(userId) {
+  const userEmail = await fetchUserEmail(userId);
+  const response = await fetch("http://localhost:8087/admin/email/send", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      to: userEmail,
+      subject: "Plan Expiry Reminder",
+      body: `Dear User, your plan is expiring soon. Please renew it as soon as possible.`
+    })
+  });
+
+  if (response.ok) {
+    alert("Email reminder sent successfully!");
+  } else {
+    alert("Failed to send email reminder.");
+  }
+}
+
 
 function renewPlan(userId) {
   alert("Initiate plan renewal for user: " + userId);

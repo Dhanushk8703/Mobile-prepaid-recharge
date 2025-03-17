@@ -64,7 +64,7 @@ public class UsersService {
 
 
 
-	public Optional<Users> findByMobileNumber(Long mobileNumber) {
-		return usersRepository.findByPhoneNumber(mobileNumber);
-	}
+	public Optional<Users> findByMobileNumber(Long phone) {
+        return usersRepository.findByPhoneNumber(phone);
+    }
 }
