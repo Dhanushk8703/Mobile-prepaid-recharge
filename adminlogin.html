@@ -31,6 +31,7 @@
         <span></span>
         <label>Password</label>
       </div>
+      <p id="errorMsg"></p>
       <input type="submit" value="Login" id="submitBtn" />
     </form>
   </div>
@@ -50,14 +51,18 @@
         body: JSON.stringify({ username, password }),
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem("adminToken", data.accessToken); // Store JWT token
-        alert("Login successful!");
-        window.location.href = "admin.html";
+      if (response.status === 401) {
+        document.getElementById("errorMsg").textContent = "Invalid username or password.";
       } else {
-        alert("Login failed: " + data.message);
+        const data = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem("adminToken", data.accessToken); // Store JWT token
+          alert("Login successful!");
+          window.location.href = "admin.html";
+        } else {
+          alert("Login failed: " + data.message);
+        }
       }
     });
   </script>

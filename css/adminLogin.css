@@ -92,3 +92,7 @@ body {
     border-color: #2691d9;
     transition: .5s;
   }
+
+  #errorMsg {
+    color: red;
+  }

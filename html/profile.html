@@ -225,21 +225,20 @@
 
         document.addEventListener("DOMContentLoaded", async function () {
             // Check if user is logged in
-            if (!sessionStorage.getItem("loggedIn") || !sessionStorage.getItem("phone")) {
+            if (!sessionStorage.getItem("loggedIn") || !sessionStorage.getItem("email")) {
                 window.location.href = "login.html";
                 return;
             }
-            const userPhone = sessionStorage.getItem("phone");
+            const email = sessionStorage.getItem("email");
 
             let currentUser = null; // will hold the logged-in user details
 
             try {
                 // Fetch user details directly from your backend
-                const response = await fetch(`http://localhost:8087/api/users/phone/${userPhone}`, {
+                const response = await fetch(`http://localhost:8087/api/users/email/${email}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
-                        // If authentication is not required, you can remove any Authorization header
                     }
                 });
                 if (!response.ok) {

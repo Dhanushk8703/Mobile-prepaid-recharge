@@ -1,3 +1,12 @@
+window.addEventListener('scroll', function () {
+  const header = document.getElementById('header');
+  if (window.scrollY > 50) {
+    header.classList.add('scrolled');
+  } else {
+    header.classList.remove('scrolled');
+  }
+});
+
 // Global variable to store grouped plans data by category
 let plansData = [];
 
@@ -63,9 +72,9 @@ async function fetchPublicData() {
 // Call the function to load public data and render plans
 fetchPublicData().then(data => {
   if (data && data.categories) {
-    plansData = data.categories; // Save globally for filtering
+    plansData = data.categories.filter(category => category.status === 'STATUS_ACTIVE'); // Save globally for filtering
     renderPlans(plansData);
-    populateCategoryFilter(data.categories);
+    populateCategoryFilter(plansData);
   }
 });
 
@@ -213,6 +222,7 @@ function renderPlans(categoriesResponse) {
 
   categoriesResponse.forEach((category, index) => {
     // Create tab header using category attributes
+    
     const li = document.createElement('li');
     li.className = "nav-item";
     li.role = "presentation";
@@ -259,7 +269,7 @@ function renderPlans(categoriesResponse) {
           <h4 class="plan-title mb-3">${plan.planName}</h4>
           <p class="plan-validity"><strong>Validity:</strong> ${plan.validity} Days</p>
           <p class="plan-price"><strong>Price:</strong> ₹${plan.planPrice}</p>
-          <p class="plan-data"><strong>Data:</strong> ${plan.data} GB</p>
+          <p class="plan-data"><strong>Data:</strong> ${plan.data} GB per day</p>
           <p class="plan-sms"><strong>SMS:</strong> ${plan.sms}</p>
           <p class="plan-description">${plan.description}</p>
           
@@ -303,7 +313,7 @@ document.getElementById('plans-container').addEventListener('click', function (e
         const benefitsArr = JSON.parse(benefitsStr);
         if (Array.isArray(benefitsArr) && benefitsArr.length) {
           benefitsHTML = `<h6>Benefits:</h6><div class="benefits-details">` +
-            benefitsArr.map(benefit => `<div class="benefit-item"><i class="${benefit.icon}"></i> ${benefit.benefitsName}</div>`).join('') +
+            benefitsArr.map(benefit => `<div class="benefit-item">${benefit.icon}  ${benefit.benefitsName}</div>`).join('') +
             `</div>`;
         }
       } catch (err) {
@@ -315,6 +325,8 @@ document.getElementById('plans-container').addEventListener('click', function (e
     document.getElementById('planDetailModalLabel').innerText = title;
     document.getElementById('modalContent').innerHTML = `
       <p><strong>Validity:</strong> ${validity} Days</p>
+      <p><strong>Plan ID:</strong> ${planId}</p>
+      <p><strong>Title:</strong> ${title}</p>
       <p><strong>Price:</strong> ₹${price}</p>
       <p>${description}</p>
       ${benefitsHTML}

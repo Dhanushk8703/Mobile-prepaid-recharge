@@ -21,4 +21,8 @@ public class QueryService {
 	public List<Query> getAllQueries() {
 		return queryRepository.findAll();
 	}
+
+	public void deleteById(Long id) {
+		queryRepository.deleteById(id);	
+	}
 }

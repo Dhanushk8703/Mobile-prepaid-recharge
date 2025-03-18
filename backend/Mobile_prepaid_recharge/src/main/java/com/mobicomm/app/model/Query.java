@@ -16,8 +16,9 @@ public class Query {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	private String username;
 	private Long phoneNumber;
 	private String queryType;
 	private String message;
-	
+	private String email;
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mobicomm.app.exception.PhoneNotFoundException;
 import com.mobicomm.app.model.Users;
 import com.mobicomm.app.service.UsersService;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -61,24 +62,23 @@ public class UsersController {
 	}
 	
 	@GetMapping("/phone/{mobileNumber}")
-    public ResponseEntity<?> getUserByPhone(@PathVariable Long mobileNumber) {
-        try {
-            Optional<Users> userOpt = userService.findByMobileNumber(mobileNumber);
-            System.out.println("Fetching user by phone: " + mobileNumber);
-            if (userOpt.isPresent()) {
-                return ResponseEntity.ok(userOpt.get());
-            } else {
-                // If user not found, return 404, not 500
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                     .body("No user found for phone: " + mobileNumber);
-            }
-        } catch (Exception e) {
-            // Any runtime exception here triggers a 500
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("Internal server error");
-        }
+    public ResponseEntity<Users> getUserByPhone(@PathVariable Long mobileNumber) {
+        return userService.findByMobileNumber(mobileNumber)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new PhoneNotFoundException("It is not a registered MobiComm number."));
     }
+	
+	@GetMapping("/email/{email}")
+	public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
+		Optional<Users>user =  userService.findByEmail(email);
+		
+		if (user.isPresent()) {
+			return new ResponseEntity<>(user, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	
+	}
 	
 	@PutMapping("/{userId}")
 	public ResponseEntity<?> updateUser(@PathVariable String userId, @RequestBody Users user) {

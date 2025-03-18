@@ -81,8 +81,15 @@
                             required>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="querySubject" class="form-label">Subject</label>
-                        <input type="text" class="form-control" id="querySubject" placeholder="Subject" required>
+                        <label for="queryType" class="form-label">Query Type</label>
+                        <select id="queryType" class="form-select" required>
+                            <option value="">Select Query Type</option>
+                            <option value="rechargeIssue">Recharge Issue</option>
+                            <option value="planDetails">Plan Details</option>
+                            <option value="suggestions">Suggestions</option>
+                            <option value="complaint">Complaint</option>
+                            <option value="other">Other</option>
+                        </select>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -132,7 +139,8 @@
                 <div class="col-md-4 mb-4">
                     <h5 class="text-dark" data-aos="fade-down" data-aos-duration="500">Quick Links</h5>
                     <ul class="list-unstyled">
-                        <li data-aos="fade-up" data-aos-duration="600"><a href="../index.html" class="footer-link">Home</a>
+                        <li data-aos="fade-up" data-aos-duration="600"><a href="../index.html"
+                                class="footer-link">Home</a>
                         </li>
                         <li data-aos="fade-up" data-aos-duration="700"><a href="prepaid.html"
                                 class="footer-link">Prepaid Plans</a></li>
@@ -181,70 +189,43 @@
             }
         });
 
-        function send() {
-            alert("Your message has been sent successfully!");
-        }
-
         $(document).ready(function () {
             $("#queryForm").submit(function (e) {
                 e.preventDefault();
 
-                // Get form data
-                const name = $("#queryName").val().trim();
-                const email = $("#queryEmail").val().trim();
-                const mobile = $("#queryMobile").val().trim();
-                const subject = $("#querySubject").val().trim();
-                const queryMessage = $("#queryMessage").val().trim();
+                // Collect form data
+                const queryData = {
+                    username: $("#queryName").val().trim(),
+                    email:$("#queryEmail").val().trim(),
+                    phoneNumber: $("#queryMobile").val().trim(),
+                    queryType: $("#queryType").val().trim(),
+                    message: $("#queryMessage").val().trim(),
+                };
 
-                if (!mobile || !queryMessage) {
+                // Validate fields
+                if (!queryData.phoneNumber || !queryData.message) {
                     alert("Please enter your mobile number and query message.");
                     return;
                 }
 
-                // Fetch current dashboard data
-                $.getJSON("http://localhost:3000/dashboard")
-                    .done(function (dashboardData) {
-                        // Assume the structure is dashboard.users.details array
-                        const usersArray = dashboardData.users.details;
-                        let userFound = false;
-
-                        // Find the user with the matching mobile number
-                        for (let i = 0; i < usersArray.length; i++) {
-                            if (usersArray[i].phone === mobile) {
-                                // Update the query field with the entered query message
-                                usersArray[i].query = queryMessage;
-                                userFound = true;
-                                break;
-                            }
-                        }
-
-                        if (userFound) {
-                            // Update the dashboard on the server
-                            $.ajax({
-                                url: "http://localhost:3000/dashboard",
-                                type: "PUT",
-                                data: JSON.stringify({ users: { ...dashboardData.users, details: usersArray } }),
-                                contentType: "application/json",
-                                success: function () {
-                                    alert("Your query has been submitted successfully.");
-                                    // Optionally clear the form
-                                    $("#queryForm")[0].reset();
-                                },
-                                error: function (err) {
-                                    console.error("Error updating dashboard:", err);
-                                    alert("There was an error submitting your query. Please try again later.");
-                                }
-                            });
-                        } else {
-                            alert("User with the provided mobile number not found.");
-                        }
-                    })
-                    .fail(function (error) {
-                        console.error("Error fetching dashboard data:", error);
-                        alert("Error retrieving data. Please try again later.");
-                    });
+                // Send data to the backend
+                $.ajax({
+                    url: "http://localhost:8087/api/query",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(queryData),
+                    success: function () {
+                        alert("Your query has been submitted successfully.");
+                        $("#queryForm")[0].reset();
+                    },
+                    error: function (err) {
+                        console.error("Error submitting query:", err);
+                        alert("There was an error submitting your query. Please try again later.");
+                    }
+                });
             });
         });
+
 
     </script>
 </body>

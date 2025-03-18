@@ -29,12 +29,14 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+        
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()      // Public endpoints for authentication
-                .requestMatchers("/admin/**").authenticated()   // Only /admin endpoints require JWT auth
-                .anyRequest().permitAll()                        // All other endpoints are public
+                .requestMatchers("/auth/**").permitAll()      // Public authentication endpoints
+                .requestMatchers("/api/payments/create").permitAll()  // Allow webhook access
+                .requestMatchers("/admin/**").authenticated()  // Requires JWT authentication
+                .anyRequest().permitAll()                      // All other requests are allowed
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

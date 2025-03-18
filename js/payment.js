@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const planSummary = document.getElementById('planSummary');
   if (planSummary) {
+    sessionStorage.setItem('planName', planTitle); 
     planSummary.innerHTML = `
       <h4>${planTitle}</h4>
       <p><strong>Plan ID:</strong> ${planId}</p>
@@ -250,7 +251,7 @@ async function sendEmailReminder(email, transactionId, mobileNumber, planId, pla
 
             • Transaction ID: ${transactionId}
             • Mobile Number: ${mobileNumber}
-            • Plan: ${planId}
+            • Plan: ${sessionStorage.getItem("planName")}
             • Price: ₹${planPrice}
             • Payment Method: ${paymentMethod}
 

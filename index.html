@@ -455,20 +455,60 @@
           localStorage.removeItem('mobileNumber');
         }
 
-        document.getElementById('homeMobileForm').addEventListener('submit', function (e) {
+        document.getElementById('homeMobileForm').addEventListener('submit', async function (e) {
           e.preventDefault();
-          const mobile = document.getElementById('homeMobileNumber').value.trim();
-          const error = document.getElementById('error-number');
-          if (mobile.length < 10) {
-            error.textContent = 'Please enter a valid 10-digit mobile number.';
-          } else {
 
-            localStorage.setItem('mobileNumber', mobile);
-            // Redirect or move to the next step (e.g., select plan)
-            window.location.href = "./html/prepaid.html"; // or payment.html if that's your flow
+          const mobileInput = document.getElementById('homeMobileNumber');
+          const error = document.getElementById('error-number');
+          const mobile = mobileInput.value.trim();
+
+          console.log("Entered mobile:", mobile);
+
+          // 1) Basic Client-Side Validation
+          if (mobile.length !== 10 || !/^\d+$/.test(mobile)) {
+            error.textContent = 'Please enter a valid 10-digit mobile number.';
+            return;
           }
-          // Store mobile number in localStorage
+
+          try {
+            // Clear any previous error
+            error.textContent = '';
+
+            // 2) Fetch user details from backend
+            const response = await fetch(`http://localhost:8087/api/users/phone/${mobile}`, {
+              method: 'GET',
+              headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('adminToken'),
+                'Content-Type': 'application/json'
+              }
+            });
+
+            // 3) Check response
+            if (!response.ok) {
+              // If user not found, backend might return 404
+              if (response.status === 404) {
+                error.textContent = 'This number is not registered.';
+              } else {
+                error.textContent = `Server error. Status: ${response.status}`;
+              }
+              return;
+            }
+
+            // 4) If response is OK, user is found
+            const userData = await response.json();
+            console.log("Fetched user data:", userData);
+
+            // 5) Store mobile in localStorage and redirect
+            localStorage.setItem('mobileNumber', mobile);
+            window.location.href = "./html/prepaid.html";
+
+          } catch (err) {
+            console.error('Error fetching user details:', err);
+            error.textContent = 'Failed to validate the number. Please try again.';
+          }
         });
+
+
       }
 
       typeWriter();

@@ -270,45 +270,13 @@
     <div class="container-fluid mt-5">
         <div class="row">
             <!-- LEFT COLUMN (Filter for Large Screens) -->
-            <div class="col-lg-3 d-none d-lg-block">
+            <!-- <div class="col-lg-3 d-none d-lg-block">
                 <div class="main-container">
                     <section class="filter-section py-4 bg-light">
                         <div class="filter-section-container">
                             <div class="container">
                                 <div class="row" data-aos="fade-right" data-aos-duration="800">
-                                    <!-- Category Filter (Dynamic) -->
-                                    <div class="col-md-12 mb-4">
-                                        <label for="categoryFilter" class="form-label">Plan Category</label>
-                                        <select id="categoryFilter" class="form-select">
-                                            <option value="all">All Categories</option>
-                                        </select>
-                                    </div>
-                                    <!-- Search by Keyword -->
-                                    <div class="col-md-12 mb-4">
-                                        <label for="searchFilter" class="form-label">Search by Keyword</label>
-                                        <input type="text" id="searchFilter" class="form-control"
-                                            placeholder="e.g. Unlimited, Booster, OTT..." />
-                                    </div>
-                                    <!-- OTT Platforms Filter -->
-                                    <div class="col-md-12 mb-4">
-                                        <label class="form-label">Filter by OTT Platforms</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input ottPlatform" type="checkbox" id="ottNetflix"
-                                                value="Netflix">
-                                            <label class="form-check-label" for="ottNetflix">Netflix</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input ottPlatform" type="checkbox" id="ottAmazon"
-                                                value="Amazon Prime">
-                                            <label class="form-check-label" for="ottAmazon">Amazon Prime</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input ottPlatform" type="checkbox" id="ottHotstar"
-                                                value="Hotstar">
-                                            <label class="form-check-label" for="ottHotstar">Hotstar</label>
-                                        </div>
-                                    </div>
-                                    <!-- Validity Range Filter -->
+                                     Validity Range Filter
                                     <div class="col-md-12 mb-4">
                                         <label class="form-label">Validity (Days)</label>
                                         <div class="d-flex align-items-center">
@@ -319,7 +287,6 @@
                                                 value="100" min="1">
                                         </div>
                                     </div>
-                                    <!-- Data per Day Range Filter -->
                                     <div class="col-md-12 mb-4">
                                         <label class="form-label">Data per Day (GB)</label>
                                         <div class="d-flex align-items-center">
@@ -330,21 +297,18 @@
                                                 value="10" min="0" step="0.1">
                                         </div>
                                     </div>
-                                    <!-- 5G Plans Filter -->
                                     <div class="col-md-12 mb-4">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="fiveGFilter" />
                                             <label class="form-check-label" for="fiveGFilter">Only 5G Plans</label>
                                         </div>
                                     </div>
-                                    <!-- Price Filter -->
                                     <div class="col-md-12 mb-4">
                                         <label for="priceFilter" class="form-label">Max Price (₹)</label>
                                         <input type="range" class="form-range" min="100" max="1000" step="50"
                                             id="priceFilter" />
                                         <span id="priceValue" class="ms-2">₹1000</span>
                                     </div>
-                                    <!-- Clear Filters Button -->
                                     <div class="row">
                                         <div class="col-md-12 text-center mt-3">
                                             <button id="clearFilters" class="button-30 mt-3 text-center" type="button">
@@ -357,21 +321,21 @@
                         </div>
                     </section>
                 </div>
-            </div>
+            </div> -->
 
             <!-- RIGHT COLUMN (Plans) -->
-            <div class="col-lg-9 col-sm-12">
-                <!-- Filter Button for Small Screens -->
+            <div class="col-lg-12 col-sm-12">
+                <!-- Filter Button for Small Screens
                 <div class="d-lg-none text-end mt-5">
                     <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas"
                         data-bs-target="#filterOffcanvas" aria-controls="filterOffcanvas">
                         <i class="fa-solid fa-filter"></i> Filter
                     </button>
-                </div>
+                </div> -->
 
                 <!-- Plans Section -->
                 <section class="plans-section py-5">
-                    <div class="container">
+                    <div class="container-fluid">
                         <div class="row" id="plans-container">
                             <!-- Dynamic plan cards will be injected here -->
                         </div>

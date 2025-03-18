@@ -11,7 +11,7 @@ document.getElementById("logoutBtn").addEventListener("click", async function ()
         },
         body: JSON.stringify({ refreshToken: localStorage.getItem("refreshToken") }), // Optional if refresh tokens exist
       });
-      
+
       if (!response.ok) {
         console.warn("Logout request failed:", await response.text());
       }
@@ -118,9 +118,8 @@ function populatePlansTables(plans) {
       <td>${plan.updatedAt}</td>
       <td>${(plan.benefits && plan.benefits.length) ? plan.benefits.map(b => b.benefitsName).join(', ') : 'None'}</td>
       <td>
-        ${
-          plan.status === "STATUS_ACTIVE"
-            ? `
+        ${plan.status === "STATUS_ACTIVE"
+        ? `
               <button class="btn btn-sm btn-success edit-plan-btn" 
                       onclick='openEditPlanModal("${plan.planId}")' 
                       data-plan-id="${plan.planId}">
@@ -131,7 +130,7 @@ function populatePlansTables(plans) {
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             `
-            : `
+        : `
               <button id="active" class="btn btn-sm btn-success mx-2 my-2" 
                       data-plan-id="${plan.planId}">
                 <i class="fa-solid fa-square-check"></i>
@@ -141,7 +140,7 @@ function populatePlansTables(plans) {
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             `
-        }
+      }
       </td>
     `;
     if (plan.status === "STATUS_ACTIVE") {
@@ -375,7 +374,7 @@ document.getElementById('deactivatedCategoriesTable').addEventListener('click', 
         return response.json();
       })
       .then(data => {
-        console.log('Plan activated successfully:', data);
+        console.log('Category activated successfully:', data);
         row.style.transition = "opacity 0.5s";
         row.style.opacity = 0;
         setTimeout(() => row.remove(), 500);
@@ -390,7 +389,7 @@ document.getElementById('deactivatedCategoriesTable').addEventListener('click', 
     const row = event.target.closest('tr');
     const planId = row.querySelector('td:first-child').textContent.trim();
 
-    fetch(`http://localhost:8087/api/category/${encodeURIComponent(planId)}`, {
+    fetch(`http://localhost:8087/api/category/delete/${encodeURIComponent(planId)}`, {
       method: 'DELETE',
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("adminToken"),
@@ -407,7 +406,7 @@ document.getElementById('deactivatedCategoriesTable').addEventListener('click', 
         return response.json();
       })
       .then(data => {
-        console.log('Plan deleted successfully:', data);
+        console.log('Category deleted successfully:', data);
         row.style.transition = "opacity 0.5s";
         row.style.opacity = 0;
         setTimeout(() => row.remove(), 500);
@@ -648,7 +647,7 @@ function openAddPlanModal() {
 
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll('.edit-plan-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
+    btn.addEventListener('click', function () {
       const planId = this.getAttribute('data-plan-id');
       openEditPlanModal(planId);
     });
@@ -706,12 +705,12 @@ function openEditPlanModal(planId) {
         // Optionally, if you have a display field for benefits, you can update it like this:
         const benefitsDisplay = document.getElementById('planBenefitsDisplay');
         if (benefitsDisplay) {
-          benefitsDisplay.textContent = plan.benefits && plan.benefits.length 
+          benefitsDisplay.textContent = plan.benefits && plan.benefits.length
             ? plan.benefits.map(b => b.benefitsName).join(', ')
             : 'None';
         }
       }
-  
+
       // Initialize and show the modal using Bootstrap
       const modalElement = document.getElementById('planModal');
       const planModal = new bootstrap.Modal(modalElement);
@@ -719,7 +718,7 @@ function openEditPlanModal(planId) {
     })
     .catch(err => console.error("Error fetching plan for edit:", err));
 
-}  
+}
 function fetchBenefitsData() {
   fetch("http://localhost:8087/api/benefits", {
     method: "GET",
@@ -894,39 +893,39 @@ function populateUsersTable(users) {
     // Determine active plan name if available
     async function fetchAndDisplayActivePlan(userId) {
       try {
-          // Fetch active plan associated with the user
-          const response = await fetch(`http://localhost:8087/api/userplan/active/${userId}`);
-          
-          if (!response.ok) {
-              throw new Error(`Failed to fetch active plan, status: ${response.status}`);
-          }
-  
-          const activePlan = await response.json();
-  
-          // If no active plan found, return null
-          if (!activePlan || !activePlan.planId) {
-              console.warn("No active plan found for user:", userId);
-              return null;
-          }
-  
-          // Fetch the full plan details using the planId
-          const planResponse = await fetch(`http://localhost:8087/api/plans/${activePlan.planId}`);
-          
-          if (!planResponse.ok) {
-              throw new Error(`Failed to fetch plan details, status: ${planResponse.status}`);
-          }
-  
-          const plan = await planResponse.json();  
-          // Return only the plan name
-          return plan.planName;
-  
-      } catch (error) {
-          console.error("Error fetching active plan or plan details:", error);
-          return null; // Return null in case of an error
-      }
-  }
+        // Fetch active plan associated with the user
+        const response = await fetch(`http://localhost:8087/api/userplan/active/${userId}`);
 
-    const activePlan = await fetchAndDisplayActivePlan(user.userId);  
+        if (!response.ok) {
+          throw new Error(`Failed to fetch active plan, status: ${response.status}`);
+        }
+
+        const activePlan = await response.json();
+
+        // If no active plan found, return null
+        if (!activePlan || !activePlan.planId) {
+          console.warn("No active plan found for user:", userId);
+          return null;
+        }
+
+        // Fetch the full plan details using the planId
+        const planResponse = await fetch(`http://localhost:8087/api/plans/${activePlan.planId}`);
+
+        if (!planResponse.ok) {
+          throw new Error(`Failed to fetch plan details, status: ${planResponse.status}`);
+        }
+
+        const plan = await planResponse.json();
+        // Return only the plan name
+        return plan.planName;
+
+      } catch (error) {
+        console.error("Error fetching active plan or plan details:", error);
+        return null; // Return null in case of an error
+      }
+    }
+
+    const activePlan = await fetchAndDisplayActivePlan(user.userId);
 
     fetchAndDisplayActivePlan(user.userId);
     console.log("Active Plan:", activePlan);
@@ -985,7 +984,7 @@ function viewUser(button, activePlan) {
           document.getElementById("detailActivePlan").textContent = 'None';
           return;
         }
-        const activePlan = await fetchAndDisplayActivePlan(user.userId);  
+        const activePlan = await fetchAndDisplayActivePlan(user.userId);
 
         if (!activePlan || !activePlan.planId) {
           console.error("Active plan missing planId:", activePlan);
@@ -1130,7 +1129,7 @@ async function getExpiringAndExpiredUserPlans() {
 
     // Convert expiryDate to a valid JavaScript Date object
     let expiryDate = new Date(plan.expiryDate);
-    
+
     // If expiryDate is still invalid, log an error and skip this plan
     if (isNaN(expiryDate.getTime())) {
       console.warn(`Invalid expiry date for plan:`, plan);
@@ -1194,7 +1193,7 @@ function populateExpiredUsersTable(expiredPlans) {
     const userName = plan.userId || "Unknown User";
     const planName = plan.planId ? plan.planId : "N/A";
 
-    
+
     // Ensure expiryDate is a valid date
     let expiredOn = "Invalid Date";
     if (plan.expiryDate) {
@@ -1244,7 +1243,7 @@ function fetchUserEmail(userId) {
 
 async function sendReminder(userId) {
   const userEmail = await fetchUserEmail(userId);
-  const response = await fetch("http://localhost:8087/admin/email/send", {
+  const response = await fetch("http://localhost:8087/email/send", {
     method: "POST",
     headers: {
       "Authorization": "Bearer " + localStorage.getItem("adminToken"),
@@ -1274,4 +1273,103 @@ document.addEventListener("DOMContentLoaded", async function () {
   const { expiringPlans, expiredPlans } = await getExpiringAndExpiredUserPlans();
   populateExpiringUsersTable(expiringPlans);
   populateExpiredUsersTable(expiredPlans);
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Fetch queries and populate the table
+  fetchQueries();
+
+  function fetchQueries() {
+    fetch("http://localhost:8087/api/query") // Update with your backend URL
+      .then(response => response.json())
+      .then(queries => {
+        const tableBody = document.querySelector("#userQueriesTable tbody");
+        tableBody.innerHTML = ""; // Clear existing rows
+
+        queries.forEach(query => {
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+                      <td style="display: none;">${query.id}</td>
+                      <td">${query.username}</td>
+                      <td>${query.email}</td>
+                      <td>${query.phoneNumber}</td>
+                      <td>${query.queryType}</td>
+                      <td>${query.message}</td>
+                      <td>
+                          <button class="btn btn-success resolve-btn" data-email="${query.email} " data-id="${query.id}">
+                              Resolved
+                          </button>
+                      </td>
+                  `;
+
+          tableBody.appendChild(row);
+        });
+
+        // Attach event listeners to all buttons
+        document.querySelectorAll(".resolve-btn").forEach(button => {
+          button.addEventListener("click", function () {
+            const email = this.getAttribute("data-email");
+            const id = this.getAttribute("data-id");
+            sendResolvedEmail(email, id);
+          });
+        });
+      })
+      .catch(error => console.error("Error fetching queries:", error));
+  }
+
+  function sendResolvedEmail(email, queryId) {
+    if (!email) {
+      alert("Invalid email address.");
+      return;
+    }
+
+    const emailData = {
+      to: email,
+      subject: "Query Resolved - MobiComm",
+      body: "Dear User,\n\nYour query has been resolved successfully. If you need further assistance, feel free to contact us again.\n\nBest Regards,\nMobiComm Support Team"
+    };
+
+    fetch("http://localhost:8087/email/send", { // Update with your email API endpoint
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(emailData)
+    })
+      .then(response => {
+        if (response.ok) {
+          alert(`Email sent successfully to ${email}`);
+          deleteQuery(queryId);
+        } else {
+          alert("Error sending email.");
+        }
+      })
+      .catch(error => console.error("Error sending email:", error));
+  }
+
+  function deleteQuery(queryId) {
+    console.log("Deleting query with ID:", queryId);
+
+    fetch(`http://localhost:8087/api/query/${queryId}`, { // Update with your actual DELETE API endpoint
+        method: "DELETE"
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.text();
+        })
+        .then(result => {
+            console.log("Query deleted successfully:", result);
+
+            // Remove the row from the UI
+            const row = document.querySelector(`tr[data-query-id="${queryId}"]`);
+            if (row) row.remove();
+
+            fetchQueries();
+        })
+        .catch(error => {
+            console.error("Error deleting query:", error);
+            alert("Failed to delete query.");
+        });
+}
 });

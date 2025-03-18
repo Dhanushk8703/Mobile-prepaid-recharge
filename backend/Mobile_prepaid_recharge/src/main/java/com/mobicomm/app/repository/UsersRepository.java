@@ -14,4 +14,6 @@ public interface UsersRepository extends CrudRepository<Users, String>{
 
 	Optional<Users> findTopByOrderByUserIdDesc();
 
+	Optional<Users> findByEmail(String email);
+
 }

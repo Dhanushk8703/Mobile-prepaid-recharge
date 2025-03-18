@@ -62,6 +62,9 @@ public class UsersService {
 	        .orElse(null);  // Ensures that if user is not found, null is returned
 	}
 
+	public Optional<Users> findByEmail(String email) {
+		return usersRepository.findByEmail(email);
+	}
 
 
 	public Optional<Users> findByMobileNumber(Long phone) {

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stripe Checkout</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        input, button { padding: 10px; margin: 10px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h2>Stripe Payment Checkout</h2>
+
+    <label>Product Name:</label>
+    <input type="text" id="productName" placeholder="Enter Product Name" required>
+    
+    <label>Amount (in cents):</label>
+    <input type="number" id="amount" placeholder="Enter Amount (e.g. 1000 for $10)" required>
+
+    <button id="payButton">Pay with Stripe</button>
+
+    <script>
+        document.getElementById("payButton").addEventListener("click", async function () {
+            const productName = document.getElementById("productName").value;
+            const amount = document.getElementById("amount").value;
+
+            if (!productName || !amount) {
+                alert("Please enter Product Name and Amount");
+                return;
+            }
+
+            const response = await fetch("http://localhost:8087/api/payments/create-checkout-session", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ productName, amount })
+            });
+
+            const data = await response.json();
+
+            if (data.url) {
+                window.location.href = data.url; // Redirect to Stripe Checkout
+            } else {
+                alert("Error: " + data.error);
+            }
+        });
+    </script>
+</body>
+</html>
