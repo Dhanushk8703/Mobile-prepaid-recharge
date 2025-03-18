@@ -30,7 +30,6 @@
       <nav class="navlinks">
         <a class="navlink" data-aos="fade-down" data-aos-delay="100" href="index.html">Home</a>
         <a class="navlink" data-aos="fade-down" data-aos-delay="200" href="./html/prepaid.html">Prepaid Plans</a>
-        <!-- <a class="navlink" data-aos="fade-down" data-aos-delay="300" href="faq.html">FAQs</a> -->
         <a class="navlink" data-aos="fade-down" data-aos-delay="400" href="./html/contact.html">Contacts</a>
         <a class="navlink" data-aos="fade-down" data-aos-delay="500" href="./html/profile.html">Profile</a>
       </nav>
@@ -42,7 +41,6 @@
     <ul>
       <li><a href="index.html"><i class="fa fa-home"></i><span>Home</span></a></li>
       <li><a href="./html/prepaid.html"><i class="fa fa-bolt"></i><span>Plans</span></a></li>
-      <li><a href="faq.html"><i class="fa fa-question-circle"></i><span>FAQs</span></a></li>
       <li><a href="./html/contact.html"><i class="fa fa-phone"></i><span>Contacts</span></a></li>
       <li><a href="./html/profile.html"><i class="fa fa-user"></i><span>Profile</span></a></li>
     </ul>
@@ -281,15 +279,15 @@
               <div class="form-group mb-4">
                 <select class="form-control" id="joinPlan" required>
                   <option value="">Select Your Plan</option>
-                  <option value="plan1">MobiComm eSim</option>
-                  <option value="plan2">MobiComm Sim</option>
+                  <option value="New MobiComm Sim">New MobiComm Sim</option>
+                  <option value="Port Change">Port Change</option>
                 </select>
               </div>
               <div class="d-flex justify-content-center">
                 <button class="button-30 mt-3 text-center" type="submit" role="button">Join Now</button>
               </div>
             </form>
-            <p class="form-footer">Already have a SIM? <a href="login.html">Login Here</a></p>
+            <p class="form-footer">Already have a SIM? <a href="./html/login.html">Login Here</a></p>
           </div>
         </div>
       </div>
@@ -384,10 +382,11 @@
           <h5 class="text-dark" data-aos="fade-down" data-aos-duration="500">Quick Links</h5>
           <ul class="list-unstyled">
             <li data-aos="fade-up" data-aos-duration="600"><a href="index.html" class="footer-link">Home</a></li>
-            <li data-aos="fade-up" data-aos-duration="700"><a href="prepaid.html" class="footer-link">Prepaid Plans</a>
+            <li data-aos="fade-up" data-aos-duration="700"><a href="./html/prepaid.html" class="footer-link">Prepaid Plans</a>
             </li>
-            <li data-aos="fade-up" data-aos-duration="800"><a href="faq.html" class="footer-link">FAQs</a></li>
-            <li data-aos="fade-up" data-aos-duration="900"><a href="contact.html" class="footer-link">Contact Us</a>
+            <li data-aos="fade-up" data-aos-duration="800"><a href="faq.html" class="footer-link">FAQs</a>
+            </li>
+            <li data-aos="fade-up" data-aos-duration="900"><a href="./html/contact.html" class="footer-link">Contact Us</a>
             </li>
           </ul>
         </div>
@@ -514,43 +513,38 @@
       typeWriter();
     });
 
-    $(document).ready(function () {
-      // Listen for the form submission
-      $("#joinForm").submit(function (e) {
-        e.preventDefault(); // Prevent default page refresh
+    document.getElementById("joinForm").addEventListener("submit", async function (event) {
+    event.preventDefault(); // Prevent default form submission
 
-        // Gather form field values
-        const name = $("#joinName").val().trim();
-        const email = $("#joinEmail").val().trim();
-        const phone = $("#joinPhone").val().trim();
-        const plan = $("#joinPlan").val();
+    // Collect form data
+    const formData = {
+        name: document.getElementById("joinName").value,
+        email: document.getElementById("joinEmail").value,
+        phoneNumber: document.getElementById("joinPhone").value,
+        requestType: document.getElementById("joinPlan").value
+    };
 
-        // Create the object to send to the JSON server
-        const newUserRequestObj = {
-          name: name,
-          email: email,
-          contactNumber: phone,
-          simPlan: plan
-        };
-
-        // POST request to the JSON server's newUserRequest array
-        $.ajax({
-          url: "http://localhost:3000/newUserRequest", // Adjust if needed
-          type: "POST",
-          data: JSON.stringify(newUserRequestObj),
-          contentType: "application/json",
-          success: function () {
-            alert("Your request has been submitted successfully!");
-            // Optionally clear the form
-            $("#joinForm")[0].reset();
-          },
-          error: function (err) {
-            console.error("Error adding to newUserRequest:", err);
-            alert("There was an error submitting your request. Please try again later.");
-          }
+    try {
+        const response = await fetch("http://localhost:8087/api/newUser", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(formData)
         });
-      });
-    });
+
+        if (!response.ok) {
+            throw new Error("Failed to submit request");
+        }
+
+        alert("Request submitted successfully!");
+        document.getElementById("joinForm").reset(); // Clear form after submission
+
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Error submitting request. Please try again.");
+    }
+});
 
 
   </script>

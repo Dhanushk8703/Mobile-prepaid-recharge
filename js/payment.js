@@ -11,7 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const planSummary = document.getElementById('planSummary');
   if (planSummary) {
-    sessionStorage.setItem('planName', planTitle); 
+    sessionStorage.setItem('planName', planTitle);
+    sessionStorage.setItem('planId', planId);
+    sessionStorage.setItem('planPrice', planPrice);
     planSummary.innerHTML = `
       <h4>${planTitle}</h4>
       <p><strong>Plan ID:</strong> ${planId}</p>
@@ -59,107 +61,147 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to show only the selected payment field
     function showPaymentFields(selectedMethod) {
-        upiFields.style.display = selectedMethod === "UPI" ? "block" : "none";
-        cardFields.style.display = selectedMethod === "Card" ? "block" : "none";
-        walletFields.style.display = selectedMethod === "Wallet" ? "block" : "none";
-        netbankingFields.style.display = selectedMethod === "NetBanking" ? "block" : "none";
+      upiFields.style.display = selectedMethod === "UPI" ? "block" : "none";
+      cardFields.style.display = selectedMethod === "Card" ? "block" : "none";
+      walletFields.style.display = selectedMethod === "Wallet" ? "block" : "none";
+      netbankingFields.style.display = selectedMethod === "NetBanking" ? "block" : "none";
     }
 
     // Attach event listeners to radio buttons
     paymentMethods.forEach((radio) => {
-        radio.addEventListener("change", function () {
-            showPaymentFields(this.value);
-        });
+      radio.addEventListener("change", function () {
+        showPaymentFields(this.value);
+      });
     });
 
     // Set the default view based on the pre-checked radio button
     const defaultMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
     showPaymentFields(defaultMethod);
-});
+  });
 
+  async function fetchUserDetails(mobileNumber) {
+    try {
+      const userIdResponse = await fetch(`http://localhost:8087/api/users/phone/${mobileNumber}`, {
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+          "Content-Type": "application/json"
+        }
+      });
 
-  /***********************************************************
-    2) Payment form submission logic
-  ***********************************************************/
-  const paymentForm = document.getElementById('paymentForm');
-  if (paymentForm) {
-    paymentForm.addEventListener('submit', function (e) {
-      e.preventDefault();
+      if (!userIdResponse.ok) {
+        if (userIdResponse.status === 404) {
+          alert("No user found for this mobile number!");
+        }
+        throw new Error("Error fetching user ID, status: " + userIdResponse.status);
+      }
 
-      // Validate mobile number from localStorage
-      const mobileNumber = localStorage.getItem('mobileNumber');
-      if (!mobileNumber || mobileNumber.length !== 10 || !/^\d+$/.test(mobileNumber)) {
-        alert("Please enter a valid 10-digit mobile number.");
+      const userData = await userIdResponse.json();
+      const userId = userData.userId; // or userData.userId if your backend returns that
+      if (!userId) {
+        console.error("User ID not found in response:", userData);
         return;
       }
 
-      // Retrieve the selected payment method
-      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-
-      // Show processing message
-      document.getElementById('paymentContent').innerHTML = `
-        <div class="text-center">
-          <h2>Processing Payment...</h2>
-          <p class="my-3 text-center text-danger">Please wait while payment is processing...<br><strong>Don't refresh the page</strong></p>
-          <div class="loader"></div>
-        </div>
-      `;
-
-      // Simulate payment delay
-      setTimeout(() => {
-        // 2A) Generate a transaction ID
-        const transactionId = 'TXN' + Math.random().toString(36).substr(2, 9).toUpperCase();
-
-        // 2B) Call backend to record the recharge
-        const requestBody = new URLSearchParams({
-          planId: planId,
-          amountPaid: planPrice,
-          paymentMethod: paymentMethod,
-          mobileNumber: mobileNumber
-        });
-
-        fetch('http://localhost:8087/api/recharge-history/add', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: requestBody
-        })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(data => {
-          // 2C) Show success UI
-          document.getElementById('paymentContent').innerHTML = `
-            <div class="success-message">
-              <i class="bi bi-check-circle-fill text-warning" style="font-size: 4rem;"></i>
-              <h2>Payment Successful!</h2>
-              <div class="transaction-details">
-                <p><strong>Transaction ID:</strong> ${transactionId}</p>
-                <p><strong>Mobile Number:</strong> ${mobileNumber}</p>
-                <p><strong>Plan:</strong> ${planId}</p>
-                <p><strong>Price:</strong> ₹${planPrice}</p>
-                <p><strong>Payment Method:</strong> ${paymentMethod}</p>
-                <p>Your transaction was successful! Thank you for recharging.</p>
-                <p class="text-danger">Confirmation will be sent to your registered Email address.</p>
-              </div>
-              <button class="btn btn-pay" onclick="window.location.href='../index.html'">
-                Return to Home
-              </button>
-            </div>
-          `;
-
-          // 2D) Now send the email (we do it after successful payment)
-          fetchUserIdAndSendEmail(mobileNumber, transactionId, planId, planPrice, paymentMethod);
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert("Payment failed, please try again.");
-        });
-      }, 2500);
-    });
+      if (!email) {
+        alert("Could not retrieve user email.");
+        return;
+      }
+      sessionStorage.setItem("email", email);
+      sessionStorage.setItem("username", userData.username);
+    } catch (error) {
+      console.error("Error in fetchUserIdAndSendEmail:", error);
+    }
   }
+
+  document.getElementById("payBtn").addEventListener("click", function () {
+    // Retrieve plan price from sessionStorage
+    let planPrice = sessionStorage.getItem("planPrice");
+    if (!planPrice) {
+      alert("Plan price not set. Please select a plan.");
+      return;
+    }
+
+    // Convert price to paise
+    let amountInPaise = parseInt(planPrice) * 100;
+
+    // Call the backend to create an order
+    fetch(`http://localhost:8087/api/payment/create-order?amount=${amountInPaise}`,
+      {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+          "Content-Type": "application/json"
+        }
+      }
+    )
+      .then(response => response.json())
+      .then(order => {
+        if (!order.id) {
+          alert("Order ID not received from backend.");
+          return;
+        }
+
+        var options = {
+          "key": "rzp_test_7jbN2F87afR6Hf", // Razorpay Test Key
+          "amount": amountInPaise,
+          "currency": "INR",
+          "name": "Mobicomm",
+          "description": "Test Transaction",
+          "order_id": order.id,
+          "handler": function (response) {
+            fetch(`http://localhost:8087/api/payment/payment-details/${response.razorpay_payment_id}`,
+              {
+                method: "GET",
+                headers: {
+                  "Authorization": "Bearer " + localStorage.getItem("adminToken"),
+                  "Content-Type": "application/json"
+                }
+              }
+            )
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+              })
+              .then(data => {
+                console.log("Payment Details:", data);
+                if (data.method) {
+                  console.log("Payment Method:", data.method.toUpperCase());
+                  const paymentMethod = data.method.toUpperCase();
+                  const mobileNumber = localStorage.getItem("mobileNumber");
+                  const transactionId = response.razorpay_payment_id;
+                  const planId = sessionStorage.getItem("planId");
+
+                  fetchUserIdAndSendEmail(mobileNumber, transactionId, planId, planPrice, paymentMethod)
+                } else {
+                  console.warn("Payment method not found in response.");
+                }
+              })
+              .catch(error => console.error("Error fetching payment method:", error));
+
+          }
+          ,
+          "prefill": {
+            "name": sessionStorage.getItem("username") || "Test User",
+            "email": sessionStorage.getItem("email") || "test@example.com",
+            "contact": localStorage.getItem("mobileNumber") || "9999999999"
+          },
+          "theme": {
+            "color": "#0D6EFD"
+          }
+        };
+
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert("Failed to create Razorpay order. Check backend logs.");
+      });
+  });
+
 });
 
 /***********************************************************
@@ -168,6 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
 ***********************************************************/
 async function fetchUserIdAndSendEmail(mobileNumber, transactionId, planId, planPrice, paymentMethod) {
   try {
+
     const userIdResponse = await fetch(`http://localhost:8087/api/users/phone/${mobileNumber}`, {
       method: "GET",
       headers: {
@@ -196,9 +239,8 @@ async function fetchUserIdAndSendEmail(mobileNumber, transactionId, planId, plan
       alert("Could not retrieve user email.");
       return;
     }
-
-    // 3B) Send the email
     await sendEmailReminder(email, transactionId, mobileNumber, planId, planPrice, paymentMethod);
+
   } catch (error) {
     console.error("Error in fetchUserIdAndSendEmail:", error);
   }
@@ -265,6 +307,32 @@ async function sendEmailReminder(email, transactionId, mobileNumber, planId, pla
 
     if (response.ok) {
       alert("Email confirmation sent successfully!");
+      const requestBody = new URLSearchParams();
+      requestBody.append('planId', planId);
+      requestBody.append('amountPaid', planPrice);
+      requestBody.append('paymentMethod', paymentMethod);
+      requestBody.append('mobileNumber', mobileNumber);
+  
+      fetch('http://localhost:8087/api/recharge-history/add', {
+        method: 'POST',
+        headers: { 
+          'Authorization': 'Bearer ' + localStorage.getItem('adminToken'),        
+          'Content-Type': 'application/x-www-form-urlencoded' },
+        body: requestBody
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Recharge history added:', data);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      window.location.href = "../index.html";
     } else {
       alert("Failed to send email confirmation.");
     }

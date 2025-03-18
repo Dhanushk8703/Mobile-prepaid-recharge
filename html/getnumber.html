@@ -10,6 +10,28 @@
     <link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.css">
 
     <title>Payment</title>
+    <style>
+        .btn-pay {
+            display: inline-block;
+            width: 100%;
+            margin-top: 15px;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            background: #ff6f61;
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-pay:hover {
+            background: #e64a45;
+            transform: scale(1.03);
+            box-shadow: 0 4px 8px rgba(255, 111, 97, 0.3);
+        }
+    </style>
 </head>
 
 <body class="bg-light">
@@ -24,7 +46,7 @@
             </div>
             <div class="card-body p-4">
                 <div class="text-center mb-4">
-                    <i class="bi bi-phone text-warning" style="font-size: 2.5rem;"></i>
+                    <i class="bi bi-phone text-success" style="font-size: 2.5rem;"></i>
                     <h4 class="card-title text-primary mt-3 fw-bold">Enter Mobile Number</h4>
                 </div>
                 <form id="mobileNumberForm" onsubmit="validateAndProceed(event)" class="d-flex flex-column">
@@ -32,20 +54,19 @@
                         <label for="mobileNumber" class="form-label fw-semibold text-dark">Mobile Number</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0">
-                                <i class="bi bi-telephone text-warning"></i>
+                                <i class="bi bi-telephone text-success"></i>
                             </span>
-                            <input type="tel" class="form-control border-warning bg-light" id="mobileNumber"
+                            <input type="tel" class="form-control border-dark bg-light" id="mobileNumber"
                                 placeholder="Enter 10-digit mobile number" style="border-radius: 0 8px 8px 0;">
                         </div>
-                        <span id="error" class="text-secondary"></span>
+                        <span id="error" class="text-danger"></span>
                         <div class="form-text mt-2 text-dark">
-                            <i class="bi bi-info-circle me-1 text-warning"></i>
+                            <i class="bi bi-info-circle me-1 text-success"></i>
                             Please enter a valid 10-digit mobile number
                         </div>
                     </div>
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-outline-warning btn-lg fw-semibold"
-                            style="border-radius: 8px; padding: 12px;">
+                        <button type="submit" class="btn-pay" style="border-radius: 8px; padding: 12px;">
                             <i class="bi bi-arrow-right-circle me-2"></i>
                             Proceed to Payment
                         </button>

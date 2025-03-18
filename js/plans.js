@@ -282,7 +282,9 @@ function renderPlans(categoriesResponse) {
           </div>
         </div>
       `;
-      rowDiv.appendChild(planCard);
+      if (plan.status === "STATUS_ACTIVE") {
+        rowDiv.appendChild(planCard);
+      }
     });
 
     tabPane.appendChild(rowDiv);

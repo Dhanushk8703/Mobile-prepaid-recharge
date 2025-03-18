@@ -1373,3 +1373,42 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 }
 });
+
+// Function to fetch new user requests and populate the table
+async function fetchNewUserRequests() {
+  try {
+      const response = await fetch("http://localhost:8087/api/newUser");
+      if (!response.ok) {
+          throw new Error("Failed to fetch new user requests");
+      }
+
+      const newUserRequests = await response.json();
+      const tableBody = document.querySelector("#newUserRequestsTable tbody");
+      tableBody.innerHTML = ""; // Clear existing rows
+
+      if (newUserRequests.length === 0) {
+          tableBody.innerHTML = "<tr><td colspan='6' class='text-center'>No Requests Found</td></tr>";
+          return;
+      }
+
+      newUserRequests.forEach(request => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+              <td>${request.id}</td>
+              <td>${request.name}</td>
+              <td>${request.email}</td>
+              <td>${request.phoneNumber}</td>
+              <td>${request.requestType}</td>
+          `;
+          tableBody.appendChild(row);
+      });
+
+  } catch (error) {
+      console.error("Error:", error);
+      alert("Failed to fetch user requests.");
+  }
+}
+
+// Call the function when the page loads
+document.addEventListener("DOMContentLoaded", fetchNewUserRequests);
+
