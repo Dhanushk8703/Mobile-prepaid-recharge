@@ -57,8 +57,7 @@
         const data = await response.json();
 
         if (response.ok) {
-          localStorage.setItem("adminToken", data.accessToken); // Store JWT token
-          alert("Login successful!");
+          localStorage.setItem("adminToken", data.accessToken);
           window.location.href = "admin.html";
         } else {
           alert("Login failed: " + data.message);

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mobicomm.app.exception.PhoneNotFoundException;
+import com.mobicomm.app.exception.PhoneNumberNotFoundException;
 import com.mobicomm.app.model.Users;
 import com.mobicomm.app.service.UsersService;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -45,7 +45,7 @@ public class UsersController {
 	@GetMapping("/{userId}")
 	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	public ResponseEntity<?> getUserById(@PathVariable String userId) {
-		Optional<Users> user = userService.getUserById(userId);
+		Optional<Users> user = Optional.ofNullable(userService.getUserById(userId));
 		
 		if (user.isPresent()) {
 			return new ResponseEntity<>(user, HttpStatus.OK);
@@ -65,7 +65,7 @@ public class UsersController {
     public ResponseEntity<Users> getUserByPhone(@PathVariable Long mobileNumber) {
         return userService.findByMobileNumber(mobileNumber)
                 .map(ResponseEntity::ok)
-                .orElseThrow(() -> new PhoneNotFoundException("It is not a registered MobiComm number."));
+                .orElseThrow(() -> new PhoneNumberNotFoundException("It is not a registered MobiComm number."));
     }
 	
 	@GetMapping("/email/{email}")

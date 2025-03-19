@@ -120,11 +120,13 @@ function populatePlansTables(plans) {
       <td>
         ${plan.status === "STATUS_ACTIVE"
         ? `
-              <button class="btn btn-sm btn-success edit-plan-btn" 
-                      onclick='openEditPlanModal("${plan.planId}")' 
-                      data-plan-id="${plan.planId}">
-                <i class="fa-solid fa-pen-to-square"></i>
-              </button>
+        <span class="d-inline-block" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="Disabled popover">
+  <button class="btn btn-sm btn-success edit-plan-btn" type="button"
+          onclick='openEditPlanModal("${plan.planId}")' 
+          data-plan-id="${plan.planId}">
+    <i class="fa-solid fa-pen-to-square"></i>
+    </button>
+</span>
               <button id="deactive" class="btn btn-sm btn-danger mx-2 my-2" 
                       data-plan-id="${plan.planId}">
                 <i class="fa-solid fa-trash-can"></i>

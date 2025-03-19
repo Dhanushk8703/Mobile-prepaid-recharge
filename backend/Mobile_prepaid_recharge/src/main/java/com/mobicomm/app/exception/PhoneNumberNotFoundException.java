@@ -1,8 +1,8 @@
 package com.mobicomm.app.exception;
 
 @SuppressWarnings("serial")
-public class PhoneNotFoundException extends RuntimeException {
-    public PhoneNotFoundException(String message) {
+public class PhoneNumberNotFoundException extends RuntimeException {
+    public PhoneNumberNotFoundException(String message) {
         super(message);
     }
 }

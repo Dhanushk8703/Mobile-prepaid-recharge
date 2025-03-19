@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.mobicomm.app.exception.UserNotFoundException;
 import com.mobicomm.app.model.Plan;
 import com.mobicomm.app.model.Users;
 import com.mobicomm.app.repository.UsersRepository;
@@ -48,8 +49,9 @@ public class UsersService {
 		return (List<Users>) usersRepository.findAll();
 	}
 	
-	public Optional<Users> getUserById(String userId) {
-		return usersRepository.findById(userId);
+	public Users getUserById(String userId) {
+	    return usersRepository.findById(userId)
+	        .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found"));
 	}
 	
 	public Users updateUser(String userId, Users updatedUser) {

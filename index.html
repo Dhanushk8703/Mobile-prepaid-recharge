@@ -79,7 +79,7 @@
               <form class="my-3 justify-content-center" id="homeMobileForm">
                 <input type="text" id="homeMobileNumber" class="form-control p-3" placeholder="Mobile Number"
                   aria-label="Mobile Number">
-                <span id="error-number" class="text-danger"></span>
+                <span id="errorBody" class="text-danger"></span>
                 <div class=" d-flex justify-content-center"><button class="button-30 mt-3 text-center"
                     type="submit">Continue</button></div>
               </form>
@@ -458,7 +458,7 @@
           e.preventDefault();
 
           const mobileInput = document.getElementById('homeMobileNumber');
-          const error = document.getElementById('error-number');
+          const error = document.getElementById('errorBody');
           const mobile = mobileInput.value.trim();
 
           console.log("Entered mobile:", mobile);
@@ -484,9 +484,8 @@
 
             // 3) Check response
             if (!response.ok) {
-              // If user not found, backend might return 404
               if (response.status === 404) {
-                error.textContent = 'This number is not registered.';
+                error.textContent = 'Please enter the registered MobiComm mobile number.';
               } else {
                 error.textContent = `Server error. Status: ${response.status}`;
               }

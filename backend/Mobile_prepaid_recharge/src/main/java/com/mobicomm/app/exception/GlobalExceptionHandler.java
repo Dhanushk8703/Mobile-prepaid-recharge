@@ -12,8 +12,8 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(PhoneNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handlePhoneNotFoundException(PhoneNotFoundException ex) {
+    @ExceptionHandler(PhoneNumberNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handlePhoneNotFoundException(PhoneNumberNotFoundException ex) {
         Map<String, Object> errorBody = new HashMap<>();
         errorBody.put("timestamp", LocalDateTime.now().toString());
         errorBody.put("status", HttpStatus.NOT_FOUND.value());
@@ -22,6 +22,26 @@ public class GlobalExceptionHandler {
         errorBody.put("path", "/api/users/phone"); // Or set dynamically if needed
 
         return new ResponseEntity<>(errorBody, HttpStatus.NOT_FOUND);
+    }
+    
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+    
+    @ExceptionHandler(PlanNotFoundException.class)
+    public ResponseEntity<String> handlePlanNotFoundException(PlanNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidCategoryException.class)
+    public ResponseEntity<String> handleInvalidCategoryException(InvalidCategoryException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGenericException(Exception ex) {
+        return new ResponseEntity<>("An error occurred: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

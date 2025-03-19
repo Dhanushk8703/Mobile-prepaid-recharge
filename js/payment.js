@@ -51,69 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return; // Stop script
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
-    // Get all radio buttons and payment field divs
-    const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
-    const upiFields = document.getElementById("upiFields");
-    const cardFields = document.getElementById("cardFields");
-    const walletFields = document.getElementById("walletFields");
-    const netbankingFields = document.getElementById("netbankingFields");
-
-    // Function to show only the selected payment field
-    function showPaymentFields(selectedMethod) {
-      upiFields.style.display = selectedMethod === "UPI" ? "block" : "none";
-      cardFields.style.display = selectedMethod === "Card" ? "block" : "none";
-      walletFields.style.display = selectedMethod === "Wallet" ? "block" : "none";
-      netbankingFields.style.display = selectedMethod === "NetBanking" ? "block" : "none";
-    }
-
-    // Attach event listeners to radio buttons
-    paymentMethods.forEach((radio) => {
-      radio.addEventListener("change", function () {
-        showPaymentFields(this.value);
-      });
-    });
-
-    // Set the default view based on the pre-checked radio button
-    const defaultMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-    showPaymentFields(defaultMethod);
-  });
-
-  async function fetchUserDetails(mobileNumber) {
-    try {
-      const userIdResponse = await fetch(`http://localhost:8087/api/users/phone/${mobileNumber}`, {
-        method: "GET",
-        headers: {
-          "Authorization": "Bearer " + localStorage.getItem("adminToken"),
-          "Content-Type": "application/json"
-        }
-      });
-
-      if (!userIdResponse.ok) {
-        if (userIdResponse.status === 404) {
-          alert("No user found for this mobile number!");
-        }
-        throw new Error("Error fetching user ID, status: " + userIdResponse.status);
-      }
-
-      const userData = await userIdResponse.json();
-      const userId = userData.userId; // or userData.userId if your backend returns that
-      if (!userId) {
-        console.error("User ID not found in response:", userData);
-        return;
-      }
-
-      if (!email) {
-        alert("Could not retrieve user email.");
-        return;
-      }
-      sessionStorage.setItem("email", email);
-      sessionStorage.setItem("username", userData.username);
-    } catch (error) {
-      console.error("Error in fetchUserIdAndSendEmail:", error);
-    }
-  }
-
   document.getElementById("payBtn").addEventListener("click", function () {
     // Retrieve plan price from sessionStorage
     let planPrice = sessionStorage.getItem("planPrice");
@@ -312,12 +249,14 @@ async function sendEmailReminder(email, transactionId, mobileNumber, planId, pla
       requestBody.append('amountPaid', planPrice);
       requestBody.append('paymentMethod', paymentMethod);
       requestBody.append('mobileNumber', mobileNumber);
-  
+      console.log("Request Body:", requestBody);
+
       fetch('http://localhost:8087/api/recharge-history/add', {
         method: 'POST',
-        headers: { 
-          'Authorization': 'Bearer ' + localStorage.getItem('adminToken'),        
-          'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('adminToken'),
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
         body: requestBody
       })
         .then(response => {
@@ -332,7 +271,7 @@ async function sendEmailReminder(email, transactionId, mobileNumber, planId, pla
         .catch(error => {
           console.error('Error:', error);
         });
-      window.location.href = "../index.html";
+     window.location.href = "../index.html";
     } else {
       alert("Failed to send email confirmation.");
     }

@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.mobicomm.app.exception.PlanNotFoundException;
 import com.mobicomm.app.model.Category;
 import com.mobicomm.app.model.Plan;
 import com.mobicomm.app.model.Status;
@@ -69,43 +70,35 @@ public class PlanService {
     }
     
     public Plan updatePlan(String planId, Plan plan) {
-    	Optional<Plan> existPlan = planRepository.findById(planId);
-    	
-    	if (existPlan.isPresent()) {
-    		Plan updatePlan = existPlan.get();
-    		updatePlan.setPlanName(plan.getPlanName());
-    		updatePlan.setPlanPrice(plan.getPlanPrice());
-    		updatePlan.setBenefits(plan.getBenefits());
-    		updatePlan.setCategory(plan.getCategory());
-    		updatePlan.setDescription(plan.getDescription());
-    		updatePlan.setValidity(plan.getValidity());
-    		updatePlan.setSms(plan.getSms());
-    		updatePlan.setData(plan.getData());
-    		updatePlan.setUpdatedAt(LocalDate.now());
-    		return planRepository.save(updatePlan);
-    	} else {
-    		throw new RuntimeException("Plan not found");
-    	}
+        return planRepository.findById(planId)
+            .map(existingPlan -> {
+                existingPlan.setPlanName(plan.getPlanName());
+                existingPlan.setPlanPrice(plan.getPlanPrice());
+                existingPlan.setBenefits(plan.getBenefits());
+                existingPlan.setCategory(plan.getCategory());
+                existingPlan.setDescription(plan.getDescription());
+                existingPlan.setValidity(plan.getValidity());
+                existingPlan.setSms(plan.getSms());
+                existingPlan.setData(plan.getData());
+                existingPlan.setUpdatedAt(LocalDate.now());
+                return planRepository.save(existingPlan);
+            })
+            .orElseThrow(() -> new PlanNotFoundException("Plan with ID " + planId + " not found"));
     }
-    
+
     public Plan deactivatePlan(String planId) {
-    	Optional<Plan> existPlan = planRepository.findById(planId);
-    	
-    	if (existPlan.isPresent()) {
-    		Plan plan = existPlan.get();
-    		
-    		if (plan.getStatus() == Status.STATUS_INACTIVE) {
-    			throw new RuntimeException("The plan is Already in inactive");
-    		} 
-    		
-    		plan.setStatus(Status.STATUS_INACTIVE);
-    		plan.setUpdatedAt(LocalDate.now());
-    		
-    		return planRepository.save(plan);
-    	} else {
-    		throw new RuntimeException("Plan not found");
-    	}
+        Plan plan = planRepository.findById(planId)
+            .orElseThrow(() -> new PlanNotFoundException("Plan with ID " + planId + " not found"));
+
+        if (plan.getStatus() == Status.STATUS_INACTIVE) {
+            throw new RuntimeException("The plan is already inactive");
+        }
+
+        plan.setStatus(Status.STATUS_INACTIVE);
+        plan.setUpdatedAt(LocalDate.now());
+        return planRepository.save(plan);
     }
+
     
     public Plan activatePlan(String planId) {
 	Optional<Plan> existPlan = planRepository.findById(planId);
