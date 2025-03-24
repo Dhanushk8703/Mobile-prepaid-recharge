@@ -1160,9 +1160,17 @@ function populateExpiringUsersTable(expiringPlans) {
   }
 
   expiringPlans.forEach(plan => {
-    const userName = plan.user_id || "Unknown User"; // Adjust based on API response
-    const planName = plan.plan_id || "N/A";
-    const expiryDate = new Date(plan.expiry_date).toLocaleString();
+    const userName = plan.userId || "Unknown User"; // Adjust based on API response
+    const planName = plan.planId || "N/A";
+    // Ensure expiryDate is a valid date
+    let expiredOn = "Invalid Date";
+    if (plan.expiryDate) {
+      let parsedDate = new Date(plan.expiryDate);
+      if (!isNaN(parsedDate.getTime())) {
+        expiredOn = parsedDate.toLocaleString(); // Format date properly
+      }
+    }
+    const expiryDate = expiredOn;
 
     const row = document.createElement("tr");
     row.innerHTML = `
@@ -1170,7 +1178,7 @@ function populateExpiringUsersTable(expiringPlans) {
       <td>${planName}</td>
       <td>${expiryDate}</td>
       <td>
-        <button class="btn btn-sm btn-primary" onclick="sendReminder('${plan.user_id}')">
+        <button class="btn btn-sm btn-danger" onclick="sendReminder('${plan.userId}')">
           Send Reminder
         </button>
       </td>

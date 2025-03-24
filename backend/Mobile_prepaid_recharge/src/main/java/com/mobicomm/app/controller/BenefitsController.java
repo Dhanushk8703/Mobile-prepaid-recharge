@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mobicomm.app.model.Benefits;
+import com.mobicomm.app.repository.PlanBenefitsRepository;
 import com.mobicomm.app.service.BenefitsService;
 
 @RestController
@@ -29,6 +30,9 @@ public class BenefitsController {
 	
 	@Autowired
 	private BenefitsService benefitsService;
+	
+	@Autowired
+	private PlanBenefitsRepository benefitsRepository;
 	
 	@GetMapping
 	public ResponseEntity<?> getAllBenefits() {
@@ -66,7 +70,7 @@ public class BenefitsController {
 //	        existingBenefit.setBenefitDetails(benefit.getBenefitDetails());
 	        updateBenefit.setIcon(benefit.getIcon());
 	        
-	        benefitsService.addBenefits(updateBenefit);
+	        benefitsRepository.save(updateBenefit);
 	        return ResponseEntity.ok(updateBenefit);
 	    } else {
 	        return ResponseEntity.status(HttpStatus.NOT_FOUND)

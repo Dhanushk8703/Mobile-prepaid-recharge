@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "contact": localStorage.getItem("mobileNumber") || "9999999999"
           },
           "theme": {
-            "color": "#0D6EFD"
+            "color": "#2fa31e"
           }
         };
 
@@ -215,29 +215,20 @@ async function sendEmailReminder(email, transactionId, mobileNumber, planId, pla
     const response = await fetch("http://localhost:8087/email/send", {
       method: "POST",
       headers: {
-        "Authorization": "Bearer " + localStorage.getItem("adminToken"),
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
         to: email,
         subject: "Payment Successful",
         body: `
-          Dear User,
+        Thank you for using our service. We are pleased to inform you that your payment has been successfully processed.
 
-          Thank you for using our service. We are pleased to inform you that your payment has been processed successfully. 
-          
-          Below are the details of your recent transaction:
-
-            • Transaction ID: ${transactionId}
-            • Mobile Number: ${mobileNumber}
+        Payment Details:
+            • Transaction ID: ${transactionId}.
+            • Mobile Number: ${mobileNumber}.
             • Plan: ${sessionStorage.getItem("planName")}
             • Price: ₹${planPrice}
             • Payment Method: ${paymentMethod}
-
-          If you have any questions or need further assistance, please feel free to reach out to our customer support team at mobicomm.request@gmail.com. 
-          We value your business and look forward to serving you again in the future.
-            Sincerely,
-            MobiComm Team
         `
       })
     });
@@ -271,7 +262,8 @@ async function sendEmailReminder(email, transactionId, mobileNumber, planId, pla
         .catch(error => {
           console.error('Error:', error);
         });
-     window.location.href = "../index.html";
+        alert("EMAIL CONFIRMED MAIL SENT SUCCESSFULLY!");
+        window.location.href = "../index.html";
     } else {
       alert("Failed to send email confirmation.");
     }

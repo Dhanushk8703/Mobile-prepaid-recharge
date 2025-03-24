@@ -191,13 +191,13 @@ function populateCategoryFilter(categories) {
   offcanvasCategoryFilter.innerHTML = `<option value="all">All Categories</option>`;
 
   categories.forEach(category => {
-      let option = document.createElement("option");
-      option.value = category.categoryId;
-      option.textContent = category.categoryName;
-      categoryFilter.appendChild(option);
+    let option = document.createElement("option");
+    option.value = category.categoryId;
+    option.textContent = category.categoryName;
+    categoryFilter.appendChild(option);
 
-      let offcanvasOption = option.cloneNode(true);
-      offcanvasCategoryFilter.appendChild(offcanvasOption);
+    let offcanvasOption = option.cloneNode(true);
+    offcanvasCategoryFilter.appendChild(offcanvasOption);
   });
 }
 
@@ -211,7 +211,7 @@ function renderPlans(categoriesResponse) {
 
   // Create nav-tabs container for category tabs
   const navTabs = document.createElement('ul');
-  navTabs.className = "nav nav-tabs mb-3";
+  navTabs.className = "nav nav-tabs mb-3 scrollable-tabs";
   navTabs.id = "categoryTabs";
   navTabs.role = "tablist";
 
@@ -222,7 +222,7 @@ function renderPlans(categoriesResponse) {
 
   categoriesResponse.forEach((category, index) => {
     // Create tab header using category attributes
-    
+
     const li = document.createElement('li');
     li.className = "nav-item";
     li.role = "presentation";
@@ -256,31 +256,60 @@ function renderPlans(categoriesResponse) {
       const planCard = document.createElement('div');
       planCard.classList.add('col-md-4', 'mb-4');
       planCard.innerHTML = `
-        <div class="plan-card p-4 border rounded shadow-sm h-100 position-relative" 
-            data-plan-id="${plan.planId}" 
-            data-title="${plan.planName}" 
-            data-data="${plan.data}"
-            data-sms="${plan.sms}"
-            data-description="${plan.description}"
-            data-validity="${plan.validity}" 
-            data-price="${plan.planPrice}" 
-            data-benefits='${JSON.stringify(plan.benefits ? Array.from(plan.benefits) : [])}'>
-          
-          <h4 class="plan-title mb-3">${plan.planName}</h4>
-          <p class="plan-validity"><strong>Validity:</strong> ${plan.validity} Days</p>
-          <p class="plan-price"><strong>Price:</strong> ₹${plan.planPrice}</p>
-          <p class="plan-data"><strong>Data:</strong> ${plan.data} GB per day</p>
-          <p class="plan-sms"><strong>SMS:</strong> ${plan.sms}</p>
-          <p class="plan-description">${plan.description}</p>
-          
-          <div class="btn-group mt-3">
-            <button class="btn-view btn btn-sm btn-outline-primary">View Details</button>
-             <a class="btn-recharge btn btn-sm btn-success" 
-   href="payment.html?planId=${plan.planId}&price=${plan.planPrice}&planTitle=${plan.planName}">
-  Recharge Now
-</a>
-          </div>
+        <div class="pricing-table">
+  <div class="ptable-item">
+    <div class="ptable-single"
+         data-plan-id="${plan.planId}" 
+         data-title="${plan.planName}" 
+         data-data="${plan.data}"
+         data-sms="${plan.sms}"
+         data-description="${plan.description}"
+         data-validity="${plan.validity}" 
+         data-price="${plan.planPrice}" 
+         data-benefits='${JSON.stringify(plan.benefits ? Array.from(plan.benefits) : [])}'>
+      <div class="ptable-header">
+        <div class="ptable-title">
+          <h2>${plan.planName}</h2>
         </div>
+        <div class="ptable-price">
+          <h2><small>₹</small>${plan.planPrice}<span>/ ${plan.validity} Days</span></h2>
+        </div>
+      </div>
+      <div class="ptable-body">
+        <div class="ptable-description">
+          <ul>
+            <li class="d-flex mx-5 align-items-center"><strong>Data: </strong> <span> ${plan.data} GB per day</span></li>
+            <li class="d-flex mx-5 align-items-center"><strong>SMS: </strong> <span> ${plan.sms}</span></li>
+            <li class="d-flex mx-5"><strong>Description:</strong><span>${plan.description}</span></li>
+          </ul>
+        </div>
+        <div class="ptable-features">
+        <ul>
+        <div class="d-flex align-items-center mx-4">
+  <span class="me-2">OTT Benefits:</span>
+  <div class="d-flex flex-wrap">
+    ${plan.benefits ? Array.from(plan.benefits).map(benefit => `
+      <div class="benefit-item d-inline-block mx-1">
+        <img class="rounded-circle" src="../assets/images/${benefit.icon}" 
+             alt="${benefit.benefitsName}" width="40" height="40">
+      </div>`).join('') : ''}
+  </div>
+</div>
+
+        </ul>
+        </div>
+      </div>
+      <div class="ptable-footer">
+        <div class="ptable-action">
+          <a class="button-30 text-center"
+             href="payment.html?planId=${plan.planId}&price=${plan.planPrice}&planTitle=${plan.planName}">
+            Recharge Now
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
       `;
       if (plan.status === "STATUS_ACTIVE") {
         rowDiv.appendChild(planCard);
@@ -334,7 +363,7 @@ document.getElementById('plans-container').addEventListener('click', function (e
       ${benefitsHTML}
     `;
     document.getElementById('rechargeModalBtn').href = "payment.html?planId=" + planId + "&price=" + price;
-    
+
     // Show the modal using Bootstrap's Modal API
     var myModal = new bootstrap.Modal(document.getElementById('planDetailModal'));
     myModal.show();

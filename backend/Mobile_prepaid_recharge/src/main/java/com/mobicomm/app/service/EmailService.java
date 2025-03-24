@@ -1,13 +1,11 @@
 package com.mobicomm.app.service;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-
 
 @Service
 public class EmailService {
@@ -22,8 +20,8 @@ public class EmailService {
 
             helper.setTo(to);
             helper.setSubject(subject);
-            helper.setText(htmlContent, true); // Enable HTML content
-            helper.setFrom("your-email@gmail.com"); // Ensure this is your verified sender email
+            helper.setText(htmlContent, true); // Set true for HTML content
+            helper.setFrom("your-email@gmail.com"); // Replace with your verified sender email
 
             mailSender.send(message);
             System.out.println("HTML Email sent successfully to " + to);
